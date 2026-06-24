@@ -3,6 +3,8 @@ var DATA_PROVIDER = window.DATA_PROVIDER = (() => {
   const STORAGE_KEY = 'trianota_data_v1';
   const LEGACY_GOAL_RECORDS_KEY = 'tdg_records_v1';
   const LEGACY_META_BEST_KEY = 'tdg_meta_best_v1';
+  const REMOTE_CACHE_KEY = 'trianota_remote_cache_v1';
+  const REMOTE_CACHE_TTL_MS = 5 * 60 * 1000;
 
   // Esquema local preparado para un proveedor remoto futuro, sin conexion remota ni autenticacion.
   // {
@@ -54,6 +56,27 @@ var DATA_PROVIDER = window.DATA_PROVIDER = (() => {
     if(typeof params === 'string' || typeof params === 'number' || typeof params === 'boolean') return String(params);
     return JSON.stringify(stableValue(params));
   }
+  function normalizeRemoteCache(raw){
+    return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  }
+  function remoteCacheBucket(group){
+    if(!remoteCache[group] || typeof remoteCache[group] !== 'object' || Array.isArray(remoteCache[group])){
+      remoteCache[group] = {};
+    }
+    return remoteCache[group];
+  }
+  function isRemoteCacheFresh(group, key){
+    const item = remoteCache[group] && remoteCache[group][key];
+    const fetchedAt = item && Number(item.fetchedAt || 0);
+    return !!(fetchedAt && Date.now() - fetchedAt < REMOTE_CACHE_TTL_MS);
+  }
+  function markRemoteCacheFetched(group, key, value){
+    remoteCacheBucket(group)[key] = {
+      fetchedAt: Date.now(),
+      hasValue: !(value === undefined || value === null || (Array.isArray(value) && value.length === 0))
+    };
+    writeJson(REMOTE_CACHE_KEY, remoteCache);
+  }
   function normalizeMetricGroups(raw){
     const base = freshMetricGroups();
     const source = raw && typeof raw === 'object' ? raw : {};
@@ -103,26 +126,31 @@ var DATA_PROVIDER = window.DATA_PROVIDER = (() => {
   function refreshKey(methodName, args){
     return `${methodName}:${metricParamKey(args || [])}`;
   }
-  function refreshRemote(methodName, args, onValue){
+  function refreshRemote(methodName, args, onValue, cache){
     try {
+      const cacheGroup = cache && cache.group;
+      const cacheKey = cache && cache.key;
+      if(cacheGroup && cacheKey && isRemoteCacheFresh(cacheGroup, cacheKey)) return;
       const provider = window.FIREBASE_PROVIDER;
       if(!provider || typeof provider[methodName] !== 'function') return;
       const key = refreshKey(methodName, args);
       if(remoteRefreshes[key]) return;
       const ready = provider.ready && typeof provider.ready.then === 'function' ? provider.ready : Promise.resolve(provider.enabled);
       remoteRefreshes[key] = ready.then(() => {
-        if(!provider.enabled) return null;
+        if(!provider.enabled) return undefined;
         return provider[methodName].apply(provider, args || []);
       }).then(value => {
-        if(value === undefined || value === null) return;
+        if(value === undefined) return;
+        if(cacheGroup && cacheKey) markRemoteCacheFetched(cacheGroup, cacheKey, value);
         onValue(value);
       }).catch(() => {}).finally(() => { delete remoteRefreshes[key]; });
     } catch {}
   }
   function cacheMetricEntry(collection, metricKey, params, record){
-    if(record === undefined || record === null) return;
+    if(record === undefined) return;
     const key = metricParamKey(params);
-    const previous = collection && collection[metricKey] && collection[metricKey][key] ? JSON.stringify(collection[metricKey][key]) : null;
+    const bucket = collection && collection[metricKey] && typeof collection[metricKey] === 'object' ? collection[metricKey] : null;
+    const previous = bucket && Object.prototype.hasOwnProperty.call(bucket, key) ? JSON.stringify(bucket[key]) : null;
     const saved = saveMetricEntry(collection, metricKey, params, record);
     try { console.info('[Trianota data cache updated]', {type:'goal world', metricKey, params, value:saved}); } catch {}
     if(previous !== JSON.stringify(saved)){
@@ -150,6 +178,7 @@ var DATA_PROVIDER = window.DATA_PROVIDER = (() => {
   }
 
   let data = migrateLegacy(normalizeData(readJson(STORAGE_KEY, null)));
+  let remoteCache = normalizeRemoteCache(readJson(REMOTE_CACHE_KEY, null));
   writeJson(STORAGE_KEY, data);
 
   const api = {
@@ -159,8 +188,9 @@ var DATA_PROVIDER = window.DATA_PROVIDER = (() => {
     saveGoalLocalRecords(records){ data.goal.localRecords = Array.isArray(records) ? clone(records) : []; writeJson(STORAGE_KEY, data); writeJson(LEGACY_GOAL_RECORDS_KEY, data.goal.localRecords); return clone(data.goal.localRecords); },
     getGoalPersonalBest(metricKey, params){ return getMetricEntry(data.goal.personalBestByMetric, metricKey, params, null); },
     saveGoalPersonalBest(metricKey, params, record){ return saveMetricEntry(data.goal.personalBestByMetric, metricKey, params, record); },
-    getGoalWorldRecord(metricKey, params){ const local = getMetricEntry(data.goal.worldRecords, metricKey, params, null); refreshRemote('getGoalWorldRecord', [metricKey, params], value => cacheMetricEntry(data.goal.worldRecords, metricKey, params, value)); return local; },
-    getGoalGlobalRanking(metricKey, params){ const ranking = getMetricEntry(data.goal.globalRankings, metricKey, params, []); refreshRemote('getGoalGlobalRanking', [metricKey, params], value => cacheMetricRanking(data.goal.globalRankings, metricKey, params, value)); return Array.isArray(ranking) ? ranking : []; },
+    getGoalWorldRecord(metricKey, params){ const local = getMetricEntry(data.goal.worldRecords, metricKey, params, null); const key = `${metricKey}:${metricParamKey(params)}`; refreshRemote('getGoalWorldRecord', [metricKey, params], value => cacheMetricEntry(data.goal.worldRecords, metricKey, params, value), {group:'goalWorldRecords', key}); return local; },
+    getGoalGlobalRanking(metricKey, params){ const ranking = getMetricEntry(data.goal.globalRankings, metricKey, params, []); const key = `${metricKey}:${metricParamKey(params)}`; refreshRemote('getGoalGlobalRanking', [metricKey, params], value => cacheMetricRanking(data.goal.globalRankings, metricKey, params, value), {group:'goalGlobalRankings', key}); return Array.isArray(ranking) ? ranking : []; },
+    prefetchGoalWorldRecords(requests){ if(!Array.isArray(requests)) return; const seen = {}; requests.forEach(item => { if(!item || !item.metricKey) return; const key = `${item.metricKey}:${metricParamKey(item.params)}`; if(seen[key]) return; seen[key] = true; api.getGoalWorldRecord(item.metricKey, item.params); }); },
     getCampaignPersonalBestTime(levelKey){ return data.campaign.personalBestTimeByLevel[levelKey] ? clone(data.campaign.personalBestTimeByLevel[levelKey]) : null; },
     getCampaignPersonalBestTimes(){ return clone(data.campaign.personalBestTimeByLevel); },
     saveCampaignPersonalBestTime(levelKey, result){ data.campaign.personalBestTimeByLevel[levelKey] = clone(result); writeJson(STORAGE_KEY, data); writeJson(LEGACY_META_BEST_KEY, data.campaign.personalBestTimeByLevel); return clone(result); },
@@ -171,18 +201,19 @@ var DATA_PROVIDER = window.DATA_PROVIDER = (() => {
       const local = data.campaign.worldRecordByLevel[levelKey] ? clone(data.campaign.worldRecordByLevel[levelKey]) : null;
       refreshRemote('getCampaignWorldRecord', [levelKey], value => {
         const previous = data.campaign.worldRecordByLevel[levelKey] ? JSON.stringify(data.campaign.worldRecordByLevel[levelKey]) : null;
-        const nextValue = clone(value);
+        const nextValue = value === null ? null : clone(value);
         const next = JSON.stringify(nextValue);
         data.campaign.worldRecordByLevel[levelKey] = nextValue;
         writeJson(STORAGE_KEY, data);
         try { console.info('[Trianota data cache updated]', {type:'campaign world', levelKey, value:nextValue}); } catch {}
         if(previous !== next){
-          try { window.dispatchEvent(new CustomEvent('trianota:campaignWorldRecordUpdated', {detail:{levelKey, value:clone(nextValue)}})); } catch {}
+          try { window.dispatchEvent(new CustomEvent('trianota:campaignWorldRecordUpdated', {detail:{levelKey, value:nextValue === null ? null : clone(nextValue)}})); } catch {}
         }
-      });
+      }, {group:'campaignWorldRecordByLevel', key:String(levelKey)});
       return local;
     },
-    getCampaignGlobalRanking(levelKey){ const ranking = data.campaign.globalRankingByLevel[levelKey]; refreshRemote('getCampaignGlobalRanking', [levelKey], value => { if(Array.isArray(value)){ data.campaign.globalRankingByLevel[levelKey] = clone(value); writeJson(STORAGE_KEY, data); } }); return Array.isArray(ranking) ? clone(ranking) : []; },
+    prefetchCampaignWorldRecords(levelKeys){ if(!Array.isArray(levelKeys)) return; const seen = {}; levelKeys.forEach(levelKey => { if(!levelKey || seen[levelKey]) return; seen[levelKey] = true; api.getCampaignWorldRecord(levelKey); }); },
+    getCampaignGlobalRanking(levelKey){ const ranking = data.campaign.globalRankingByLevel[levelKey]; refreshRemote('getCampaignGlobalRanking', [levelKey], value => { if(Array.isArray(value)){ data.campaign.globalRankingByLevel[levelKey] = clone(value); writeJson(STORAGE_KEY, data); } }, {group:'campaignGlobalRankingByLevel', key:String(levelKey)}); return Array.isArray(ranking) ? clone(ranking) : []; },
     getWorldRecord(scope, key, params){
       if(scope === 'campaign') return api.getCampaignWorldRecord(key);
       if(scope === 'goal') return api.getGoalWorldRecord(key, params);

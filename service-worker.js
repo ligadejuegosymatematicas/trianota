@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v19.71-fastest-goals';
+const CACHE_NAME = 'trianota-pwa-v19.72-firestore-read-cache';
 const LOCAL_ASSETS = [
   './',
   './index.html',

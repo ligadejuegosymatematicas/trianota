@@ -129,8 +129,9 @@ function renderStats(){
   const currentPersonal = goalPersonalSnapshot();
   const goalsNewBest = state.goals > (previous.goals || 0);
   const surfaceNewBest = bestSurface > (previous.surface || 0);
-  const worldGoals = DATA_PROVIDER.getGoalWorldRecord('mostGoalsFixedDuration', {duration:cfg.duration});
-  const worldSurface = DATA_PROVIDER.getGoalWorldRecord('maxSurfaceUsage', {duration:cfg.duration});
+  const officialDuration = isOfficialGoalDuration(cfg.duration);
+  const worldGoals = officialDuration ? DATA_PROVIDER.getGoalWorldRecord('mostGoalsFixedDuration', {duration:cfg.duration}) : null;
+  const worldSurface = officialDuration ? DATA_PROVIDER.getGoalWorldRecord('maxSurfaceUsage', {duration:cfg.duration}) : null;
 
   $('statsContent').innerHTML = `
     <div class="statsSummary">
@@ -163,6 +164,14 @@ function saveRecordFromUI(){
 }
 
 function renderRecords(){
+  if(DATA_PROVIDER && typeof DATA_PROVIDER.prefetchGoalWorldRecords === 'function'){
+    DATA_PROVIDER.prefetchGoalWorldRecords([
+      ...OFFICIAL_FASTEST_TARGETS.map(item => ({metricKey:'fastestNGoles', params:{goals:item.goals}})),
+      ...OFFICIAL_GOAL_DURATIONS.map(item => ({metricKey:'mostGoalsFixedDuration', params:{duration:item.duration}})),
+      ...OFFICIAL_GOAL_DURATIONS.map(item => ({metricKey:'maxSurfaceUsage', params:{duration:item.duration}}))
+    ]);
+  }
+
   const fastestHtml = OFFICIAL_FASTEST_TARGETS.map(item => renderRecordVariant(
     item.label,
     personalFastestHtml(item.goals),

@@ -96,6 +96,10 @@ function renderMetaWorlds(){
   }
   if(mini) mini.textContent='';
 
+  if(unlocked && DATA_PROVIDER && typeof DATA_PROVIDER.prefetchCampaignWorldRecords === 'function'){
+    DATA_PROVIDER.prefetchCampaignWorldRecords(w.levels.filter(lv=>lv.state!=='locked').map(lv=>`${worldNumber}-${lv.n}`));
+  }
+
   const hasArt = !!(WORLD_ART && WORLD_ART[w.shape]);
   const visualHtml = `${hasArt ? worldEmblem(w.shape) : ''}${unlocked ? '' : '<div class="worldLockOverlay">🔒</div>'}`;
   const visualClass = `${unlocked ? '' : 'lockedWorld'} ${hasArt ? 'artLogo' : ''} ${themeClass} ${reveal ? 'revealWorld' : ''}`.trim();
