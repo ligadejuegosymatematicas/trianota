@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Trianota - Prototipo v19.34</title>
+  <link rel="stylesheet" href="css/styles.css?v=19.64_goal_records_official" />
+</head>
+<body>
+  <section id="home" class="screen active">
+    <div class="card homeCard">
+      <div class="brandLogoWrap"><img class="brandLogo" src="assets/trianota_logo.png" alt="Trianota"></div>
+
+      <div class="profileBlock" id="homeProfileBlock">
+        <div class="profileSummary" id="profileSummary" hidden><span><b id="homePlayerNick"></b> <span class="profileCheck">✓</span></span></div>
+        <div class="profileEditor" id="profileEditor">
+          <label for="playerNickInput">Nick del jugador</label>
+          <div class="profileInputRow"><input id="playerNickInput" maxlength="16" autocomplete="nickname" placeholder="Tu nick"><button class="btn small" id="confirmNickBtn" type="button">Confirmar</button></div>
+        </div>
+      </div>
+      <div class="tiny profileMsg" id="playerNickMsg">⚠ Debes registrar un nick antes de jugar.</div>
+
+      <div class="modeGrid compact">
+        <div class="modeCard goalMode">
+          <div class="modeTitle">⚽ GOL</div>
+          <p class="modeDesc">¿Cuántos goles puedes convertir y cuánta cancha puedes conquistar?</p>
+          <button class="btn modeBtn" id="goalPlayBtn" disabled>▶ Jugar</button>
+        </div>
+
+        <div class="modeCard meta">
+          <div class="modeTitle">🏁 META</div>
+          <p class="modeDesc">Supera niveles usando triangulaciones para alcanzar objetivos.</p>
+          <button class="btn secondary modeBtn metaCampaignBtn" id="metaBtn" disabled>▶ Campaña</button>
+        </div>
+      </div>
+
+      <div class="homeActions">
+        <button class="btn secondary" id="recordsBtn">Récords</button>
+        <button class="btn secondary" id="configBtn">⚙ Configuración</button>
+        <button class="btn secondary" id="aboutBtn">ℹ Acerca del juego</button>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="metaScreen" class="screen">
+    <div class="card metaCard">
+      <button class="metaBack" id="metaBackBtn" aria-label="Volver">‹</button>
+      <div class="metaTitle" id="metaWorldTitle">Meta</div>
+      <div class="worldMini" id="metaWorldMini"></div>
+      <div id="metaWorlds"></div>
+    </div>
+  </section>
+
+  <section id="config" class="screen">
+    <div class="card">
+      <h2>Configuración</h2>
+      <div class="settingsGroup profileSettings">
+        <h3>Perfil</h3>
+        <label for="configNickInput">Nick</label>
+        <div class="profileInputRow"><input id="configNickInput" maxlength="16" autocomplete="nickname" placeholder="Tu nick"><button class="btn small" id="saveProfileBtn" type="button">Guardar cambios</button></div>
+        <div class="tiny profileMsg" id="configNickMsg"></div>
+      </div>
+      <div class="row"><label>Duración</label><select id="duration"><option value="120">2 min</option><option value="180">3 min</option><option value="300">5 min</option><option value="60">1 min prueba</option></select></div>
+      <div class="row"><label>Fondo</label><select id="surface"><option value="grass">Pasto</option><option value="concrete">Cemento</option><option value="dirt">Tierra</option><option value="wood">Madera</option><option value="hockey">Hielo</option></select></div>
+      <div class="row"><label>Modo de golpeo</label><select id="kickMode"><option value="sling">Honda libre</option><option value="dirforce">Dirección + fuerza</option></select></div>
+      <div class="row"><label>Velocidad dirección</label><select id="directionSpeed"><option value="0.55">Lenta</option><option value="0.8" selected>Normal</option><option value="1.1">Rápida</option></select></div>
+      <button class="btn" id="saveConfigBtn">Guardar</button>
+      <button class="btn secondary" data-back>Volver</button>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="screen">
+    <div class="gameWrap">
+      <div class="hud">
+        <div class="pill"><span id="scoreIcon">⚽</span> <span id="goalsHud">0</span></div>
+        <div class="metaLevelPill" id="metaLevelPill" style="display:none">M1 · N1</div>
+        <div class="status" id="statusText"></div>
+        <div class="pill">⏱ <span id="timeHud">02:00</span></div>
+      </div>
+      <div id="canvasBox">
+        <canvas id="game"></canvas>
+        <div id="redTint" class="redTint"></div>
+        <div id="goalFlash" class="goalFlash"></div>
+        <div id="overlayMsg" class="overlayMsg"></div>
+        <div id="legend" class="legend"></div>
+      </div>
+      <div class="actionDock" aria-label="Controles de jugada">
+        <div class="bottomBar">
+        <button class="iconBtn smallExit" id="endBtn" aria-label="Salir" title="Salir">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <path d="M22 14h22a6 6 0 0 1 6 6v24a6 6 0 0 1-6 6H22" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+            <path d="M28 32H8m0 0 8-8M8 32l8 8" fill="none" stroke="#f87171" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="iconBtn" id="triBtn" aria-label="Mostrar u ocultar triangulaciones" title="Triangulaciones">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <defs>
+              <linearGradient id="triFill" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#38f5ff"/>
+                <stop offset=".55" stop-color="#38bdf8"/>
+                <stop offset="1" stop-color="#2563eb"/>
+              </linearGradient>
+            </defs>
+            <path d="M7 46 L20 18 L33 46 Z" fill="url(#triFill)" stroke="#f8fafc" stroke-width="3.2" stroke-linejoin="round"/>
+            <path d="M39 46 L52 18 L65 46 Z" transform="translate(-5 0)" fill="none" stroke="#f8fafc" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 5"/>
+            <path d="M29 32 H42" fill="none" stroke="#f8fafc" stroke-width="4.2" stroke-linecap="round"/>
+            <path d="M29 32 l5 -5 M29 32 l5 5 M42 32 l-5 -5 M42 32 l-5 5" fill="none" stroke="#f8fafc" stroke-width="4.2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button class="iconBtn" id="histBtn" style="display:none" aria-label="Historial de intentos" title="Historial">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <defs>
+              <linearGradient id="cardGrad" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stop-color="#22d3ee"/>
+                <stop offset=".55" stop-color="#38bdf8"/>
+                <stop offset="1" stop-color="#60a5fa"/>
+              </linearGradient>
+            </defs>
+            <rect x="23" y="10" width="30" height="25" rx="7" fill="rgba(96,165,250,.14)" stroke="rgba(96,165,250,.65)" stroke-width="3"/>
+            <rect x="16" y="18" width="30" height="27" rx="7" fill="rgba(56,189,248,.18)" stroke="rgba(56,189,248,.82)" stroke-width="3"/>
+            <rect x="9" y="28" width="31" height="26" rx="7" fill="rgba(34,211,238,.20)" stroke="url(#cardGrad)" stroke-width="3.4"/>
+          </svg>
+        </button>
+        <button class="iconBtn primary" id="kickoffBtn" style="display:none" aria-label="Saque inicial" title="Saque inicial">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <defs>
+              <linearGradient id="resetGrad" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stop-color="#facc15"/>
+                <stop offset="1" stop-color="#fde047"/>
+              </linearGradient>
+              <radialGradient id="coinP" cx=".35" cy=".25" r=".75">
+                <stop offset="0" stop-color="#e9d5ff"/>
+                <stop offset=".55" stop-color="#a855f7"/>
+                <stop offset="1" stop-color="#6d28d9"/>
+              </radialGradient>
+              <radialGradient id="coinB" cx=".35" cy=".25" r=".75">
+                <stop offset="0" stop-color="#bfdbfe"/>
+                <stop offset=".55" stop-color="#60a5fa"/>
+                <stop offset="1" stop-color="#2563eb"/>
+              </radialGradient>
+              <radialGradient id="coinR" cx=".35" cy=".25" r=".75">
+                <stop offset="0" stop-color="#fecaca"/>
+                <stop offset=".55" stop-color="#f87171"/>
+                <stop offset="1" stop-color="#dc2626"/>
+              </radialGradient>
+            </defs>
+            <path d="M48 17a24 24 0 1 0 4 24" fill="none" stroke="url(#resetGrad)" stroke-width="7" stroke-linecap="round"/>
+            <path d="M45 11 L57 19 L43 25 Z" fill="#fde047"/>
+            <circle cx="25" cy="28" r="7.2" fill="url(#coinB)" stroke="#f8fafc" stroke-width="2.7"/>
+            <circle cx="39" cy="28" r="7.2" fill="url(#coinR)" stroke="#f8fafc" stroke-width="2.7"/>
+            <circle cx="32" cy="41" r="7.2" fill="url(#coinP)" stroke="#f8fafc" stroke-width="2.7"/>
+          </svg>
+        </button>
+        </div>
+        <button class="nextLevelBtn" id="nextLevelBtn" aria-label="Siguiente nivel" title="Siguiente nivel">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <defs>
+              <linearGradient id="nextGoldFill" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#fff7ad"/>
+                <stop offset=".50" stop-color="#facc15"/>
+                <stop offset="1" stop-color="#d97706"/>
+              </linearGradient>
+            </defs>
+            <circle cx="32" cy="32" r="27" fill="rgba(2,6,23,.72)" stroke="url(#nextGoldFill)" stroke-width="5"/>
+            <circle cx="32" cy="32" r="21" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="1.5"/>
+            <path d="M25 18 L48 32 L25 46 Z" fill="url(#nextGoldFill)" stroke="#fff7ed" stroke-width="2.4" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div id="attemptModal" class="modal"><div class="card"><h2>Estadísticas del intento</h2><div id="attemptContent"></div><button class="btn secondary" data-close="attemptModal">Cerrar</button></div></div>
+  <div id="historyModal" class="modal"><div class="card"><h2>Historial</h2><div id="historyList"></div><button class="btn secondary" data-close="historyModal">Cerrar</button></div></div>
+  <div id="statsModal" class="modal"><div class="card"><h2>Fin del partido</h2><div id="statsContent"></div><button class="btn" id="againBtn">Jugar nuevamente</button><button class="btn secondary" id="statsHistBtn">📚 Ver historial</button><button class="btn secondary" data-close="statsModal">Cerrar</button></div></div>
+  <div id="recordsModal" class="modal"><div class="card"><h2>Récords</h2><div id="recordsList"></div><button class="btn secondary" data-close="recordsModal">Cerrar</button></div></div>
+  <div id="aboutModal" class="modal"><div class="card"><h2>Acerca del juego</h2><p><b>Trianota</b></p><p><b>Modo GOL:</b><br>¿Cuántos goles puedes convertir y cuánta cancha puedes conquistar?</p><p><b>Modo META:</b><br>Supera niveles usando triangulaciones para alcanzar objetivos.</p><button class="btn secondary" data-close="aboutModal">Cerrar</button></div></div>
+  <div id="profileToast" class="profileToast" role="status" aria-live="polite"></div>
+
+<script src="js/campaign_levels.js"></script>
+<script src="js/assets.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="js/firebase_provider.js?v=19.66_best_transaction"></script>
+<script src="js/data_provider.js?v=19.63_firestore_read"></script>
+<script src="js/metrics.js"></script>
+<script src="js/records.js?v=19.65_firestore_writes"></script>
+<script src="js/zones.js"></script>
+<script src="js/campaign.js?v=19.54_campaign_records"></script>
+<script src="js/audio.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/history.js?v=19.54_campaign_records"></script>
+<script src="js/ui_records.js?v=19.64_goal_records_official"></script>
+<script src="js/goal.js"></script>
+<script src="js/main.js?v=19.58_home_identity_texts"></script>
+</body>
+</html>
