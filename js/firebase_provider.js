@@ -1,6 +1,7 @@
-// Optional Firebase provider.
+﻿// Optional Firebase provider.
 // GitHub Pages remains the frontend host; this stage writes candidate entries and updates provisional best docs.
 var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
+  let readyResolved = false;
   const firebaseConfig = {
     apiKey: "AIzaSyAqAIowWiWcnSSYxbVcHoBBsHFtaddo-bk",
     authDomain: "trinota-672ff.firebaseapp.com",
@@ -28,6 +29,7 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
     saveGoalPersonalBest(){ return Promise.resolve(null); },
     submitGoalRecord,
     submitCampaignRecord,
+    debugStatus,
     getWorldRecord,
     getGlobalRanking,
     submitRecord(){ return { skipped: true, reason: api.enabled ? 'firebase-candidate-stage' : 'firebase-disabled' }; }
@@ -39,6 +41,29 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
 
   function setError(err){
     api.lastError = err && (err.code || err.message) ? (err.code || err.message) : String(err);
+  }
+
+  function debugStatus(){
+    return {
+      enabled:api.enabled,
+      uid:api.uid,
+      ready:readyResolved,
+      firestoreReady:api.firestoreReady,
+      lastError:api.lastError
+    };
+  }
+
+  function warnFirestoreWrite(type, path, payload, err){
+    if(err) setError(err);
+    try {
+      console.warn('[Trianota Firestore write failed]', {
+        type,
+        path,
+        payload,
+        code:err && err.code,
+        message:err && err.message
+      });
+    } catch {}
   }
 
   function toPlain(value){
@@ -191,8 +216,13 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
 
   async function submitGoalRecord(metricKey, params, record){
     try {
-      if(!metricKey || !record || !await ensureReady()) return { skipped:true, reason:'firebase-disabled' };
       const variantKey = metricParamKey(params);
+      const entryPath = 'goalRecords/' + String(metricKey) + '/variants/' + variantKey + '/entries/{autoId}';
+      if(!metricKey || !record) return { skipped:true, reason:'missing-goal-record-data' };
+      if(!await ensureReady()){
+        warnFirestoreWrite('goal entry', entryPath, {params, record, debugStatus:debugStatus()}, {code:'firebase-disabled', message:'Firebase provider is not ready'});
+        return { skipped:true, reason:'firebase-disabled' };
+      }
       const bestCandidate = {
         ...profilePayload(record),
         metricKey:String(metricKey),
@@ -206,18 +236,29 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
         clientCreatedAt:new Date().toISOString()
       };
       const payload = {...bestCandidate, createdAt:firebase.firestore.FieldValue.serverTimestamp()};
-      const ref = await api.db.collection('goalRecords').doc(String(metricKey)).collection('variants').doc(variantKey).collection('entries').add(payload);
+      let ref;
+      try {
+        ref = await api.db.collection('goalRecords').doc(String(metricKey)).collection('variants').doc(variantKey).collection('entries').add(payload);
+      } catch (err) {
+        warnFirestoreWrite('goal entry', entryPath, payload, err);
+        return { ok:false, error:api.lastError };
+      }
       const bestResult = await updateGoalBestIfBetter(metricKey, params, ref.id, bestCandidate);
       return { ok:true, id:ref.id, best:bestResult };
     } catch (err) {
-      setError(err);
+      warnFirestoreWrite('goal submit', 'goalRecords/' + String(metricKey), {params, record}, err);
       return { ok:false, error:api.lastError };
     }
   }
 
   async function submitCampaignRecord(levelKey, result){
     try {
-      if(!levelKey || !result || !await ensureReady()) return { skipped:true, reason:'firebase-disabled' };
+      const entryPath = 'campaignRecords/' + String(levelKey) + '/entries/{autoId}';
+      if(!levelKey || !result) return { skipped:true, reason:'missing-campaign-record-data' };
+      if(!await ensureReady()){
+        warnFirestoreWrite('campaign entry', entryPath, {result, debugStatus:debugStatus()}, {code:'firebase-disabled', message:'Firebase provider is not ready'});
+        return { skipped:true, reason:'firebase-disabled' };
+      }
       const record = cleanRecord(result);
       const bestCandidate = {
         ...profilePayload(result),
@@ -228,11 +269,17 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
         clientCreatedAt:new Date().toISOString()
       };
       const payload = {...bestCandidate, createdAt:firebase.firestore.FieldValue.serverTimestamp()};
-      const ref = await api.db.collection('campaignRecords').doc(String(levelKey)).collection('entries').add(payload);
+      let ref;
+      try {
+        ref = await api.db.collection('campaignRecords').doc(String(levelKey)).collection('entries').add(payload);
+      } catch (err) {
+        warnFirestoreWrite('campaign entry', entryPath, payload, err);
+        return { ok:false, error:api.lastError };
+      }
       const bestResult = await updateCampaignBestIfBetter(levelKey, ref.id, bestCandidate);
       return { ok:true, id:ref.id, best:bestResult };
     } catch (err) {
-      setError(err);
+      warnFirestoreWrite('campaign submit', 'campaignRecords/' + String(levelKey), {result}, err);
       return { ok:false, error:api.lastError };
     }
   }
@@ -259,7 +306,8 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
       });
       return { ok:true, updated };
     } catch (err) {
-      setError(err);
+      const variantKey = metricParamKey(params);
+      warnFirestoreWrite('goal best', 'goalRecords/' + String(metricKey) + '/variants/' + variantKey, {entryId, record:cleanRecord(record)}, err);
       return { ok:false, error:api.lastError };
     }
   }
@@ -284,7 +332,7 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
       });
       return { ok:true, updated };
     } catch (err) {
-      setError(err);
+      warnFirestoreWrite('campaign best', 'campaignRecords/' + String(levelKey), {entryId, result:cleanRecord(result)}, err);
       return { ok:false, error:api.lastError };
     }
   }
@@ -326,6 +374,14 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
     }
   }
 
-  api.ready = init();
+  api.ready = init().then(value => { readyResolved = true; return value; }).catch(err => { readyResolved = true; setError(err); return false; });
   return api;
 })();
+
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -16,32 +16,32 @@
       <div class="brandLogoWrap"><img class="brandLogo" src="assets/trianota_logo.png" alt="Trianota"></div>
 
       <div class="profileBlock" id="homeProfileBlock">
-        <div class="profileSummary" id="profileSummary" hidden><span><b id="homePlayerNick"></b> <span class="profileCheck">✓</span></span></div>
+        <div class="profileSummary" id="profileSummary" hidden><span><b id="homePlayerNick"></b> <span class="profileCheck">âœ“</span></span></div>
         <div class="profileEditor" id="profileEditor">
           <label for="playerNickInput">Nick del jugador</label>
           <div class="profileInputRow"><input id="playerNickInput" maxlength="16" autocomplete="nickname" placeholder="Tu nick"><button class="btn small" id="confirmNickBtn" type="button">Confirmar</button></div>
         </div>
       </div>
-      <div class="tiny profileMsg" id="playerNickMsg">⚠ Debes registrar un nick antes de jugar.</div>
+      <div class="tiny profileMsg" id="playerNickMsg">âš  Debes registrar un nick antes de jugar.</div>
 
       <div class="modeGrid compact">
         <div class="modeCard goalMode">
-          <div class="modeTitle">⚽ GOL</div>
-          <p class="modeDesc">¿Cuántos goles puedes convertir y cuánta cancha puedes conquistar?</p>
-          <button class="btn modeBtn" id="goalPlayBtn" disabled>▶ Jugar</button>
+          <div class="modeTitle">âš½ GOL</div>
+          <p class="modeDesc">Â¿CuÃ¡ntos goles puedes convertir y cuÃ¡nta cancha puedes conquistar?</p>
+          <button class="btn modeBtn" id="goalPlayBtn" disabled>â–¶ Jugar</button>
         </div>
 
         <div class="modeCard meta">
-          <div class="modeTitle">🏁 META</div>
+          <div class="modeTitle">ðŸ META</div>
           <p class="modeDesc">Supera niveles usando triangulaciones para alcanzar objetivos.</p>
-          <button class="btn secondary modeBtn metaCampaignBtn" id="metaBtn" disabled>▶ Campaña</button>
+          <button class="btn secondary modeBtn metaCampaignBtn" id="metaBtn" disabled>â–¶ CampaÃ±a</button>
         </div>
       </div>
 
       <div class="homeActions">
-        <button class="btn secondary" id="recordsBtn">Récords</button>
-        <button class="btn secondary" id="configBtn">⚙ Configuración</button>
-        <button class="btn secondary" id="aboutBtn">ℹ Acerca del juego</button>
+        <button class="btn secondary" id="recordsBtn">RÃ©cords</button>
+        <button class="btn secondary" id="configBtn">âš™ ConfiguraciÃ³n</button>
+        <button class="btn secondary" id="aboutBtn">â„¹ Acerca del juego</button>
       </div>
     </div>
   </section>
@@ -49,7 +49,7 @@
 
   <section id="metaScreen" class="screen">
     <div class="card metaCard">
-      <button class="metaBack" id="metaBackBtn" aria-label="Volver">‹</button>
+      <button class="metaBack" id="metaBackBtn" aria-label="Volver">â€¹</button>
       <div class="metaTitle" id="metaWorldTitle">Meta</div>
       <div class="worldMini" id="metaWorldMini"></div>
       <div id="metaWorlds"></div>
@@ -58,17 +58,17 @@
 
   <section id="config" class="screen">
     <div class="card">
-      <h2>Configuración</h2>
+      <h2>ConfiguraciÃ³n</h2>
       <div class="settingsGroup profileSettings">
         <h3>Perfil</h3>
         <label for="configNickInput">Nick</label>
         <div class="profileInputRow"><input id="configNickInput" maxlength="16" autocomplete="nickname" placeholder="Tu nick"><button class="btn small" id="saveProfileBtn" type="button">Guardar cambios</button></div>
         <div class="tiny profileMsg" id="configNickMsg"></div>
       </div>
-      <div class="row"><label>Duración</label><select id="duration"><option value="120">2 min</option><option value="180">3 min</option><option value="300">5 min</option><option value="60">1 min prueba</option></select></div>
+      <div class="row"><label>DuraciÃ³n</label><select id="duration"><option value="120">2 min</option><option value="180">3 min</option><option value="300">5 min</option><option value="60">1 min prueba</option></select></div>
       <div class="row"><label>Fondo</label><select id="surface"><option value="grass">Pasto</option><option value="concrete">Cemento</option><option value="dirt">Tierra</option><option value="wood">Madera</option><option value="hockey">Hielo</option></select></div>
-      <div class="row"><label>Modo de golpeo</label><select id="kickMode"><option value="sling">Honda libre</option><option value="dirforce">Dirección + fuerza</option></select></div>
-      <div class="row"><label>Velocidad dirección</label><select id="directionSpeed"><option value="0.55">Lenta</option><option value="0.8" selected>Normal</option><option value="1.1">Rápida</option></select></div>
+      <div class="row"><label>Modo de golpeo</label><select id="kickMode"><option value="sling">Honda libre</option><option value="dirforce">DirecciÃ³n + fuerza</option></select></div>
+      <div class="row"><label>Velocidad direcciÃ³n</label><select id="directionSpeed"><option value="0.55">Lenta</option><option value="0.8" selected>Normal</option><option value="1.1">RÃ¡pida</option></select></div>
       <button class="btn" id="saveConfigBtn">Guardar</button>
       <button class="btn secondary" data-back>Volver</button>
     </div>
@@ -77,10 +77,10 @@
   <section id="gameScreen" class="screen">
     <div class="gameWrap">
       <div class="hud">
-        <div class="pill"><span id="scoreIcon">⚽</span> <span id="goalsHud">0</span></div>
-        <div class="metaLevelPill" id="metaLevelPill" style="display:none">M1 · N1</div>
+        <div class="pill"><span id="scoreIcon">âš½</span> <span id="goalsHud">0</span></div>
+        <div class="metaLevelPill" id="metaLevelPill" style="display:none">M1 Â· N1</div>
         <div class="status" id="statusText"></div>
-        <div class="pill">⏱ <span id="timeHud">02:00</span></div>
+        <div class="pill">â± <span id="timeHud">02:00</span></div>
       </div>
       <div id="canvasBox">
         <canvas id="game"></canvas>
@@ -175,11 +175,11 @@
     </div>
   </section>
 
-  <div id="attemptModal" class="modal"><div class="card"><h2>Estadísticas del intento</h2><div id="attemptContent"></div><button class="btn secondary" data-close="attemptModal">Cerrar</button></div></div>
+  <div id="attemptModal" class="modal"><div class="card"><h2>EstadÃ­sticas del intento</h2><div id="attemptContent"></div><button class="btn secondary" data-close="attemptModal">Cerrar</button></div></div>
   <div id="historyModal" class="modal"><div class="card"><h2>Historial</h2><div id="historyList"></div><button class="btn secondary" data-close="historyModal">Cerrar</button></div></div>
-  <div id="statsModal" class="modal"><div class="card"><h2>Fin del partido</h2><div id="statsContent"></div><button class="btn" id="againBtn">Jugar nuevamente</button><button class="btn secondary" id="statsHistBtn">📚 Ver historial</button><button class="btn secondary" data-close="statsModal">Cerrar</button></div></div>
-  <div id="recordsModal" class="modal"><div class="card"><h2>Récords</h2><div id="recordsList"></div><button class="btn secondary" data-close="recordsModal">Cerrar</button></div></div>
-  <div id="aboutModal" class="modal"><div class="card"><h2>Acerca del juego</h2><p><b>Trianota</b></p><p><b>Modo GOL:</b><br>¿Cuántos goles puedes convertir y cuánta cancha puedes conquistar?</p><p><b>Modo META:</b><br>Supera niveles usando triangulaciones para alcanzar objetivos.</p><button class="btn secondary" data-close="aboutModal">Cerrar</button></div></div>
+  <div id="statsModal" class="modal"><div class="card"><h2>Fin del partido</h2><div id="statsContent"></div><button class="btn" id="againBtn">Jugar nuevamente</button><button class="btn secondary" id="statsHistBtn">ðŸ“š Ver historial</button><button class="btn secondary" data-close="statsModal">Cerrar</button></div></div>
+  <div id="recordsModal" class="modal"><div class="card"><h2>RÃ©cords</h2><div id="recordsList"></div><button class="btn secondary" data-close="recordsModal">Cerrar</button></div></div>
+  <div id="aboutModal" class="modal"><div class="card"><h2>Acerca del juego</h2><p><b>Trianota</b></p><p><b>Modo GOL:</b><br>Â¿CuÃ¡ntos goles puedes convertir y cuÃ¡nta cancha puedes conquistar?</p><p><b>Modo META:</b><br>Supera niveles usando triangulaciones para alcanzar objetivos.</p><button class="btn secondary" data-close="aboutModal">Cerrar</button></div></div>
   <div id="profileToast" class="profileToast" role="status" aria-live="polite"></div>
 
 <script src="js/campaign_levels.js"></script>
@@ -187,10 +187,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="js/firebase_provider.js?v=19.66_best_transaction"></script>
+<script src="js/firebase_provider.js?v=19.68_firestore_debug"></script>
 <script src="js/data_provider.js?v=19.63_firestore_read"></script>
 <script src="js/metrics.js"></script>
-<script src="js/records.js?v=19.65_firestore_writes"></script>
+<script src="js/records.js?v=19.68_firestore_debug"></script>
 <script src="js/zones.js"></script>
 <script src="js/campaign.js?v=19.54_campaign_records"></script>
 <script src="js/audio.js"></script>
@@ -208,3 +208,4 @@
 </script>
 </body>
 </html>
+

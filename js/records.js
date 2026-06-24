@@ -1,4 +1,4 @@
-const FIREBASE_OFFICIAL_GOAL_DURATIONS = [120, 180, 300];
+﻿const FIREBASE_OFFICIAL_GOAL_DURATIONS = [120, 180, 300];
 
 function isOfficialGoalRecordDuration(duration){
   return FIREBASE_OFFICIAL_GOAL_DURATIONS.includes(+duration);
@@ -15,17 +15,21 @@ function submitFirebaseGoalCandidates(record){
     const provider = window.FIREBASE_PROVIDER;
     if(!provider || typeof provider.submitGoalRecord !== 'function') return;
     const candidate = {...record, nick:record.nick || firebaseProfileNick()};
-    provider.submitGoalRecord('mostGoalsFixedDuration', {duration:+record.duration}, candidate).catch(()=>{});
-    provider.submitGoalRecord('maxSurfaceUsage', {duration:+record.duration}, candidate).catch(()=>{});
-  } catch {}
+    provider.submitGoalRecord('mostGoalsFixedDuration', {duration:+record.duration}, candidate).then(result => { if(result && result.ok === false) console.warn('[Trianota Firestore submit result]', result); });
+    provider.submitGoalRecord('maxSurfaceUsage', {duration:+record.duration}, candidate).then(result => { if(result && result.ok === false) console.warn('[Trianota Firestore submit result]', result); });
+  } catch (err) {
+    console.warn('[Trianota Firestore submit setup failed]', {type:'goal', code:err && err.code, message:err && err.message, error:err});
+  }
 }
 
 function submitFirebaseCampaignCandidate(levelKey, result){
   try {
     const provider = window.FIREBASE_PROVIDER;
     if(!provider || typeof provider.submitCampaignRecord !== 'function') return;
-    provider.submitCampaignRecord(levelKey, {...result, nick:firebaseProfileNick()}).catch(()=>{});
-  } catch {}
+    provider.submitCampaignRecord(levelKey, {...result, nick:firebaseProfileNick()}).then(result => { if(result && result.ok === false) console.warn('[Trianota Firestore submit result]', result); });
+  } catch (err) {
+    console.warn('[Trianota Firestore submit setup failed]', {type:'campaign', code:err && err.code, message:err && err.message, error:err});
+  }
 }
 function loadRecords(){return DATA_PROVIDER.getGoalLocalRecords();}
 
@@ -58,3 +62,6 @@ function saveRecord(nick){
   DATA_PROVIDER.saveGoalLocalRecords(state.records);
   submitFirebaseGoalCandidates(rec);
 }
+
+
+
