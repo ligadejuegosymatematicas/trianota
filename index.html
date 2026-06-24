@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Trianota - Prototipo v19.34</title>
+  <meta name="theme-color" content="#020617" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
   <link rel="stylesheet" href="css/styles.css?v=19.64_goal_records_official" />
 </head>
 <body>
@@ -195,5 +199,12 @@
 <script src="js/ui_records.js?v=19.64_goal_records_official"></script>
 <script src="js/goal.js"></script>
 <script src="js/main.js?v=19.58_home_identity_texts"></script>
+<script>
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>
