@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v19.67';
+const CACHE_NAME = 'trianota-pwa-v19.70-world-record-cache';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -25,6 +25,28 @@ const LOCAL_ASSETS = [
   './js/zones.js'
 ];
 
+function cacheableLocalRequest(request){
+  const requestUrl = new URL(request.url);
+  return requestUrl.origin === self.location.origin && request.method === 'GET';
+}
+
+function putInCache(request, response){
+  if(!response || response.status !== 200 || response.type !== 'basic') return response;
+  const copy = response.clone();
+  caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+  return response;
+}
+
+function networkFirst(request){
+  return fetch(request)
+    .then(response => putInCache(request, response))
+    .catch(() => caches.match(request));
+}
+
+function cacheFirst(request){
+  return caches.match(request).then(cached => cached || fetch(request).then(response => putInCache(request, response)));
+}
+
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -42,18 +64,16 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  if(!cacheableLocalRequest(event.request)) return;
   const requestUrl = new URL(event.request.url);
-  if(requestUrl.origin !== self.location.origin || event.request.method !== 'GET') return;
+  const path = requestUrl.pathname;
+  const freshAsset = event.request.mode === 'navigate' ||
+    event.request.destination === 'document' ||
+    event.request.destination === 'script' ||
+    event.request.destination === 'style' ||
+    path.endsWith('.html') ||
+    path.endsWith('.js') ||
+    path.endsWith('.css');
 
-  event.respondWith(
-    caches.match(event.request, {ignoreSearch:true}).then(cached => {
-      if(cached) return cached;
-      return fetch(event.request).then(response => {
-        if(!response || response.status !== 200 || response.type !== 'basic') return response;
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
-        return response;
-      });
-    })
-  );
+  event.respondWith(freshAsset ? networkFirst(event.request) : cacheFirst(event.request));
 });

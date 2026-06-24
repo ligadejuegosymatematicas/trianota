@@ -171,7 +171,10 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
 
   async function getCampaignWorldRecord(levelKey){
     if(!levelKey || !await ensureReady()) return null;
-    return readDoc(api.db.collection('campaignRecords').doc(String(levelKey)));
+    const path = 'campaignRecords/' + String(levelKey);
+    const record = await readDoc(api.db.collection('campaignRecords').doc(String(levelKey)));
+    try { console.info('[Trianota Firestore world record read]', {type:'campaign world', path, levelKey:String(levelKey), record}); } catch {}
+    return record;
   }
 
   async function getCampaignGlobalRanking(levelKey){
@@ -272,11 +275,13 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
       let ref;
       try {
         ref = await api.db.collection('campaignRecords').doc(String(levelKey)).collection('entries').add(payload);
+        try { console.info('[Trianota Firestore write ok]', {type:'campaign entry', path:entryPath.replace('{autoId}', ref.id), payload}); } catch {}
       } catch (err) {
         warnFirestoreWrite('campaign entry', entryPath, payload, err);
         return { ok:false, error:api.lastError };
       }
       const bestResult = await updateCampaignBestIfBetter(levelKey, ref.id, bestCandidate);
+      try { console.info('[Trianota Firestore write ok]', {type:'campaign best', path:'campaignRecords/' + String(levelKey), result:bestResult}); } catch {}
       return { ok:true, id:ref.id, best:bestResult };
     } catch (err) {
       warnFirestoreWrite('campaign submit', 'campaignRecords/' + String(levelKey), {result}, err);
@@ -293,7 +298,10 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
       await api.db.runTransaction(async transaction => {
         const snap = await transaction.get(parentRef);
         const currentBest = snap && snap.exists ? recordFromDoc(snap.data()) : null;
-        if(!isBetterGoalRecord(metricKey, currentBest, candidate)) return;
+        if(!isBetterGoalRecord(metricKey, currentBest, candidate)){
+          try { console.warn('[Trianota Firestore best skipped]', {type:'goal best comparison', path:'goalRecords/' + String(metricKey) + '/variants/' + variantKey, currentBest, candidate}); } catch {}
+          return;
+        }
         transaction.set(parentRef, {
           best:candidate,
           bestEntryId:String(entryId),
@@ -321,7 +329,10 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
       await api.db.runTransaction(async transaction => {
         const snap = await transaction.get(parentRef);
         const currentBest = snap && snap.exists ? recordFromDoc(snap.data()) : null;
-        if(!isBetterCampaignRecord(currentBest, candidate)) return;
+        if(!isBetterCampaignRecord(currentBest, candidate)){
+          try { console.warn('[Trianota Firestore best skipped]', {type:'campaign best comparison', path:'campaignRecords/' + String(levelKey), currentBest, candidate}); } catch {}
+          return;
+        }
         transaction.set(parentRef, {
           best:candidate,
           bestEntryId:String(entryId),

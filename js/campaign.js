@@ -187,3 +187,15 @@ function startMetaLevel(levelNum=1, resetHistory=true, worldNum=1){
   // v19.27: pantalla de juego limpia. Sin instrucciones superiores persistentes.
   setStatus('');
 }
+
+
+if(typeof window !== 'undefined' && !window.__trianotaCampaignWorldRecordListener){
+  window.__trianotaCampaignWorldRecordListener = true;
+  window.addEventListener('trianota:campaignWorldRecordUpdated', event => {
+    const metaScreen = typeof $ === 'function' ? $('metaScreen') : document.getElementById('metaScreen');
+    if(metaScreen && metaScreen.classList.contains('active') && typeof renderMetaWorlds === 'function'){
+      try { console.info('[Trianota campaign selector rerender]', {reason:'campaign-world-record-updated', detail:event.detail}); } catch {}
+      renderMetaWorlds();
+    }
+  });
+}

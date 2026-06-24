@@ -13,7 +13,10 @@ function submitFirebaseGoalCandidates(record){
   try {
     if(!record || !isOfficialGoalRecordDuration(record.duration)) return;
     const provider = window.FIREBASE_PROVIDER;
-    if(!provider || typeof provider.submitGoalRecord !== 'function') return;
+    if(!provider || typeof provider.submitGoalRecord !== 'function'){
+      console.warn('[Trianota Firestore submit setup failed]', {type:'goal', reason:'provider-missing'});
+      return;
+    }
     const candidate = {...record, nick:record.nick || firebaseProfileNick()};
     provider.submitGoalRecord('mostGoalsFixedDuration', {duration:+record.duration}, candidate).then(result => { if(result && result.ok === false) console.warn('[Trianota Firestore submit result]', result); });
     provider.submitGoalRecord('maxSurfaceUsage', {duration:+record.duration}, candidate).then(result => { if(result && result.ok === false) console.warn('[Trianota Firestore submit result]', result); });
@@ -25,7 +28,10 @@ function submitFirebaseGoalCandidates(record){
 function submitFirebaseCampaignCandidate(levelKey, result){
   try {
     const provider = window.FIREBASE_PROVIDER;
-    if(!provider || typeof provider.submitCampaignRecord !== 'function') return;
+    if(!provider || typeof provider.submitCampaignRecord !== 'function'){
+      console.warn('[Trianota Firestore submit setup failed]', {type:'campaign', reason:'provider-missing', levelKey});
+      return;
+    }
     provider.submitCampaignRecord(levelKey, {...result, nick:firebaseProfileNick()}).then(result => { if(result && result.ok === false) console.warn('[Trianota Firestore submit result]', result); });
   } catch (err) {
     console.warn('[Trianota Firestore submit setup failed]', {type:'campaign', code:err && err.code, message:err && err.message, error:err});

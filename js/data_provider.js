@@ -161,7 +161,21 @@ var DATA_PROVIDER = window.DATA_PROVIDER = (() => {
     getCampaignSessionBest(levelKey){ return data.campaign.sessionBestByLevel[levelKey] ? clone(data.campaign.sessionBestByLevel[levelKey]) : null; },
     saveCampaignSessionBest(levelKey, result){ data.campaign.sessionBestByLevel[levelKey] = clone(result); writeJson(STORAGE_KEY, data); return clone(result); },
     addCampaignAttempt(levelKey, attempt){ const list = data.campaign.attemptsByLevel[levelKey] || []; list.push(clone(attempt)); data.campaign.attemptsByLevel[levelKey] = list; writeJson(STORAGE_KEY, data); return clone(list); },
-    getCampaignWorldRecord(levelKey){ const local = data.campaign.worldRecordByLevel[levelKey] ? clone(data.campaign.worldRecordByLevel[levelKey]) : null; refreshRemote('getCampaignWorldRecord', [levelKey], value => { data.campaign.worldRecordByLevel[levelKey] = clone(value); writeJson(STORAGE_KEY, data); }); return local; },
+    getCampaignWorldRecord(levelKey){
+      const local = data.campaign.worldRecordByLevel[levelKey] ? clone(data.campaign.worldRecordByLevel[levelKey]) : null;
+      refreshRemote('getCampaignWorldRecord', [levelKey], value => {
+        const previous = data.campaign.worldRecordByLevel[levelKey] ? JSON.stringify(data.campaign.worldRecordByLevel[levelKey]) : null;
+        const nextValue = clone(value);
+        const next = JSON.stringify(nextValue);
+        data.campaign.worldRecordByLevel[levelKey] = nextValue;
+        writeJson(STORAGE_KEY, data);
+        try { console.info('[Trianota data cache updated]', {type:'campaign world', levelKey, value:nextValue}); } catch {}
+        if(previous !== next){
+          try { window.dispatchEvent(new CustomEvent('trianota:campaignWorldRecordUpdated', {detail:{levelKey, value:clone(nextValue)}})); } catch {}
+        }
+      });
+      return local;
+    },
     getCampaignGlobalRanking(levelKey){ const ranking = data.campaign.globalRankingByLevel[levelKey]; refreshRemote('getCampaignGlobalRanking', [levelKey], value => { if(Array.isArray(value)){ data.campaign.globalRankingByLevel[levelKey] = clone(value); writeJson(STORAGE_KEY, data); } }); return Array.isArray(ranking) ? clone(ranking) : []; },
     getWorldRecord(scope, key, params){
       if(scope === 'campaign') return api.getCampaignWorldRecord(key);
