@@ -1,4 +1,4 @@
-let goalPersonalBeforeSave = null;
+﻿let goalPersonalBeforeSave = null;
 
 function goalRecordsForCurrentDuration(){
   return (state.records || []).filter(r => !r.duration || +r.duration === +cfg.duration);
@@ -187,3 +187,15 @@ function renderRecords(){
     ${renderRecordCategory('SUPERFICIE', surfaceHtml)}
   `;
 }
+
+if(typeof window !== 'undefined' && !window.__trianotaGoalWorldRecordListener){
+  window.__trianotaGoalWorldRecordListener = true;
+  window.addEventListener('trianota:goalWorldRecordUpdated', () => {
+    const modal = document.getElementById('recordsModal');
+    if(modal && modal.classList.contains('show') && typeof renderRecords === 'function'){
+      try { console.info('[Trianota records modal rerender]', {reason:'goal-world-record-updated'}); } catch {}
+      renderRecords();
+    }
+  });
+}
+

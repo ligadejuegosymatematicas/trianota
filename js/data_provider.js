@@ -121,7 +121,13 @@ var DATA_PROVIDER = window.DATA_PROVIDER = (() => {
   }
   function cacheMetricEntry(collection, metricKey, params, record){
     if(record === undefined || record === null) return;
-    saveMetricEntry(collection, metricKey, params, record);
+    const key = metricParamKey(params);
+    const previous = collection && collection[metricKey] && collection[metricKey][key] ? JSON.stringify(collection[metricKey][key]) : null;
+    const saved = saveMetricEntry(collection, metricKey, params, record);
+    try { console.info('[Trianota data cache updated]', {type:'goal world', metricKey, params, value:saved}); } catch {}
+    if(previous !== JSON.stringify(saved)){
+      try { window.dispatchEvent(new CustomEvent('trianota:goalWorldRecordUpdated', {detail:{metricKey, params, value:saved}})); } catch {}
+    }
   }
   function cacheMetricRanking(collection, metricKey, params, ranking){
     if(!Array.isArray(ranking)) return;

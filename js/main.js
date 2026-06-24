@@ -38,7 +38,7 @@
   const state = {
     screen:'home', running:false, phase:'idle', showTri:false,
     lastTriangle:null,
-    timeLeft:120, goals:0, history:[], currentSeq:[],
+    timeLeft:120, goals:0, fastestGoalTimes:{}, history:[], currentSeq:[],
     discs:[], selected:null, lastHit:null, allowedInitial:true, shot:null,
     drag:null, aimMode:'idle', aimAngle:0, aimAngleFixed:null, forceValue:0, forceDir:1, messageLock:false, ended:false, introZoom:false, introStart:0, introDuration:1550, goalGlowUntil:0, goalChainUntil:0, records: loadRecords(),
     sessionStart:0, attemptStart:0, lastAttemptIndex:null, lastCollisionSoundAt:0, passGlow:null, paintBursts:[], metaWorldIndex:0, gameMode:'goal', currentMetaWorld:1, currentMetaLevel:1, metaLevelKey:'1-1', metaStart:0, metaElapsed:0, metaDone:[false,false,false], metaBest: loadMetaBest(), metaSeenWorlds: loadMetaSeenWorlds(), totals:{passes:0,triangles:0,complexity:0,area:0,fouls:0}
@@ -515,7 +515,7 @@ function completeMetaLevel(){
 
   function startGame(){
     state.gameMode='goal';
-    state.running=true; state.ended=false; state.timeLeft=cfg.duration; state.goals=0; state.history=[];
+    state.running=true; state.ended=false; state.timeLeft=cfg.duration; state.goals=0; state.fastestGoalTimes={}; state.history=[];
     state.totals={passes:0,triangles:0,complexity:0,area:0,fouls:0};
     state.sessionStart=Date.now(); showScreen('gameScreen'); kickoff(false); startIntroZoom(); updateHud();
   }
@@ -877,7 +877,11 @@ function completeMetaLevel(){
   function endSequence(type, reason){
     if(state.messageLock) return;
     state.messageLock=true; state.running=false; state.phase='ended'; state.drag=null;
-    if(type==='goal'){state.goals++; updateHud(); playTone('goal'); showOverlay('goal','GOL'); setStatus('Gol. Revisa la jugada o vuelve al saque inicial.');}
+    if(type==='goal'){
+      state.goals++;
+      if(typeof captureFastestGoalMilestone === 'function') captureFastestGoalMilestone(state.goals, cfg.duration - state.timeLeft);
+      updateHud(); playTone('goal'); showOverlay('goal','GOL'); setStatus('Gol. Revisa la jugada o vuelve al saque inicial.');
+    }
     else {state.totals.fouls++; playTone('foul'); showOverlay('foul','FALTA'); setStatus(reason+'.');}
     const seq = JSON.parse(JSON.stringify(state.currentSeq));
     const metrics = summarizeSeq(seq);

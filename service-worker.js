@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v19.70-world-record-cache';
+const CACHE_NAME = 'trianota-pwa-v19.71-fastest-goals';
 const LOCAL_ASSETS = [
   './',
   './index.html',
