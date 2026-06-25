@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v19.72-firestore-read-cache';
+const CACHE_NAME = 'trianota-pwa-v19.74-timer-text-best-diag';
 const LOCAL_ASSETS = [
   './',
   './index.html',

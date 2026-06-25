@@ -295,6 +295,7 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
       const parentRef = api.db.collection('goalRecords').doc(String(metricKey)).collection('variants').doc(variantKey);
       const candidate = cleanRecord(record);
       let updated = false;
+      let status = 'skipped';
       await api.db.runTransaction(async transaction => {
         const snap = await transaction.get(parentRef);
         const currentBest = snap && snap.exists ? recordFromDoc(snap.data()) : null;
@@ -311,8 +312,10 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
           params:cleanRecord(params || {})
         }, {merge:true});
         updated = true;
+        status = 'updated';
       });
-      return { ok:true, updated };
+      try { console.info('[Trianota Firestore best update]', {type:'goal best', metricKey:String(metricKey), variantKey, entryId:String(entryId), status, updated}); } catch {}
+      return { ok:true, updated, status };
     } catch (err) {
       const variantKey = metricParamKey(params);
       warnFirestoreWrite('goal best', 'goalRecords/' + String(metricKey) + '/variants/' + variantKey, {entryId, record:cleanRecord(record)}, err);

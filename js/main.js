@@ -1,13 +1,13 @@
-﻿((CAMPAIGN_LEVELS) => {
+((CAMPAIGN_LEVELS) => {
   'use strict';
 
   const FIELD_W = 10, FIELD_H = 18, R = 0.3;
   const GOAL_W = 2, GOAL_D = 1;
-  const GOAL_TOP = 0.18; // deja visible la altura completa de la porterÃ­a
+  const GOAL_TOP = 0.18; // deja visible la altura completa de la portería
   const COLORS = ['#38bdf8','#22d3ee','#22c55e','#eab308','#f97316','#ef4444','#a855f7','#ec4899','#f8fafc'];
-  // CalibraciÃ³n comÃºn de golpeo v16.3.
-  // Con fricciÃ³n 2.1, una velocidad inicial cercana a 5.8 recorre aproximadamente 8 unidades
-  // en lÃ­nea recta sin colisiones: 4 franjas horizontales de 2 unidades.
+  // Calibración común de golpeo v16.3.
+  // Con fricción 2.1, una velocidad inicial cercana a 5.8 recorre aproximadamente 8 unidades
+  // en línea recta sin colisiones: 4 franjas horizontales de 2 unidades.
   const SHOT_MAX_SPEED = 5.8;
   const SLING_MAX_PULL = 2.6;
   const cfg = { duration: 120, surface: 'grass', kickMode: 'sling', directionSpeed: 0.8 };
@@ -58,7 +58,7 @@
   document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>showScreen('home'));
 
   const PROFILE_CONFIRMED_KEY = 'tdg_player_nick_confirmed_v1';
-  const PROFILE_REQUIRED_MSG = 'âš  Debes registrar un nick antes de jugar.';
+  const PROFILE_REQUIRED_MSG = '⚠ Debes registrar un nick antes de jugar.';
   let profileEditMode = false;
   let profileToastTimer = null;
 
@@ -151,10 +151,10 @@
     return true;
   }
   function confirmHomeNick(){
-    return saveProfileNickFromInput('playerNickInput', 'âœ“ Nick guardado. Puedes cambiarlo desde ConfiguraciÃ³n.', 'playerNickMsg');
+    return saveProfileNickFromInput('playerNickInput', '✓ Nick guardado. Puedes cambiarlo desde Configuración.', 'playerNickMsg');
   }
   function saveConfigNick(){
-    return saveProfileNickFromInput('configNickInput', 'âœ“ Nick actualizado.', 'configNickMsg');
+    return saveProfileNickFromInput('configNickInput', '✓ Nick actualizado.', 'configNickMsg');
   }
   function requirePlayerNick(){
     if(updatePlayerProfileGate()) return true;
@@ -402,7 +402,7 @@
     if(z.requiredName && d.name !== z.requiredName) return false;
     return true;
   }
-  const META_ACCEPT_TOL = 0.055; // tolerancia visual: evita rechazos por pocos pÃ­xeles fuera de la meta.
+  const META_ACCEPT_TOL = 0.055; // tolerancia visual: evita rechazos por pocos píxeles fuera de la meta.
   function isDiscInMeta(id){
     const d=state.discs[id];
     const tol = META_ACCEPT_TOL;
@@ -475,7 +475,7 @@
   }
   function validateInitialMickeyShot(){
     if(!isInitialShotActive()) return null;
-    if(initialContactCount() <= 0) return {ok:false, reason:'Saque invÃ¡lido: la ficha A no empujÃ³ ninguna ficha del Mickey'};
+    if(initialContactCount() <= 0) return {ok:false, reason:'Saque inválido: la ficha A no empujó ninguna ficha del Mickey'};
     return {ok:true, metrics:{b:0,h:0,complexity:0,area:0,initial:true}, inter:null};
   }
 function completeMetaLevel(){
@@ -522,9 +522,9 @@ function completeMetaLevel(){
   }
 
   function kickoff(resumeClock){
-    // En modo Gol, si el partido ya terminÃ³ por tiempo, el saque inicial no debe reactivar la cancha.
+    // En modo Gol, si el partido ya terminó por tiempo, el saque inicial no debe reactivar la cancha.
     if(state.gameMode==='goal' && state.ended && state.timeLeft <= 0){
-      setStatus('â± Fin');
+      setStatus('⏱ Fin');
       updateActionButtons();
       return;
     }
@@ -540,11 +540,11 @@ function completeMetaLevel(){
   }
 
   function setupMickey(){
-    // Arco arriba. Mickey abajo: una ficha atrÃ¡s y dos fichas adelante.
+    // Arco arriba. Mickey abajo: una ficha atrás y dos fichas adelante.
     const cx = FIELD_W/2;
     const yBack = FIELD_H - 1.05;
-    // Mickey correcto: una ficha atrÃ¡s y dos adelante, tangentes.
-    // Con radio R, los centros forman un triÃ¡ngulo equilÃ¡tero de lado 2R.
+    // Mickey correcto: una ficha atrás y dos adelante, tangentes.
+    // Con radio R, los centros forman un triángulo equilátero de lado 2R.
     const halfSep = R;
     const yFront = yBack - Math.sqrt(3) * R;
     state.discs = [
@@ -584,13 +584,17 @@ function completeMetaLevel(){
   function worldToScreen(p){return {x:ox+p.x*scale, y:oy+p.y*scale};}
   function screenToWorld(clientX,clientY){const r=canvas.getBoundingClientRect();return {x:(clientX-r.left)*dpr/scale, y:(clientY-r.top)*dpr/scale};}
 
-  function tick(dt){
+  function tick(dt, clockDt=dt){
     if(state.screen==='gameScreen' && state.running && !state.ended){
       if(state.gameMode==='meta'){
         state.metaElapsed = (performance.now() - state.metaStart)/1000;
       } else {
-        state.timeLeft -= dt;
-        if(state.timeLeft<=0){state.timeLeft=0; finishGame(false);}
+        const timerDt = Math.max(0, Number.isFinite(clockDt) ? clockDt : dt);
+        state.timeLeft = Math.max(0, state.timeLeft - timerDt);
+        if(state.timeLeft <= 0 && !state.ended){
+          state.timeLeft = 0;
+          finishGame(false);
+        }
       }
       updateHud();
     }
@@ -600,7 +604,13 @@ function completeMetaLevel(){
     requestAnimationFrame(loop);
   }
   let last=performance.now();
-  function loop(now){const dt=Math.min(0.033,(now-last)/1000); last=now; tick(dt);}
+  function loop(now){
+    const elapsed = (now-last)/1000;
+    const clockDt = Number.isFinite(elapsed) && elapsed > 0 ? elapsed : 0;
+    const dt = Math.min(0.033, clockDt);
+    last=now;
+    tick(dt, clockDt);
+  }
   requestAnimationFrame(loop);
 
   function updateDirForceAim(dt){
@@ -636,7 +646,7 @@ function completeMetaLevel(){
     checkPaintPools(was);
 
     // Meta/Gol se detectan antes que la salida por fondo.
-    // ExcepciÃ³n: durante el saque inicial Mickey se valida primero que A haya empujado
+    // Excepción: durante el saque inicial Mickey se valida primero que A haya empujado
     // al menos una ficha del Mickey; no se exige cruce de puerta en ese primer golpe.
     const movedNow = state.lastHit;
     const initialShot = isInitialShotActive();
@@ -646,7 +656,7 @@ function completeMetaLevel(){
         recordTriangle(movedNow, validGoalPass.metrics);
         endSequence('goal','Gol');
       } else {
-        endSequence('foul', validGoalPass.reason || 'Gol invÃ¡lido: no atravesÃ³ limpiamente la puerta');
+        endSequence('foul', validGoalPass.reason || 'Gol inválido: no atravesó limpiamente la puerta');
       }
       return;
     }
@@ -662,13 +672,13 @@ function completeMetaLevel(){
       return;
     }
 
-    // v18.4: durante el saque inicial en modo Meta, si A ya empujÃ³ al menos
+    // v18.4: durante el saque inicial en modo Meta, si A ya empujó al menos
     // una ficha del Mickey y entra en META, se completa inmediatamente.
-    // Esto evita que siga moviÃ©ndose y termine cobrando falta por salir luego.
+    // Esto evita que siga moviéndose y termine cobrando falta por salir luego.
     if(initialShot && movedNow!=null && state.gameMode==='meta' && isDiscInMeta(movedNow)){
       const valid = validateInitialMickeyShot();
       if(!valid.ok){
-        endSequence('foul', valid.reason || 'Saque inicial invÃ¡lido');
+        endSequence('foul', valid.reason || 'Saque inicial inválido');
         return;
       }
       if(!state.shot.initialRecorded){
@@ -696,11 +706,11 @@ function completeMetaLevel(){
       const movedId=state.lastHit;
 
       // Saque inicial Mickey: primero se valida que A haya empujado al menos
-      // una ficha del Mickey. Si ademÃ¡s A termina en META, cuenta como completada.
+      // una ficha del Mickey. Si además A termina en META, cuenta como completada.
       if(initialShot){
         const valid = validateInitialMickeyShot();
         if(!valid.ok){
-          endSequence('foul', valid.reason || 'Saque inicial invÃ¡lido');
+          endSequence('foul', valid.reason || 'Saque inicial inválido');
           return;
         }
         if(!state.shot.initialRecorded){
@@ -745,7 +755,7 @@ function completeMetaLevel(){
           setStatus('');
         }
       } else {
-        endSequence('foul', valid.reason || 'No atravesÃ³ limpiamente la puerta');
+        endSequence('foul', valid.reason || 'No atravesó limpiamente la puerta');
       }
     }
   }
@@ -776,9 +786,9 @@ function completeMetaLevel(){
 
   function cleanupAfterInitialMickeyShot(){
     // v19.4: si el saque inicial fue muy suave, las fichas pueden quedar
-    // visualmente separadas, pero fÃ­sicamente aÃºn tocÃ¡ndose por tolerancias
+    // visualmente separadas, pero físicamente aún tocándose por tolerancias
     // internas. Antes de habilitar la regla normal, despejamos una holgura
-    // mÃ­nima para que la siguiente jugada no cobre una colisiÃ³n fantasma.
+    // mínima para que la siguiente jugada no cobre una colisión fantasma.
     const minDist = 2*R + 0.075;
     for(let iter=0; iter<10; iter++){
       let changed=false;
@@ -818,7 +828,7 @@ function completeMetaLevel(){
         if(state.gameMode==='meta' && (state.metaDone[i] || state.metaDone[j])) continue;
         if(Math.hypot(state.discs[i].x-state.discs[j].x,state.discs[i].y-state.discs[j].y) < 2*R-1e-3){
           playCollisionSound(1.0);
-          return 'ColisiÃ³n entre fichas';
+          return 'Colisión entre fichas';
         }
       }
     }
@@ -832,7 +842,7 @@ function completeMetaLevel(){
 
     // v17.8: la puerta se congela al momento del golpe.
     // Esto evita que en el saque Mickey se cobre falta por validar contra
-    // una puerta que ya cambiÃ³ cuando las dos fichas delanteras fueron empujadas.
+    // una puerta que ya cambió cuando las dos fichas delanteras fueron empujadas.
     const shot = (state.shot && state.shot.hitId === id) ? state.shot : null;
     const others=state.discs.filter(d=>d.id!==id);
     const A = shot ? shot.doorA : others[0];
@@ -841,21 +851,21 @@ function completeMetaLevel(){
     const end = {x:moving.x,y:moving.y};
 
     const side0 = orient(A,B,start), side1 = orient(A,B,end);
-    if(Math.abs(side0)<1e-6 || Math.abs(side1)<1e-6 || side0*side1>=0) return {ok:false, reason:'No pasÃ³ de un lado al otro de la puerta'};
+    if(Math.abs(side0)<1e-6 || Math.abs(side1)<1e-6 || side0*side1>=0) return {ok:false, reason:'No pasó de un lado al otro de la puerta'};
 
     const inter = lineIntersection(start,end,A,B);
-    if(!inter) return {ok:false, reason:'No cruzÃ³ el segmento de la puerta'};
+    if(!inter) return {ok:false, reason:'No cruzó el segmento de la puerta'};
 
     const len = dist(A,B);
-    if(len <= 1e-6) return {ok:false, reason:'La puerta quedÃ³ demasiado estrecha'};
+    if(len <= 1e-6) return {ok:false, reason:'La puerta quedó demasiado estrecha'};
 
     // En jugadas normales exigimos paso limpio. En el saque inicial se permite
-    // el contacto del Mickey, por eso no se aplica esta restricciÃ³n de margen.
+    // el contacto del Mickey, por eso no se aplica esta restricción de margen.
     if(!shot?.initial){
       const margin = R;
       const t = paramOnSegment(A,B,inter);
-      if(len <= 2*R + 0.06) return {ok:false, reason:'La puerta quedÃ³ demasiado estrecha para paso limpio'};
-      if(t*len < margin || (1-t)*len < margin) return {ok:false, reason:'La ficha no atravesÃ³ limpiamente la puerta'};
+      if(len <= 2*R + 0.06) return {ok:false, reason:'La puerta quedó demasiado estrecha para paso limpio'};
+      if(t*len < margin || (1-t)*len < margin) return {ok:false, reason:'La ficha no atravesó limpiamente la puerta'};
     }
 
     const b=len;
@@ -907,7 +917,7 @@ function completeMetaLevel(){
     state.running=false; state.phase='ended'; state.ended=true;
     if(!exitOnly){
       saveRecordFromUI(); renderStats(); showModal('statsModal');
-      setStatus('â± Fin');
+      setStatus('⏱ Fin');
     }
     updateActionButtons();
   }
@@ -922,7 +932,7 @@ function completeMetaLevel(){
 
     const p=screenToWorld(e.clientX,e.clientY); const hit=pickDisc(p);
     if(hit==null) return;
-    if(state.lastHit===hit){setStatus('No puedes golpear la ficha reciÃ©n golpeada.'); return;}
+    if(state.lastHit===hit){setStatus('No puedes golpear la ficha recién golpeada.'); return;}
     if(state.allowedInitial && hit!==0){setStatus('Primero golpea la ficha trasera.'); return;}
     state.selected=hit; state.drag={start:p,current:p,t0:performance.now(),last:p,lastT:performance.now(),velocity:{x:0,y:0}};
     state.lastStart={x:state.discs[hit].x,y:state.discs[hit].y};
@@ -943,9 +953,9 @@ function completeMetaLevel(){
     const speedGesture=Math.hypot(state.drag.velocity.x,state.drag.velocity.y);
     if(pull<0.08){state.drag=null; state.selected=null; return;}
     // Honda/pasador v16.3:
-    // Escala lineal pura: mitad del estiramiento Ãºtil = mitad de la fuerza mÃ¡xima.
-    // El estiramiento visible se satura en SLING_MAX_PULL y la fuerza mÃ¡xima es
-    // la misma que en el modo DirecciÃ³n + fuerza.
+    // Escala lineal pura: mitad del estiramiento útil = mitad de la fuerza máxima.
+    // El estiramiento visible se satura en SLING_MAX_PULL y la fuerza máxima es
+    // la misma que en el modo Dirección + fuerza.
     const dirx=-vx/pull, diry=-vy/pull;
     const pullRatio=Math.max(0, Math.min(1, pull/SLING_MAX_PULL));
     const force=SHOT_MAX_SPEED * pullRatio;
@@ -959,7 +969,7 @@ function completeMetaLevel(){
     if(state.aimMode === 'idle'){
       const hit=pickDisc(p);
       if(hit==null) return;
-      if(state.lastHit===hit){setStatus('No puedes golpear la ficha reciÃ©n golpeada.'); return;}
+      if(state.lastHit===hit){setStatus('No puedes golpear la ficha recién golpeada.'); return;}
       if(state.allowedInitial && hit!==0){setStatus('Primero golpea la ficha trasera.'); return;}
       state.selected=hit;
       state.lastStart={x:state.discs[hit].x,y:state.discs[hit].y};
@@ -983,7 +993,7 @@ function completeMetaLevel(){
 
     if(state.aimMode === 'force'){
       // Misma escala que la honda: barra al 100% = SHOT_MAX_SPEED;
-      // barra al 50% = 50% de la fuerza mÃ¡xima.
+      // barra al 50% = 50% de la fuerza máxima.
       const force = SHOT_MAX_SPEED * Math.max(0, Math.min(1, state.forceValue));
       const a = state.aimAngleFixed ?? state.aimAngle;
       launchSelected(Math.cos(a), Math.sin(a), force);
@@ -1063,7 +1073,7 @@ function completeMetaLevel(){
     if(intro){
       ctx.restore();
 
-      // ViÃ±eta suave para dar sensaciÃ³n de cÃ¡mara entrando desde el arco.
+      // Viñeta suave para dar sensación de cámara entrando desde el arco.
       const alpha = Math.max(0, 0.30 * (1 - ((2.65 - intro.zoom)/1.65)));
       ctx.save();
       ctx.fillStyle = `rgba(2,6,23,${alpha.toFixed(3)})`;
@@ -1078,7 +1088,7 @@ function completeMetaLevel(){
     const isTri=state.showTri;
 
     // v15.4: pasada final de superficies.
-    // Menos trazos grandes; mÃ¡s microtextura, compactaciÃ³n y luz suave de estadio.
+    // Menos trazos grandes; más microtextura, compactación y luz suave de estadio.
     const g=ctx.createLinearGradient(0,0,0,H);
     if(cfg.surface==='grass'){
       g.addColorStop(0,'#2f9f4e'); g.addColorStop(.40,'#176b35'); g.addColorStop(1,'#082c1b');
@@ -1285,7 +1295,7 @@ function completeMetaLevel(){
     const zones = metaZones();
 
     function drawCheckeredZone(z, label, cols, rows){
-      // Recorte dentro del rectÃ¡ngulo blanco de la cancha.
+      // Recorte dentro del rectángulo blanco de la cancha.
       const left = Math.max(z.left, R);
       const right = Math.min(z.right, FIELD_W - R);
       const top = Math.max(z.top, R);
@@ -1429,8 +1439,8 @@ function completeMetaLevel(){
 
     ctx.save();
 
-    // AlineaciÃ³n visual/geomÃ©trica: la boca frontal del arco queda ajustada
-    // a la zona real de gol. No cambia detecciÃ³n ni fÃ­sica.
+    // Alineación visual/geométrica: la boca frontal del arco queda ajustada
+    // a la zona real de gol. No cambia detección ni física.
     const svgW = ww * 1.37;
     const svgH = hh * 1.50;
     const sx = x - svgW * (70/520);
@@ -1463,7 +1473,7 @@ function completeMetaLevel(){
       ctx.restore();
     }
 
-    // Zona real de detecciÃ³n muy sutil.
+    // Zona real de detección muy sutil.
     ctx.save();
     ctx.strokeStyle = cfg.surface === 'hockey' ? 'rgba(15,23,42,.20)' : 'rgba(255,255,255,.16)';
     ctx.lineWidth=1*dpr;
@@ -1530,7 +1540,7 @@ function completeMetaLevel(){
 
   function drawDoor(){
     // Puerta objetivo mientras hay una ficha seleccionada.
-    // No toca la fÃ­sica ni agrega estados nuevos.
+    // No toca la física ni agrega estados nuevos.
     if(state.selected==null) return;
     if(cfg.kickMode === 'sling' && !state.drag) return;
     if(cfg.kickMode === 'dirforce' && state.aimMode === 'idle') return;
@@ -1596,8 +1606,8 @@ function completeMetaLevel(){
 
       ctx.save();
 
-      // Sombra proyectada muy suave al cÃ©sped: ancla la ficha a la cancha.
-      // No afecta fÃ­sica ni colisiones.
+      // Sombra proyectada muy suave al césped: ancla la ficha a la cancha.
+      // No afecta física ni colisiones.
       ctx.save();
       ctx.globalAlpha = blocked ? .34 : .48;
       ctx.shadowColor = 'rgba(0,0,0,.34)';
@@ -1610,7 +1620,7 @@ function completeMetaLevel(){
       ctx.fill();
       ctx.restore();
 
-      // Aro de disponibilidad mÃ¡s sutil:
+      // Aro de disponibilidad más sutil:
       // menos grosor, menos opacidad y menos brillo.
       if(playable){
         ctx.save();
@@ -1633,10 +1643,10 @@ function completeMetaLevel(){
         ctx.restore();
       }
 
-      // SVG premium. TamaÃ±o visual independiente del radio fÃ­sico.
+      // SVG premium. Tamaño visual independiente del radio físico.
       const visualR = r * 1.40;
       if(sprite && sprite.complete && sprite.naturalWidth > 0){
-        // Bloqueada mÃ¡s visible: no desaparece, porque sigue formando puertas.
+        // Bloqueada más visible: no desaparece, porque sigue formando puertas.
         ctx.globalAlpha = blocked ? .78 : 1;
         ctx.drawImage(sprite, p.x - visualR, p.y - visualR, visualR * 2, visualR * 2);
       } else {
@@ -1655,7 +1665,7 @@ function completeMetaLevel(){
         ctx.fillText(d.name, p.x, p.y);
       }
 
-      // Velo de bloqueada mÃ¡s suave que antes.
+      // Velo de bloqueada más suave que antes.
       if(blocked){
         ctx.globalAlpha = .13;
         ctx.beginPath();
@@ -1671,7 +1681,7 @@ function completeMetaLevel(){
         ctx.stroke();
       }
 
-      // En modo Meta, la ficha completada queda marcada sobre sÃ­ misma.
+      // En modo Meta, la ficha completada queda marcada sobre sí misma.
       if(state.gameMode==='meta' && state.metaDone[d.id]){
         ctx.save();
         ctx.globalAlpha = 1;
@@ -1691,7 +1701,7 @@ function completeMetaLevel(){
         ctx.font = `900 ${Math.max(12*dpr, r*.62)}px system-ui`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('âœ“', p.x + r*.78, p.y - r*.80);
+        ctx.fillText('✓', p.x + r*.78, p.y - r*.80);
         ctx.restore();
       }
 
@@ -1728,7 +1738,7 @@ function completeMetaLevel(){
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
 
-    // Brillo pequeÃ±o en el punto exacto de cruce de la puerta.
+    // Brillo pequeño en el punto exacto de cruce de la puerta.
     const rg = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r2);
     rg.addColorStop(0, `rgba(255,255,255,${0.44*alpha})`);
     rg.addColorStop(.28, `rgba(250,204,21,${0.34*alpha})`);
@@ -1744,7 +1754,7 @@ function completeMetaLevel(){
     ctx.arc(p.x,p.y,r1,0,Math.PI*2);
     ctx.stroke();
 
-    // Dos chispas diagonales muy breves: se lee como cruce, no como explosiÃ³n.
+    // Dos chispas diagonales muy breves: se lee como cruce, no como explosión.
     ctx.strokeStyle = `rgba(250,204,21,${0.62*alpha})`;
     ctx.lineWidth = 1.15*dpr;
     ctx.lineCap = 'round';
@@ -1835,7 +1845,7 @@ function completeMetaLevel(){
     ctx.font=`900 ${12*dpr}px system-ui`;
     ctx.textBaseline='middle';
     ctx.fillStyle='rgba(248,250,252,.92)';
-    ctx.textAlign='right'; ctx.fillText('DÃ©bil', x-9*dpr, y+h/2);
+    ctx.textAlign='right'; ctx.fillText('Débil', x-9*dpr, y+h/2);
     ctx.textAlign='left'; ctx.fillText('Fuerte', x+w+9*dpr, y+h/2);
 
     ctx.fillStyle='rgba(15,23,42,.90)';
@@ -1870,11 +1880,11 @@ function completeMetaLevel(){
 
   
   function complexityLabel(v){
-    if(v<5) return 'â­ BÃ¡sica';
-    if(v<10) return 'â­â­ Intermedia';
-    if(v<20) return 'â­â­â­ Avanzada';
-    if(v<35) return 'â­â­â­â­ Experta';
-    return 'â­â­â­â­â­ Legendaria';
+    if(v<5) return '⭐ Básica';
+    if(v<10) return '⭐⭐ Intermedia';
+    if(v<20) return '⭐⭐⭐ Avanzada';
+    if(v<35) return '⭐⭐⭐⭐ Experta';
+    return '⭐⭐⭐⭐⭐ Legendaria';
   }
 
   function playCollisionSound(strength=1){
