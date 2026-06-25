@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v19.75-goal-timer-end-fix';
+const CACHE_NAME = 'trianota-pwa-v19.76-timer-finish-fix';
 const LOCAL_ASSETS = [
   './',
   './index.html',

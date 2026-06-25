@@ -9,6 +9,7 @@
   <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
   <link rel="stylesheet" href="css/styles.css?v=19.64_goal_records_official" />
+  <script>window.TRIANOTA_VERSION = '19.76_timer_finish_fix';</script>
 </head>
 <body>
   <section id="home" class="screen active">
@@ -179,7 +180,7 @@
   <div id="historyModal" class="modal"><div class="card"><h2>Historial</h2><div id="historyList"></div><button class="btn secondary" data-close="historyModal">Cerrar</button></div></div>
   <div id="statsModal" class="modal"><div class="card"><h2>Fin del partido</h2><div id="statsContent"></div><button class="btn" id="againBtn">Jugar nuevamente</button><button class="btn secondary" id="statsHistBtn">📚 Ver historial</button><button class="btn secondary" data-close="statsModal">Cerrar</button></div></div>
   <div id="recordsModal" class="modal"><div class="card"><h2>Récords</h2><div id="recordsList"></div><button class="btn secondary" data-close="recordsModal">Cerrar</button></div></div>
-  <div id="aboutModal" class="modal"><div class="card"><h2>Acerca del juego</h2><p><b>Trianota</b></p><p><b>Modo GOL:</b><br>¿Cuántos goles puedes convertir y cuánta cancha puedes conquistar?</p><p><b>Modo META:</b><br>Supera niveles usando triangulaciones para alcanzar objetivos.</p><button class="btn secondary" data-close="aboutModal">Cerrar</button></div></div>
+  <div id="aboutModal" class="modal"><div class="card"><h2>Acerca del juego</h2><p><b>Trianota</b></p><p><b>Modo GOL:</b><br>¿Cuántos goles puedes convertir y cuánta cancha puedes conquistar?</p><p><b>Modo META:</b><br>Supera niveles usando triangulaciones para alcanzar objetivos.</p><p class="tiny">Versión: <span id="appVersion"></span></p><button class="btn secondary" data-close="aboutModal">Cerrar</button></div></div>
   <div id="profileToast" class="profileToast" role="status" aria-live="polite"></div>
 
 <script src="js/campaign_levels.js"></script>
@@ -196,10 +197,12 @@
 <script src="js/audio.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/history.js?v=19.54_campaign_records"></script>
-<script src="js/ui_records.js?v=19.72_firestore_read_cache"></script>
+<script src="js/ui_records.js?v=19.76_timer_finish_fix"></script>
 <script src="js/goal.js"></script>
-<script src="js/main.js?v=19.75_goal_timer_end_fix"></script>
+<script src="js/main.js?v=19.76_timer_finish_fix"></script>
 <script>
+  const versionEl = document.getElementById('appVersion');
+  if(versionEl) versionEl.textContent = window.TRIANOTA_VERSION || '';
   if('serviceWorker' in navigator){
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js').catch(() => {});

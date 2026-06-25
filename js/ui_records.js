@@ -78,6 +78,11 @@ const OFFICIAL_GOAL_DURATIONS = [
   {duration:180, label:'Duración: 3 minutos'},
   {duration:300, label:'Duración: 5 minutos'}
 ];
+function isOfficialGoalDuration(duration){
+  if(typeof isOfficialGoalRecordDuration === 'function') return isOfficialGoalRecordDuration(duration);
+  return OFFICIAL_GOAL_DURATIONS.some(item => +item.duration === +duration);
+}
+window.isOfficialGoalDuration = isOfficialGoalDuration;
 const OFFICIAL_FASTEST_TARGETS = [
   {goals:3, label:'3 goles'},
   {goals:5, label:'5 goles'}
@@ -129,7 +134,7 @@ function renderStats(){
   const currentPersonal = goalPersonalSnapshot();
   const goalsNewBest = state.goals > (previous.goals || 0);
   const surfaceNewBest = bestSurface > (previous.surface || 0);
-  const officialDuration = isOfficialGoalDuration(cfg.duration);
+  const officialDuration = typeof isOfficialGoalDuration === 'function' ? isOfficialGoalDuration(cfg.duration) : false;
   const worldGoals = officialDuration ? DATA_PROVIDER.getGoalWorldRecord('mostGoalsFixedDuration', {duration:cfg.duration}) : null;
   const worldSurface = officialDuration ? DATA_PROVIDER.getGoalWorldRecord('maxSurfaceUsage', {duration:cfg.duration}) : null;
 
