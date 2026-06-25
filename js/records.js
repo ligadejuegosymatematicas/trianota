@@ -1,4 +1,4 @@
-﻿const FIREBASE_OFFICIAL_GOAL_DURATIONS = [120, 180, 300];
+const FIREBASE_OFFICIAL_GOAL_DURATIONS = [120, 180, 300];
 const FASTEST_GOAL_TARGETS = [3, 5];
 
 function isOfficialGoalRecordDuration(duration){
@@ -85,7 +85,18 @@ function submitFirebaseCampaignCandidate(levelKey, result){
       console.warn('[Trianota Firestore submit setup failed]', {type:'campaign', reason:'provider-missing', levelKey});
       return;
     }
-    provider.submitCampaignRecord(levelKey, {...result, nick:firebaseProfileNick()}).then(result => { if(result && result.ok === false) console.warn('[Trianota Firestore submit result]', result); });
+    provider.submitCampaignRecord(levelKey, {...result, nick:firebaseProfileNick()}).then(submitResult => {
+      const best = submitResult && submitResult.best;
+      const entryOk = !!(submitResult && submitResult.ok);
+      const bestUpdated = !!(best && best.updated);
+      const bestSkipped = !!(best && (best.status === 'skipped' || best.skipped));
+      const errorCode = submitResult && (submitResult.error || (best && best.error));
+      if(bestUpdated && best.best && DATA_PROVIDER && typeof DATA_PROVIDER.saveCampaignWorldRecord === 'function'){
+        DATA_PROVIDER.saveCampaignWorldRecord(levelKey, best.best);
+      }
+      try { console.info('[Trianota Campaign Record]', {levelKey, time:result && result.time, entryOk, bestUpdated, bestSkipped, errorCode}); } catch {}
+      if(submitResult && submitResult.ok === false) console.warn('[Trianota Firestore submit result]', submitResult);
+    });
   } catch (err) {
     console.warn('[Trianota Firestore submit setup failed]', {type:'campaign', code:err && err.code, message:err && err.message, error:err});
   }

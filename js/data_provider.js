@@ -197,6 +197,19 @@ var DATA_PROVIDER = window.DATA_PROVIDER = (() => {
     getCampaignSessionBest(levelKey){ return data.campaign.sessionBestByLevel[levelKey] ? clone(data.campaign.sessionBestByLevel[levelKey]) : null; },
     saveCampaignSessionBest(levelKey, result){ data.campaign.sessionBestByLevel[levelKey] = clone(result); writeJson(STORAGE_KEY, data); return clone(result); },
     addCampaignAttempt(levelKey, attempt){ const list = data.campaign.attemptsByLevel[levelKey] || []; list.push(clone(attempt)); data.campaign.attemptsByLevel[levelKey] = list; writeJson(STORAGE_KEY, data); return clone(list); },
+    saveCampaignWorldRecord(levelKey, result){
+      if(!levelKey || result === undefined) return null;
+      const previous = data.campaign.worldRecordByLevel[levelKey] ? JSON.stringify(data.campaign.worldRecordByLevel[levelKey]) : null;
+      const nextValue = result === null ? null : clone(result);
+      const next = JSON.stringify(nextValue);
+      data.campaign.worldRecordByLevel[levelKey] = nextValue;
+      writeJson(STORAGE_KEY, data);
+      markRemoteCacheFetched('campaignWorldRecordByLevel', String(levelKey), nextValue);
+      if(previous !== next){
+        try { window.dispatchEvent(new CustomEvent('trianota:campaignWorldRecordUpdated', {detail:{levelKey, value:nextValue === null ? null : clone(nextValue)}})); } catch {}
+      }
+      return nextValue === null ? null : clone(nextValue);
+    },
     getCampaignWorldRecord(levelKey){
       const local = data.campaign.worldRecordByLevel[levelKey] ? clone(data.campaign.worldRecordByLevel[levelKey]) : null;
       refreshRemote('getCampaignWorldRecord', [levelKey], value => {

@@ -1,4 +1,4 @@
-﻿// Optional Firebase provider.
+// Optional Firebase provider.
 // GitHub Pages remains the frontend host; this stage writes candidate entries and updates provisional best docs.
 var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
   let readyResolved = false;
@@ -329,6 +329,7 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
       const parentRef = api.db.collection('campaignRecords').doc(String(levelKey));
       const candidate = cleanRecord(result);
       let updated = false;
+      let status = 'skipped';
       await api.db.runTransaction(async transaction => {
         const snap = await transaction.get(parentRef);
         const currentBest = snap && snap.exists ? recordFromDoc(snap.data()) : null;
@@ -343,8 +344,10 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
           levelKey:String(levelKey)
         }, {merge:true});
         updated = true;
+        status = 'updated';
       });
-      return { ok:true, updated };
+      try { console.info('[Trianota Firestore best update]', {type:'campaign best', levelKey:String(levelKey), entryId:String(entryId), status, updated}); } catch {}
+      return { ok:true, updated, status, best:updated ? candidate : null };
     } catch (err) {
       warnFirestoreWrite('campaign best', 'campaignRecords/' + String(levelKey), {entryId, result:cleanRecord(result)}, err);
       return { ok:false, error:api.lastError };
