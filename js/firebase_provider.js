@@ -217,6 +217,187 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
     return { uid: api.uid, nick };
   }
 
+  function nowText(){
+    try { return new Date().toLocaleString('es-CL'); }
+    catch { return new Date().toISOString(); }
+  }
+
+  function fixed(value, digits){
+    const n = numeric(value);
+    return n.toFixed(digits);
+  }
+
+  function timeLabel(seconds){
+    const total = Math.max(0, numeric(seconds));
+    const minutes = Math.floor(total / 60);
+    const secs = Math.floor(total % 60);
+    const hundredths = Math.floor((total - Math.floor(total)) * 100);
+    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(hundredths).padStart(2, '0')}`;
+  }
+
+  function durationLabel(seconds){
+    const value = numeric(seconds);
+    if(value <= 0) return '';
+    const minutes = value / 60;
+    if(Number.isInteger(minutes)) return `${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`;
+    return `${value} segundos`;
+  }
+
+  function levelLabel(levelKey){
+    const parts = String(levelKey || '').split('-');
+    if(parts.length >= 2 && parts[0] && parts[1]) return `M${parts[0]}-N${parts[1]}`;
+    return String(levelKey || 'Nivel');
+  }
+
+  function goalMetricLabel(metricKey){
+    if(metricKey === 'fastestNGoles') return 'Rapidez';
+    if(metricKey === 'maxSurfaceUsage') return 'Superficie';
+    return 'Goles';
+  }
+
+  function goalValueLabel(metricKey, record){
+    if(metricKey === 'fastestNGoles') return timeLabel(record && record.time);
+    if(metricKey === 'maxSurfaceUsage') return `${fixed(record && record.bestUtil, 1)}%`;
+    const goals = numeric(record && record.goals);
+    return `${goals} ${goals === 1 ? 'gol' : 'goles'}`;
+  }
+
+  function goalSummary(metricKey, params, record){
+    const nick = (record && record.nick) || 'Jugador';
+    const metric = goalMetricLabel(metricKey);
+    const value = goalValueLabel(metricKey, record);
+    if(metricKey === 'fastestNGoles'){
+      const goals = numeric(params && params.goals);
+      return `${nick} - ${metric} ${goals} goles: ${value}`;
+    }
+    const duration = durationLabel((params && params.duration) || (record && record.duration));
+    return `${nick} - ${metric}: ${value}${duration ? ` en ${duration}` : ''}`;
+  }
+
+  function goalAdminFields(metricKey, params, record){
+    const duration = metricKey === 'fastestNGoles' ? '' : durationLabel((params && params.duration) || (record && record.duration));
+    const fields = {
+      mode:'goal',
+      summary:goalSummary(metricKey, params, record),
+      metricLabel:goalMetricLabel(metricKey),
+      valueLabel:goalValueLabel(metricKey, record),
+      createdAtText:nowText()
+    };
+    if(duration) fields.durationLabel = duration;
+    return fields;
+  }
+
+  function campaignValueLabel(record){
+    return timeLabel(record && record.time);
+  }
+
+  function campaignAdminFields(levelKey, record){
+    const label = levelLabel(levelKey);
+    const nick = (record && record.nick) || 'Jugador';
+    const value = campaignValueLabel(record);
+    return {
+      mode:'campaign',
+      summary:`${nick} - ${label}: ${value}`,
+      metricLabel:'Menor tiempo',
+      valueLabel:value,
+      levelLabel:label,
+      createdAtText:nowText()
+    };
+  }
+
+  function bestAdminFields(candidate, entryAdminFields){
+    return {
+      holderUid:candidate && candidate.uid ? String(candidate.uid) : api.uid,
+      holderNick:candidate && candidate.nick ? String(candidate.nick) : 'Jugador',
+      summary:entryAdminFields && entryAdminFields.summary ? entryAdminFields.summary : '',
+      valueLabel:entryAdminFields && entryAdminFields.valueLabel ? entryAdminFields.valueLabel : '',
+      updatedAtText:nowText()
+    };
+  }
+
+  function playerStatsBase(candidate){
+    const uid = candidate && candidate.uid ? String(candidate.uid) : api.uid;
+    const nick = candidate && candidate.nick ? String(candidate.nick).trim().slice(0, 16) : 'Jugador';
+    const base = {
+      uid,
+      nick,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAtText:nowText()
+    };
+    if(nick) base.usualNicks = firebase.firestore.FieldValue.arrayUnion(nick);
+    return base;
+  }
+
+  function goalStatsSummary(metricKey, params, entryId, candidate){
+    return {
+      metricKey:String(metricKey),
+      variantKey:metricParamKey(params),
+      params:cleanRecord(params || {}),
+      entryId:String(entryId),
+      summary:candidate.summary || goalSummary(metricKey, params || {}, candidate),
+      metricLabel:candidate.metricLabel || goalMetricLabel(metricKey),
+      valueLabel:candidate.valueLabel || goalValueLabel(metricKey, candidate),
+      durationLabel:candidate.durationLabel || durationLabel(candidate.duration),
+      goals:Number(candidate.goals || 0),
+      bestUtil:Number(candidate.bestUtil || 0),
+      time:Number(candidate.time || 0),
+      duration:Number(candidate.duration || 0),
+      updatedAtText:nowText()
+    };
+  }
+
+  function campaignStatsSummary(levelKey, entryId, candidate){
+    return {
+      levelKey:String(levelKey),
+      entryId:String(entryId),
+      summary:candidate.summary || campaignAdminFields(levelKey, candidate).summary,
+      metricLabel:candidate.metricLabel || 'Menor tiempo',
+      valueLabel:candidate.valueLabel || campaignValueLabel(candidate),
+      levelLabel:candidate.levelLabel || levelLabel(levelKey),
+      time:Number(candidate.time || 0),
+      updatedAtText:nowText()
+    };
+  }
+
+  async function updatePlayerStats(payload, candidate){
+    try {
+      const uid = candidate && candidate.uid ? String(candidate.uid) : api.uid;
+      if(!uid || !await ensureReady()) return { skipped:true, reason:'firebase-disabled' };
+      const path = 'playerStats/' + uid;
+      const fullPayload = {...playerStatsBase(candidate), ...payload};
+      await api.db.collection('playerStats').doc(uid).set(fullPayload, {merge:true});
+      try { console.info('[Trianota Firestore playerStats ok]', {path, payload:fullPayload}); } catch {}
+      return { ok:true };
+    } catch (err) {
+      warnFirestoreWrite('player stats', candidate && candidate.uid ? 'playerStats/' + String(candidate.uid) : 'playerStats/{uid}', payload, err);
+      return { ok:false, error:api.lastError };
+    }
+  }
+
+  async function updateGoalPlayerStats(metricKey, params, entryId, candidate, bestResult){
+    const variantKey = metricParamKey(params);
+    const summary = goalStatsSummary(metricKey, params || {}, entryId, candidate);
+    const payload = {
+      goalSummary:{ [String(metricKey)]: { [variantKey]: summary } }
+    };
+    if(bestResult && bestResult.updated){
+      payload.worldRecordsOwned = { goal:{ [String(metricKey)]: { [variantKey]: summary } } };
+    }
+    return updatePlayerStats(payload, candidate);
+  }
+
+  async function updateCampaignPlayerStats(levelKey, entryId, candidate, bestResult){
+    const summary = campaignStatsSummary(levelKey, entryId, candidate);
+    const key = String(levelKey);
+    const payload = {
+      campaignSummary:{ levels:{ [key]: summary } }
+    };
+    if(bestResult && bestResult.updated){
+      payload.worldRecordsOwned = { campaign:{ [key]: summary } };
+    }
+    return updatePlayerStats(payload, candidate);
+  }
+
   async function submitGoalRecord(metricKey, params, record){
     try {
       const variantKey = metricParamKey(params);
@@ -226,8 +407,10 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
         warnFirestoreWrite('goal entry', entryPath, {params, record, debugStatus:debugStatus()}, {code:'firebase-disabled', message:'Firebase provider is not ready'});
         return { skipped:true, reason:'firebase-disabled' };
       }
+      const profile = profilePayload(record);
       const bestCandidate = {
-        ...profilePayload(record),
+        ...profile,
+        ...goalAdminFields(String(metricKey), params || {}, {...record, ...profile}),
         metricKey:String(metricKey),
         variantKey,
         params:cleanRecord(params || {}),
@@ -247,7 +430,8 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
         return { ok:false, error:api.lastError };
       }
       const bestResult = await updateGoalBestIfBetter(metricKey, params, ref.id, bestCandidate);
-      return { ok:true, id:ref.id, best:bestResult };
+      const playerStatsResult = await updateGoalPlayerStats(metricKey, params, ref.id, bestCandidate, bestResult);
+      return { ok:true, id:ref.id, best:bestResult, playerStats:playerStatsResult };
     } catch (err) {
       warnFirestoreWrite('goal submit', 'goalRecords/' + String(metricKey), {params, record}, err);
       return { ok:false, error:api.lastError };
@@ -263,8 +447,10 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
         return { skipped:true, reason:'firebase-disabled' };
       }
       const record = cleanRecord(result);
+      const profile = profilePayload(result);
       const bestCandidate = {
-        ...profilePayload(result),
+        ...profile,
+        ...campaignAdminFields(levelKey, {...result, ...profile}),
         levelKey:String(levelKey),
         time:Number(result.time || 0),
         metrics:cleanRecord(result.metrics || {}),
@@ -281,8 +467,9 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
         return { ok:false, error:api.lastError };
       }
       const bestResult = await updateCampaignBestIfBetter(levelKey, ref.id, bestCandidate);
-      try { console.info('[Trianota Firestore write ok]', {type:'campaign best', path:'campaignRecords/' + String(levelKey), result:bestResult}); } catch {}
-      return { ok:true, id:ref.id, best:bestResult };
+      const playerStatsResult = await updateCampaignPlayerStats(levelKey, ref.id, bestCandidate, bestResult);
+      try { console.info('[Trianota Firestore write ok]', {type:'campaign best', path:'campaignRecords/' + String(levelKey), result:bestResult, playerStats:playerStatsResult}); } catch {}
+      return { ok:true, id:ref.id, best:bestResult, playerStats:playerStatsResult };
     } catch (err) {
       warnFirestoreWrite('campaign submit', 'campaignRecords/' + String(levelKey), {result}, err);
       return { ok:false, error:api.lastError };
@@ -306,6 +493,7 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
         transaction.set(parentRef, {
           best:candidate,
           bestEntryId:String(entryId),
+          ...bestAdminFields(candidate, goalAdminFields(String(metricKey), params || {}, candidate)),
           updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
           metricKey:String(metricKey),
           variantKey,
@@ -340,6 +528,7 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
         transaction.set(parentRef, {
           best:candidate,
           bestEntryId:String(entryId),
+          ...bestAdminFields(candidate, campaignAdminFields(levelKey, candidate)),
           updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
           levelKey:String(levelKey)
         }, {merge:true});

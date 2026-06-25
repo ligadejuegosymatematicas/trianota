@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v19.76-campaign-world-best-fix';
+const CACHE_NAME = 'trianota-pwa-v19.78-player-stats-min';
 const LOCAL_ASSETS = [
   './',
   './index.html',
