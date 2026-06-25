@@ -593,6 +593,7 @@ function completeMetaLevel(){
         state.timeLeft = Math.max(0, state.timeLeft - timerDt);
         if(state.timeLeft <= 0 && !state.ended){
           state.timeLeft = 0;
+          try { console.info('[Trianota Timer]', {timeLeft:state.timeLeft, running:state.running, ended:state.ended, phase:state.phase, dt, clockDt}); } catch {}
           finishGame(false);
         }
       }
@@ -898,7 +899,9 @@ function completeMetaLevel(){
 
   function endSequence(type, reason){
     if(state.messageLock) return;
-    state.messageLock=true; state.running=false; state.phase='ended'; state.drag=null;
+    state.messageLock=true;
+    state.running = state.gameMode === 'goal';
+    state.phase='ended'; state.drag=null;
     if(type==='goal'){
       state.goals++;
       if(typeof captureFastestGoalMilestone === 'function') captureFastestGoalMilestone(state.goals, cfg.duration - state.timeLeft);
