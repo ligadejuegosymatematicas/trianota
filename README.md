@@ -1,1 +1,1 @@
-# Primera versión pública de Trianota v19.66
+# Primera versión pública de Trianota v19.76
