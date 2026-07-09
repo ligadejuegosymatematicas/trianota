@@ -21,6 +21,7 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
     lastError: null,
     ready: Promise.resolve(false),
     getUid(){ return api.uid; },
+    getPlayerStats,
     getCampaignWorldRecord,
     getCampaignGlobalRanking,
     getGoalWorldRecord,
@@ -66,6 +67,171 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
     } catch {}
   }
 
+  const PENDING_WRITES_KEY = 'trianota_firestore_pending_writes_v1';
+  const RETRYABLE_FIRESTORE_CODES = [
+    'aborted',
+    'cancelled',
+    'deadline-exceeded',
+    'internal',
+    'resource-exhausted',
+    'unavailable',
+    'unknown',
+    'network-request-failed'
+  ];
+  const PERMANENT_FIRESTORE_CODES = [
+    'already-exists',
+    'failed-precondition',
+    'invalid-argument',
+    'not-found',
+    'permission-denied',
+    'unauthenticated'
+  ];
+  let pendingRetryTimer = null;
+  let pendingQueueProcessing = false;
+
+  function firestoreCode(err){
+    if(!err) return '';
+    const raw = typeof err === 'string' ? err : (err.code || err.message || String(err));
+    return String(raw || '').replace(/^firestore\//, '').replace(/^FirebaseError:\s*/i, '');
+  }
+
+  function isRetryableFirestoreError(err){
+    const code = firestoreCode(err);
+    return RETRYABLE_FIRESTORE_CODES.includes(code);
+  }
+
+  function isPermanentFirestoreError(err){
+    const code = firestoreCode(err);
+    return PERMANENT_FIRESTORE_CODES.includes(code);
+  }
+
+  function readPendingWrites(){
+    try {
+      const raw = localStorage.getItem(PENDING_WRITES_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function writePendingWrites(queue){
+    try {
+      localStorage.setItem(PENDING_WRITES_KEY, JSON.stringify(queue.slice(0, 80)));
+      return true;
+    } catch (err) {
+      try { console.warn('[Trianota Firestore queue failed]', {code:err && err.code, message:err && err.message}); } catch {}
+      return false;
+    }
+  }
+
+  function queueBackoffMs(attempts){
+    return Math.min(5 * 60 * 1000, 15000 * Math.pow(2, Math.min(5, attempts || 0)));
+  }
+
+  function enqueuePendingWrite(item, err){
+    try {
+      if(!isRetryableFirestoreError(err)) return false;
+      const queue = readPendingWrites();
+      const index = queue.findIndex(existing => existing && existing.id === item.id);
+      const previous = index >= 0 ? queue[index] : null;
+      const attempts = previous ? Number(previous.attempts || 0) : 0;
+      const queued = {
+        ...previous,
+        ...item,
+        attempts,
+        lastError:firestoreCode(err),
+        queuedAt:previous && previous.queuedAt ? previous.queuedAt : new Date().toISOString(),
+        nextAttemptAt:Date.now() + queueBackoffMs(attempts)
+      };
+      if(index >= 0) queue[index] = queued;
+      else queue.push(queued);
+      const ok = writePendingWrites(queue);
+      if(ok) schedulePendingQueueRetry(queueBackoffMs(attempts) + 500);
+      try { console.warn('[Trianota Firestore queued]', {id:queued.id, kind:queued.kind, error:queued.lastError}); } catch {}
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+
+  function retryableResult(result){
+    return result && result.ok === false && isRetryableFirestoreError(result.error);
+  }
+
+  function schedulePendingQueueRetry(delayMs=0){
+    if(pendingRetryTimer) return;
+    pendingRetryTimer = setTimeout(() => {
+      pendingRetryTimer = null;
+      processPendingWrites();
+    }, Math.max(0, delayMs || 0));
+  }
+
+  function updateQueuedFailure(item, err){
+    const attempts = Number(item.attempts || 0) + 1;
+    return {
+      ...item,
+      attempts,
+      lastError:firestoreCode(err),
+      nextAttemptAt:Date.now() + queueBackoffMs(attempts)
+    };
+  }
+
+  async function processPendingWrites(){
+    if(pendingQueueProcessing) return;
+    pendingQueueProcessing = true;
+    try {
+      if(!await ensureReady()) return;
+      const queue = readPendingWrites();
+      if(!queue.length) return;
+      const now = Date.now();
+      const next = [];
+      let processed = 0;
+      for(const item of queue){
+        if(!item || !item.id) continue;
+        if(processed >= 8 || Number(item.nextAttemptAt || 0) > now){
+          next.push(item);
+          continue;
+        }
+        processed++;
+        const result = await retryPendingWrite(item);
+        if(result && result.done){
+          try { console.info('[Trianota Firestore queue sent]', {id:item.id, kind:item.kind}); } catch {}
+          continue;
+        }
+        next.push(updateQueuedFailure((result && result.item) || item, (result && result.error) || 'unknown'));
+      }
+      writePendingWrites(next);
+      if(next.some(item => Number(item.nextAttemptAt || 0) <= Date.now())) {
+        schedulePendingQueueRetry(30000);
+      } else {
+        const nextAttempt = next.reduce((soonest, item) => {
+          const at = Number(item && item.nextAttemptAt || 0);
+          return at > 0 ? Math.min(soonest, at) : soonest;
+        }, Infinity);
+        if(Number.isFinite(nextAttempt)) schedulePendingQueueRetry(Math.max(1000, nextAttempt - Date.now()));
+      }
+    } catch (err) {
+      try { console.warn('[Trianota Firestore queue failed]', {code:err && err.code, message:err && err.message}); } catch {}
+    } finally {
+      pendingQueueProcessing = false;
+    }
+  }
+
+  async function retryPendingWrite(item){
+    if(item.kind === 'goal') return retryQueuedGoal(item);
+    if(item.kind === 'campaign') return retryQueuedCampaign(item);
+    return {done:true};
+  }
+
+  function initPendingQueueRetries(){
+    try {
+      if(typeof window !== 'undefined' && window.addEventListener){
+        window.addEventListener('online', () => schedulePendingQueueRetry(1000));
+      }
+      schedulePendingQueueRetry(2500);
+    } catch {}
+  }
   function toPlain(value){
     if(value === undefined || value === null) return value;
     if(value && typeof value.toDate === 'function') return value.toDate().toISOString();
@@ -194,6 +360,18 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
     return readRanking(api.db.collection('goalRecords').doc(String(metricKey)).collection('variants').doc(variantKey).collection('entries'), rankingSort(metricKey));
   }
 
+  async function getPlayerStats(uid){
+    try {
+      if(!await ensureReady()) return null;
+      const targetUid = uid || api.uid;
+      if(!targetUid) return null;
+      return readDoc(api.db.collection('playerStats').doc(String(targetUid)));
+    } catch (err) {
+      setError(err);
+      try { console.warn('[Trianota Firestore playerStats read failed]', {code:err && err.code, message:err && err.message}); } catch {}
+      return null;
+    }
+  }
   function cleanRecord(value){
     if(value === undefined) return null;
     if(value === null) return null;
@@ -398,6 +576,91 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
     return updatePlayerStats(payload, candidate);
   }
 
+  function goalEntryRef(metricKey, variantKey, entryId){
+    return api.db.collection('goalRecords').doc(String(metricKey)).collection('variants').doc(variantKey).collection('entries').doc(String(entryId));
+  }
+
+  function campaignEntryRef(levelKey, entryId){
+    return api.db.collection('campaignRecords').doc(String(levelKey)).collection('entries').doc(String(entryId));
+  }
+
+  function goalQueueItem(metricKey, params, variantKey, entryId, candidate, entryWritten){
+    return {
+      id:`goal:${String(metricKey)}:${variantKey}:${String(entryId)}`,
+      kind:'goal',
+      metricKey:String(metricKey),
+      params:cleanRecord(params || {}),
+      variantKey,
+      entryId:String(entryId),
+      candidate:cleanRecord(candidate),
+      entryWritten:!!entryWritten
+    };
+  }
+
+  function campaignQueueItem(levelKey, entryId, candidate, entryWritten){
+    return {
+      id:`campaign:${String(levelKey)}:${String(entryId)}`,
+      kind:'campaign',
+      levelKey:String(levelKey),
+      entryId:String(entryId),
+      candidate:cleanRecord(candidate),
+      entryWritten:!!entryWritten
+    };
+  }
+
+  async function writeGoalEntry(metricKey, variantKey, entryId, candidate){
+    const payload = {...candidate, createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+    await goalEntryRef(metricKey, variantKey, entryId).set(payload);
+    return payload;
+  }
+
+  async function writeCampaignEntry(levelKey, entryId, candidate){
+    const payload = {...candidate, createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+    await campaignEntryRef(levelKey, entryId).set(payload);
+    return payload;
+  }
+
+  async function retryQueuedGoal(item){
+    const metricKey = item.metricKey;
+    const params = item.params || {};
+    const variantKey = item.variantKey || metricParamKey(params);
+    const entryId = item.entryId;
+    const candidate = item.candidate;
+    if(!metricKey || !variantKey || !entryId || !candidate) return {done:true};
+    if(!item.entryWritten){
+      try {
+        await writeGoalEntry(metricKey, variantKey, entryId, candidate);
+        item.entryWritten = true;
+      } catch (err) {
+        return isPermanentFirestoreError(err) ? {done:true} : {done:false, item, error:err};
+      }
+    }
+    const bestResult = await updateGoalBestIfBetter(metricKey, params, entryId, candidate);
+    const playerStatsResult = await updateGoalPlayerStats(metricKey, params, entryId, candidate, bestResult);
+    if(retryableResult(bestResult)) return {done:false, item, error:bestResult.error};
+    if(retryableResult(playerStatsResult)) return {done:false, item, error:playerStatsResult.error};
+    return {done:true};
+  }
+
+  async function retryQueuedCampaign(item){
+    const levelKey = item.levelKey;
+    const entryId = item.entryId;
+    const candidate = item.candidate;
+    if(!levelKey || !entryId || !candidate) return {done:true};
+    if(!item.entryWritten){
+      try {
+        await writeCampaignEntry(levelKey, entryId, candidate);
+        item.entryWritten = true;
+      } catch (err) {
+        return isPermanentFirestoreError(err) ? {done:true} : {done:false, item, error:err};
+      }
+    }
+    const bestResult = await updateCampaignBestIfBetter(levelKey, entryId, candidate);
+    const playerStatsResult = await updateCampaignPlayerStats(levelKey, entryId, candidate, bestResult);
+    if(retryableResult(bestResult)) return {done:false, item, error:bestResult.error};
+    if(retryableResult(playerStatsResult)) return {done:false, item, error:playerStatsResult.error};
+    return {done:true};
+  }
   async function submitGoalRecord(metricKey, params, record){
     try {
       const variantKey = metricParamKey(params);
@@ -421,23 +684,25 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
         duration:Number(record.duration || (params && params.duration) || 0),
         clientCreatedAt:new Date().toISOString()
       };
-      const payload = {...bestCandidate, createdAt:firebase.firestore.FieldValue.serverTimestamp()};
-      let ref;
+      const ref = api.db.collection('goalRecords').doc(String(metricKey)).collection('variants').doc(variantKey).collection('entries').doc();
       try {
-        ref = await api.db.collection('goalRecords').doc(String(metricKey)).collection('variants').doc(variantKey).collection('entries').add(payload);
+        await writeGoalEntry(metricKey, variantKey, ref.id, bestCandidate);
       } catch (err) {
-        warnFirestoreWrite('goal entry', entryPath, payload, err);
+        warnFirestoreWrite('goal entry', entryPath.replace('{autoId}', ref.id), {...bestCandidate, createdAt:'serverTimestamp()'}, err);
+        enqueuePendingWrite(goalQueueItem(metricKey, params, variantKey, ref.id, bestCandidate, false), err);
         return { ok:false, error:api.lastError };
       }
       const bestResult = await updateGoalBestIfBetter(metricKey, params, ref.id, bestCandidate);
       const playerStatsResult = await updateGoalPlayerStats(metricKey, params, ref.id, bestCandidate, bestResult);
+      if(retryableResult(bestResult) || retryableResult(playerStatsResult)){
+        enqueuePendingWrite(goalQueueItem(metricKey, params, variantKey, ref.id, bestCandidate, true), bestResult && bestResult.ok === false ? bestResult.error : playerStatsResult.error);
+      }
       return { ok:true, id:ref.id, best:bestResult, playerStats:playerStatsResult };
     } catch (err) {
       warnFirestoreWrite('goal submit', 'goalRecords/' + String(metricKey), {params, record}, err);
       return { ok:false, error:api.lastError };
     }
   }
-
   async function submitCampaignRecord(levelKey, result){
     try {
       const entryPath = 'campaignRecords/' + String(levelKey) + '/entries/{autoId}';
@@ -457,17 +722,20 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
         record,
         clientCreatedAt:new Date().toISOString()
       };
-      const payload = {...bestCandidate, createdAt:firebase.firestore.FieldValue.serverTimestamp()};
-      let ref;
+      const ref = api.db.collection('campaignRecords').doc(String(levelKey)).collection('entries').doc();
       try {
-        ref = await api.db.collection('campaignRecords').doc(String(levelKey)).collection('entries').add(payload);
-        try { console.info('[Trianota Firestore write ok]', {type:'campaign entry', path:entryPath.replace('{autoId}', ref.id), payload}); } catch {}
+        await writeCampaignEntry(levelKey, ref.id, bestCandidate);
+        try { console.info('[Trianota Firestore write ok]', {type:'campaign entry', path:entryPath.replace('{autoId}', ref.id), payload:{...bestCandidate, createdAt:'serverTimestamp()'}}); } catch {}
       } catch (err) {
-        warnFirestoreWrite('campaign entry', entryPath, payload, err);
+        warnFirestoreWrite('campaign entry', entryPath.replace('{autoId}', ref.id), {...bestCandidate, createdAt:'serverTimestamp()'}, err);
+        enqueuePendingWrite(campaignQueueItem(levelKey, ref.id, bestCandidate, false), err);
         return { ok:false, error:api.lastError };
       }
       const bestResult = await updateCampaignBestIfBetter(levelKey, ref.id, bestCandidate);
       const playerStatsResult = await updateCampaignPlayerStats(levelKey, ref.id, bestCandidate, bestResult);
+      if(retryableResult(bestResult) || retryableResult(playerStatsResult)){
+        enqueuePendingWrite(campaignQueueItem(levelKey, ref.id, bestCandidate, true), bestResult && bestResult.ok === false ? bestResult.error : playerStatsResult.error);
+      }
       try { console.info('[Trianota Firestore write ok]', {type:'campaign best', path:'campaignRecords/' + String(levelKey), result:bestResult, playerStats:playerStatsResult}); } catch {}
       return { ok:true, id:ref.id, best:bestResult, playerStats:playerStatsResult };
     } catch (err) {
@@ -580,7 +848,8 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
     }
   }
 
-  api.ready = init().then(value => { readyResolved = true; return value; }).catch(err => { readyResolved = true; setError(err); return false; });
+  api.ready = init().then(value => { readyResolved = true; schedulePendingQueueRetry(2500); return value; }).catch(err => { readyResolved = true; setError(err); return false; });
+  initPendingQueueRetries();
   return api;
 })();
 

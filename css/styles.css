@@ -888,3 +888,82 @@
 .recordVariantTitle{font-size:12px;font-weight:950;color:#e2e8f0;margin:0 0 7px;}
 .recordVariant .recordRows{gap:6px;}
 .recordVariant .recordRow{padding-top:6px;}
+/* v19.79 - Perfil v1 */
+.profileOpenBtn{margin-top:4px!important;}
+.profileModalCard{width:min(520px,100%);max-height:min(88vh,760px);overflow:auto;padding:20px;}
+.profileHero{display:flex;align-items:center;gap:13px;margin:4px 0 14px;padding:13px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:linear-gradient(160deg,rgba(30,41,59,.72),rgba(2,6,23,.62));}
+.profileAvatar{width:58px;height:58px;flex:0 0 58px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:1000;color:#020617;background:linear-gradient(145deg,#fde047,#22d3ee 58%,#a855f7);box-shadow:0 12px 26px rgba(0,0,0,.32),0 0 22px rgba(34,211,238,.18),inset 0 1px 0 rgba(255,255,255,.42);}
+.profileHeroText{min-width:0;flex:1;}
+.profileNick{font-size:23px;line-height:1.05;font-weight:1000;letter-spacing:-.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.profileStatus{margin-top:5px;color:#cbd5e1;font-size:12px;font-weight:800;}
+.profileTinyAction{width:auto!important;margin:8px 0 0!important;padding:6px 9px!important;border-radius:10px!important;font-size:12px!important;box-shadow:none!important;}
+.profileGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:10px 0 12px;}
+.profileStat{border:1px solid rgba(255,255,255,.10);border-radius:16px;background:rgba(2,6,23,.26);padding:11px;min-height:72px;}
+.profileStatLabel{font-size:11px;color:#94a3b8;font-weight:900;text-transform:uppercase;letter-spacing:.06em;}
+.profileStatValue{margin-top:5px;font-size:20px;font-weight:1000;color:#f8fafc;line-height:1.05;}
+.profileSection{border:1px solid rgba(255,255,255,.10);background:rgba(2,6,23,.24);border-radius:17px;padding:12px;margin:10px 0;}
+.profileSection h3{margin:0 0 10px;font-size:14px;letter-spacing:.07em;color:#fde68a;}
+.profileWorldRows,.profileRows{display:grid;gap:7px;}
+.profileWorldRow,.profileRow{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid rgba(255,255,255,.07);padding-top:7px;}
+.profileWorldRow:first-child,.profileRow:first-child{border-top:0;padding-top:0;}
+.profileRow span,.profileWorldRow span{color:#cbd5e1;font-size:12px;font-weight:850;}
+.profileRow b,.profileWorldRow b{color:#f8fafc;font-size:13px;text-align:right;}
+.profileLevelGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px;}
+.profileLevelCell{border:1px solid rgba(255,255,255,.10);border-radius:13px;background:rgba(15,23,42,.54);padding:8px 7px;min-height:58px;}
+.profileLevelCell.done{border-color:rgba(34,197,94,.36);background:rgba(20,83,45,.20);}
+.profileLevelCell .levelName{font-size:11px;font-weight:1000;color:#e2e8f0;}
+.profileLevelCell .levelBest{font-size:11px;font-weight:850;color:#94a3b8;margin-top:4px;line-height:1.1;}
+.profileLevelCell.done .levelBest{color:#86efac;}
+.profileRecordColumns{display:grid;grid-template-columns:1fr;gap:10px;}
+.profileRecordGroup{border-top:1px solid rgba(255,255,255,.07);padding-top:9px;}
+.profileRecordGroup:first-child{border-top:0;padding-top:0;}
+.profileRecordGroupTitle{font-size:12px;font-weight:1000;color:#e2e8f0;margin-bottom:7px;}
+.profileWorldOwnedNote{color:#94a3b8;font-size:12px;line-height:1.35;margin:3px 0 9px;}
+.profileEmpty{color:#94a3b8;font-size:12px;line-height:1.35;margin:0;}
+@media (max-width:420px){.profileModalCard{padding:16px;max-height:90vh;}.profileHero{align-items:flex-start;padding:11px;}.profileAvatar{width:50px;height:50px;flex-basis:50px;border-radius:15px;font-size:19px;}.profileNick{font-size:20px;}.profileGrid{grid-template-columns:1fr 1fr;gap:7px;}.profileStat{padding:9px;min-height:64px;}.profileStatValue{font-size:18px;}.profileLevelGrid{grid-template-columns:repeat(2,1fr);}}
+/* v19.81 - Perfil mobile-first compacto */
+#profileModal.show{align-items:center;justify-content:center;padding:10px;}
+.profileModalCard{position:relative;width:min(390px,calc(100vw - 20px));height:min(720px,calc(100svh - 20px));max-height:calc(100svh - 20px);overflow:hidden;padding:12px;border-radius:22px;background:linear-gradient(160deg,rgba(10,15,28,.98),rgba(5,8,17,.98));border:1px solid rgba(255,255,255,.14);box-shadow:0 24px 70px rgba(0,0,0,.55);}
+.profileCloseX{position:absolute;top:10px;right:10px;z-index:5;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.16);background:rgba(2,6,23,.72);color:rgba(255,255,255,.9);font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 22px rgba(0,0,0,.28);}
+#profileContent{height:100%;min-height:0;}
+.profileMainView{height:100%;min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:8px;overflow:hidden;}
+.profileHero.compact{margin:0 38px 0 0;padding:8px 10px;border-radius:18px;gap:9px;background:linear-gradient(145deg,rgba(21,28,44,.76),rgba(2,6,23,.52));border:1px solid rgba(255,255,255,.11);}
+.profileHero.compact .profileAvatar{width:44px;height:44px;flex:0 0 44px;border-radius:50%;font-size:16px;box-shadow:0 8px 20px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.38);}
+.profileHero.compact .profileNick{font-size:20px;line-height:1.05;letter-spacing:0;}
+.profileHero.compact .profileStatus{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(226,232,240,.64);margin-top:3px;}
+.profileMiniGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.profileMiniStat{min-width:0;height:46px;padding:5px 4px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(15,23,42,.74);color:#e5e7eb;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;}
+.profileMiniStat span{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:rgba(203,213,225,.68);white-space:nowrap;}
+.profileMiniStat b{font-size:15px;line-height:1;}
+.profileCompactSection{min-height:0;display:flex;flex-direction:column;gap:6px;}
+.profileCompactSection.campaign{overflow:hidden;}
+.profileSectionTitle{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.09em;color:rgba(226,232,240,.72);}
+.profileWorldGrid{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(2,minmax(58px,1fr));gap:6px;min-height:0;}
+.profileWorldTile{min-width:0;min-height:0;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:linear-gradient(155deg,rgba(30,41,59,.82),rgba(15,23,42,.58));color:#f8fafc;padding:5px 2px;display:grid;grid-template-rows:1fr auto auto;align-items:center;justify-items:center;cursor:pointer;}
+.profileWorldTile span{font-size:17px;line-height:1;color:#7dd3fc;text-shadow:0 0 12px rgba(125,211,252,.24);}
+.profileWorldTile b{font-size:12px;line-height:1;}
+.profileWorldTile em{font-style:normal;font-size:10px;color:rgba(226,232,240,.68);line-height:1;}
+.profileWorldTile.locked{opacity:.42;cursor:not-allowed;filter:saturate(.55);}
+.profileGoalCards{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.profileGoalCard{height:60px;border-radius:15px;border:1px solid rgba(255,255,255,.11);background:linear-gradient(155deg,rgba(8,145,178,.24),rgba(30,41,59,.7));color:#f8fafc;padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;}
+.profileGoalCard span{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:rgba(226,232,240,.72);}
+.profileGoalCard b{font-size:15px;line-height:1;}
+.profileSubView{height:100%;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px;}
+.profileSubHead{display:flex;align-items:center;gap:9px;padding-right:36px;}
+.profileSubHead h3{margin:0;font-size:20px;line-height:1.1;}
+.profileBackBtn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(15,23,42,.8);color:#f8fafc;font-size:25px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.profileSubBody{min-height:0;overflow:auto;padding-right:2px;}
+.profileDetailLegend,.profileDetailRow{display:grid;grid-template-columns:1.05fr .95fr .95fr;gap:6px;align-items:center;}
+.profileDetailLegend{padding:0 8px 6px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:rgba(203,213,225,.6);}
+.profileDetailLegend b,.profileDetailLegend em{font-style:normal;text-align:right;}
+.profileDetailRow{min-height:42px;margin-bottom:6px;padding:8px;border-radius:13px;background:rgba(15,23,42,.72);border:1px solid rgba(255,255,255,.08);font-size:12px;}
+.profileDetailRow span{font-weight:850;color:#f8fafc;}
+.profileDetailRow b,.profileDetailRow em{font-style:normal;text-align:right;color:rgba(226,232,240,.82);font-weight:800;}
+.profileOwnedRows{display:grid;gap:7px;}
+.profileOwnedRow{display:grid;grid-template-columns:48px 1fr auto;gap:8px;align-items:center;min-height:44px;padding:8px;border-radius:13px;background:rgba(15,23,42,.72);border:1px solid rgba(255,255,255,.08);}
+.profileOwnedRow span{font-size:10px;font-weight:900;color:#67e8f9;}
+.profileOwnedRow b{font-size:12px;color:#f8fafc;}
+.profileOwnedRow em{font-style:normal;font-size:12px;color:rgba(226,232,240,.75);}
+.profileEmpty{margin:16px 0 0;color:rgba(226,232,240,.7);font-size:13px;text-align:center;}
+.profileEmpty.large{margin-top:30vh;}
+@media (max-width:380px){.profileModalCard{width:calc(100vw - 12px);height:calc(100svh - 12px);max-height:calc(100svh - 12px);padding:9px;border-radius:18px;}.profileCloseX{top:8px;right:8px;width:31px;height:31px;font-size:20px;}.profileMainView{gap:6px;}.profileHero.compact{margin-right:34px;padding:7px 8px;}.profileHero.compact .profileAvatar{width:39px;height:39px;flex-basis:39px;font-size:14px;}.profileHero.compact .profileNick{font-size:18px;}.profileMiniStat{height:42px;}.profileMiniStat span{font-size:8px;}.profileMiniStat b{font-size:14px;}.profileWorldGrid{gap:5px;grid-template-rows:repeat(2,minmax(52px,1fr));}.profileWorldTile span{font-size:15px;}.profileWorldTile b{font-size:11px;}.profileWorldTile em{font-size:9px;}.profileGoalCard{height:54px;}.profileGoalCard span{font-size:9px;}.profileGoalCard b{font-size:13px;}}

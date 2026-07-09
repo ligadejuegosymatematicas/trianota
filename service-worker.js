@@ -1,8 +1,9 @@
-const CACHE_NAME = 'trianota-pwa-v19.78-player-stats-min';
+﻿const CACHE_NAME = 'trianota-pwa-v19.81-perfil-ui';
 const LOCAL_ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './VERSION.txt',
   './css/styles.css',
   './assets/trianota_logo.png',
   './assets/icons/apple-touch-icon.png',
@@ -33,6 +34,7 @@ const LOCAL_ASSETS = [
   './js/records.js',
   './js/ui.js',
   './js/ui_records.js',
+  './js/profile_ui.js',
   './js/zones.js'
 ];
 
@@ -88,3 +90,4 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(freshAsset ? networkFirst(event.request) : cacheFirst(event.request));
 });
+

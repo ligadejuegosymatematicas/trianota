@@ -70,10 +70,15 @@ var DATA_PROVIDER = window.DATA_PROVIDER = (() => {
     const fetchedAt = item && Number(item.fetchedAt || 0);
     return !!(fetchedAt && Date.now() - fetchedAt < REMOTE_CACHE_TTL_MS);
   }
+  function remoteCacheValue(group, key, fallback){
+    const item = remoteCache[group] && remoteCache[group][key];
+    return item && Object.prototype.hasOwnProperty.call(item, 'value') ? clone(item.value) : clone(fallback);
+  }
   function markRemoteCacheFetched(group, key, value){
     remoteCacheBucket(group)[key] = {
       fetchedAt: Date.now(),
-      hasValue: !(value === undefined || value === null || (Array.isArray(value) && value.length === 0))
+      hasValue: !(value === undefined || value === null || (Array.isArray(value) && value.length === 0)),
+      value: value === undefined ? null : clone(value)
     };
     writeJson(REMOTE_CACHE_KEY, remoteCache);
   }
@@ -183,6 +188,20 @@ var DATA_PROVIDER = window.DATA_PROVIDER = (() => {
 
   const api = {
     getPlayerProfile(){ return clone(data.player.profile); },
+    getPlayerStats(uid){
+      const provider = window.FIREBASE_PROVIDER;
+      const currentUid = uid || (provider && typeof provider.getUid === 'function' ? provider.getUid() : '') || 'current';
+      const cacheKey = String(currentUid);
+      const local = remoteCacheValue('playerStats', cacheKey, null);
+      refreshRemote('getPlayerStats', [uid], value => {
+        const providerUid = provider && typeof provider.getUid === 'function' ? provider.getUid() : '';
+        const valueKey = value && value.uid ? String(value.uid) : (providerUid || cacheKey);
+        markRemoteCacheFetched('playerStats', valueKey, value);
+        if(valueKey !== cacheKey) markRemoteCacheFetched('playerStats', cacheKey, value);
+        try { window.dispatchEvent(new CustomEvent('trianota:playerStatsUpdated', {detail:{uid:valueKey, value:value === null ? null : clone(value)}})); } catch {}
+      }, {group:'playerStats', key:cacheKey});
+      return local;
+    },
     savePlayerProfile(profilePatch){ data.player.profile = {...data.player.profile, ...profilePatch}; writeJson(STORAGE_KEY, data); return clone(data.player.profile); },
     getGoalLocalRecords(){ return clone(data.goal.localRecords); },
     saveGoalLocalRecords(records){ data.goal.localRecords = Array.isArray(records) ? clone(records) : []; writeJson(STORAGE_KEY, data); writeJson(LEGACY_GOAL_RECORDS_KEY, data.goal.localRecords); return clone(data.goal.localRecords); },
