@@ -185,8 +185,37 @@
     updatePlayerProfileGate();
   }
 
-  if($('configBtn')) $('configBtn').onclick=()=>{ syncProfileInputs(isPlayerNickConfirmed() ? profileNick() : ''); setProfileMessage('configNickMsg',''); showScreen('config'); };
-  if($('saveConfigBtn')) $('saveConfigBtn').onclick=()=>{cfg.duration=+$('duration').value; cfg.surface=$('surface').value; cfg.kickMode=$('kickMode').value; cfg.directionSpeed=+$('directionSpeed').value; showScreen('home'); updatePlayerProfileGate();};
+  function setSelectValueFromCfg(id, value){
+    const control = $(id);
+    if(!control) return;
+    control.value = String(value);
+  }
+  function updateConfigConditionalUI(){
+    const speedRow = $('directionSpeedRow');
+    if(speedRow) speedRow.hidden = cfg.kickMode !== 'dirforce';
+  }
+  function syncConfigUIFromState(){
+    setSelectValueFromCfg('duration', cfg.duration);
+    setSelectValueFromCfg('surface', cfg.surface);
+    setSelectValueFromCfg('kickMode', cfg.kickMode);
+    setSelectValueFromCfg('directionSpeed', cfg.directionSpeed);
+    updateConfigConditionalUI();
+  }
+  function applyConfigFromUI(){
+    cfg.duration = +$('duration').value;
+    cfg.surface = $('surface').value;
+    cfg.kickMode = $('kickMode').value;
+    cfg.directionSpeed = +$('directionSpeed').value;
+    updateConfigConditionalUI();
+    updatePlayerProfileGate();
+  }
+  ['duration','surface','kickMode','directionSpeed'].forEach(id=>{
+    const control = $(id);
+    if(control) control.onchange = applyConfigFromUI;
+  });
+
+  if($('configBtn')) $('configBtn').onclick=()=>{ syncConfigUIFromState(); syncProfileInputs(isPlayerNickConfirmed() ? profileNick() : ''); setProfileMessage('configNickMsg',''); showScreen('config'); };
+  if($('configCloseBtn')) $('configCloseBtn').onclick=()=>{ showScreen('home'); updatePlayerProfileGate(); };
   if($('aboutBtn')) $('aboutBtn').onclick=()=>showModal('aboutModal');
   if($('recordsBtn')) $('recordsBtn').onclick=()=>{renderRecords(); showModal('recordsModal');};
   if($('goalPlayBtn')) $('goalPlayBtn').onclick=()=>{ if(requirePlayerNick()) startGame(); };
