@@ -1,4 +1,4 @@
-﻿// Perfil v19.81. Vista principal compacta mobile-first; detalles bajo demanda.
+﻿// Perfil v19.83. UI premium compacta con r\u00e9cords mundiales bajo demanda.
 (function(){
   'use strict';
 
@@ -14,6 +14,7 @@
     {goals:5, label:'5 goles'}
   ];
   const WORLD_SYMBOLS = ['\u25b3','\u25e5','\u25cf','\u25c7','\u21af','!','\u25cc','\u221e','\u2726','\u2605'];
+  const GOAL_ICONS = {fastest:'\u26a1', goals:'\u26bd', surface:'\u25c8'};
   let currentView = {type:'main'};
 
   function el(id){ return document.getElementById(id); }
@@ -66,8 +67,9 @@
   }
   function campaignWorlds(){ return window.CAMPAIGN_LEVELS || []; }
   function worldLevels(world){ return (world && world.levels ? world.levels : []); }
+  function implementedWorldLevels(world){ return worldLevels(world).filter(level => level.implemented); }
   function implementedLevels(){
-    return campaignWorlds().flatMap(world => worldLevels(world).filter(level => level.implemented).map(level => ({world:world.world, level:level.n, key:`${world.world}-${level.n}`})));
+    return campaignWorlds().flatMap(world => implementedWorldLevels(world).map(level => ({world:world.world, level:level.n, key:`${world.world}-${level.n}`})));
   }
   function bestByLevel(){ return DATA_PROVIDER && DATA_PROVIDER.getCampaignPersonalBestTimes ? DATA_PROVIDER.getCampaignPersonalBestTimes() : {}; }
   function personalCampaignRecord(best, key){
@@ -75,21 +77,38 @@
     if(!record) return null;
     return typeof record === 'number' ? {time:record} : record;
   }
-  function completedLevels(best){ return implementedLevels().filter(level => personalCampaignRecord(best, level.key)).length; }
-  function worldsWithProgress(best){
-    return campaignWorlds().filter(world => worldLevels(world).some(level => level.implemented && personalCampaignRecord(best, `${world.world}-${level.n}`))).length;
+  function isWorldCompleted(world, best){
+    const levels = implementedWorldLevels(world);
+    return levels.length > 0 && levels.every(level => personalCampaignRecord(best, `${world.world}-${level.n}`));
+  }
+  function worldProgress(world, best){
+    const levels = implementedWorldLevels(world);
+    const done = levels.filter(level => personalCampaignRecord(best, `${world.world}-${level.n}`)).length;
+    return {done, total:levels.length};
+  }
+  function profileWorldStates(best){
+    const worlds = campaignWorlds();
+    const currentWorld = worlds.find(world => implementedWorldLevels(world).length > 0 && !isWorldCompleted(world, best));
+    const currentNumber = currentWorld ? currentWorld.world : null;
+    const states = {};
+    worlds.forEach(world => {
+      const implemented = implementedWorldLevels(world).length > 0;
+      if(!implemented) states[world.world] = 'comingSoon';
+      else if(isWorldCompleted(world, best)) states[world.world] = 'completed';
+      else if(currentNumber && world.world === currentNumber) states[world.world] = 'current';
+      else states[world.world] = 'locked';
+    });
+    return states;
   }
   function goalRecords(){ return DATA_PROVIDER && DATA_PROVIDER.getGoalLocalRecords ? DATA_PROVIDER.getGoalLocalRecords() : []; }
-  function goalMarksCount(){
-    let count = 0;
-    FASTEST_TARGETS.forEach(item => { if(personalFastest(item.goals) !== EM) count++; });
-    GOAL_DURATIONS.forEach(item => { if(bestGoals(item.duration) !== EM) count++; if(bestSurface(item.duration) !== EM) count++; });
-    return count;
-  }
   function goalRecordsForDuration(duration){ return goalRecords().filter(record => +record.duration === +duration); }
   function bestGoals(duration){
     const rec = goalRecordsForDuration(duration).sort((a,b)=>(b.goals||0)-(a.goals||0) || (b.bestUtil||0)-(a.bestUtil||0))[0];
     return rec ? `${rec.goals || 0}` : EM;
+  }
+  function bestGoalsLabel(duration){
+    const value = bestGoals(duration);
+    return value === EM ? EM : `${value} goles`;
   }
   function bestSurface(duration){
     const rec = goalRecordsForDuration(duration).sort((a,b)=>(b.bestUtil||0)-(a.bestUtil||0) || (b.goals||0)-(a.goals||0))[0];
@@ -99,60 +118,22 @@
     const rec = DATA_PROVIDER && DATA_PROVIDER.getGoalPersonalBest ? DATA_PROVIDER.getGoalPersonalBest('fastestNGoles', {goals:target}) : null;
     return rec ? secondsLabel(rec) : EM;
   }
-  function profileStats(){
-    const uid = currentUid();
-    return DATA_PROVIDER && DATA_PROVIDER.getPlayerStats ? DATA_PROVIDER.getPlayerStats(uid) : null;
-  }
-  function flattenOwnedRecords(stats){
-    const owned = stats && stats.worldRecordsOwned;
-    if(!owned || typeof owned !== 'object') return [];
-    const rows = [];
-    const goal = owned.goal || {};
-    Object.keys(goal).forEach(metricKey => {
-      const variants = goal[metricKey] || {};
-      Object.keys(variants).forEach(variantKey => {
-        const rec = variants[variantKey];
-        if(rec) rows.push({kind:'GOL', key:variantKey, label:rec.metricLabel || metricKey, value:rec.valueLabel || rec.summary || variantKey});
-      });
-    });
-    const campaign = owned.campaign || {};
-    Object.keys(campaign).forEach(levelKey => {
-      const rec = campaign[levelKey];
-      if(rec) rows.push({kind:'META', key:levelKey, label:rec.levelLabel || `M${String(levelKey).replace('-', '-N')}`, value:rec.valueLabel || rec.summary || 'R\u00e9cord mundial'});
-    });
-    return rows;
-  }
-  function ownsWorldRecord(rows, key){ return rows.some(row => row.kind === 'META' && row.key === key); }
   function heroHtml(nick){
     return `
       <div class="profileHero compact">
-        <div class="profileAvatar" aria-hidden="true">${esc(initials(nick))}</div>
+        <div class="profileAvatar" aria-hidden="true"><span>${esc(initials(nick))}</span></div>
         <div class="profileHeroText">
           <div class="profileNick">${esc(nick)}</div>
-          <div class="profileStatus">Perfil local</div>
+          <div class="profileStatus"><i aria-hidden="true"></i> Perfil local</div>
         </div>
       </div>
     `;
   }
-  function summaryButton(label, value, action){
-    return `<button class="profileMiniStat" data-profile-action="${esc(action || '')}" type="button"><span>${esc(label)}</span><b>${esc(value)}</b></button>`;
-  }
   function renderMain(){
     const nick = profileNick();
-    const best = bestByLevel();
-    const levels = implementedLevels();
-    const done = completedLevels(best);
-    const worlds = worldsWithProgress(best);
-    const ownedRows = flattenOwnedRecords(profileStats());
     return `
-      <div class="profileMainView">
+      <div class="profileMainView noMiniStats">
         ${heroHtml(nick)}
-        <div class="profileMiniGrid">
-          ${summaryButton('Campa\u00f1a', `${done}/${levels.length}`, 'main')}
-          ${summaryButton('Mundos', `${worlds}/3`, 'main')}
-          ${summaryButton('GOL', `${goalMarksCount()}`, 'goal:goals')}
-          ${summaryButton('Mundiales', `${ownedRows.length}`, 'owned')}
-        </div>
         <section class="profileCompactSection campaign">
           <div class="profileSectionTitle">Campa\u00f1a</div>
           <div class="profileWorldGrid">${campaignWorlds().map(worldTile).join('')}</div>
@@ -160,33 +141,28 @@
         <section class="profileCompactSection goal">
           <div class="profileSectionTitle">GOL</div>
           <div class="profileGoalCards">
-            ${goalCard('Rapidez', bestFastestSummary(), 'goal:fastest')}
-            ${goalCard('Goles', bestGoalsSummary(), 'goal:goals')}
-            ${goalCard('Superficie', bestSurfaceSummary(), 'goal:surface')}
+            ${goalCard('Rapidez', '3 goles', personalFastest(3), 'goal:fastest', GOAL_ICONS.fastest)}
+            ${goalCard('Goles', '2 min', bestGoalsLabel(120), 'goal:goals', GOAL_ICONS.goals)}
+            ${goalCard('Superficie', '2 min', bestSurface(120), 'goal:surface', GOAL_ICONS.surface)}
           </div>
         </section>
+        <button class="profileWorldRecordsBtn" data-profile-action="worldRecords" type="button"><span>R\u00e9cords mundiales</span><b>Ver marcas globales</b></button>
       </div>
     `;
   }
   function worldTile(world){
-    const levels = worldLevels(world);
-    const implemented = levels.filter(level => level.implemented);
     const best = bestByLevel();
-    const done = implemented.filter(level => personalCampaignRecord(best, `${world.world}-${level.n}`)).length;
-    const enabled = implemented.length > 0;
-    const detail = enabled ? `${done}/${implemented.length}` : 'Pr\u00f3x.';
+    const states = profileWorldStates(best);
+    const stateClass = states[world.world] || 'comingSoon';
+    const progress = worldProgress(world, best);
+    const enabled = stateClass === 'completed' || stateClass === 'current';
+    const detail = stateClass === 'comingSoon' ? 'Pr\u00f3x.' : `${progress.done}/${progress.total}`;
     const symbol = WORLD_SYMBOLS[(world.world || 1) - 1] || '*';
-    return `<button class="profileWorldTile ${enabled ? 'active' : 'locked'}" ${enabled ? '' : 'disabled'} data-profile-action="world:${world.world}" type="button"><span>${esc(symbol)}</span><b>M${world.world}</b><em>${esc(detail)}</em></button>`;
+    return `<button class="profileWorldTile ${stateClass}" ${enabled ? '' : 'disabled'} data-profile-action="world:${world.world}" type="button"><span>${esc(symbol)}</span><b>M${world.world}</b><em>${esc(detail)}</em></button>`;
   }
-  function goalCard(title, value, action){
-    return `<button class="profileGoalCard" data-profile-action="${esc(action)}" type="button"><span>${esc(title)}</span><b>${esc(value)}</b></button>`;
+  function goalCard(title, variant, value, action, icon){
+    return `<button class="profileGoalCard" data-profile-action="${esc(action)}" type="button"><i aria-hidden="true">${esc(icon)}</i><span>${esc(title)}</span><small>${esc(variant)}</small><b>${esc(value)}</b></button>`;
   }
-  function bestFastestSummary(){ return FASTEST_TARGETS.map(item => personalFastest(item.goals)).find(value => value !== EM) || EM; }
-  function bestGoalsSummary(){
-    const values = GOAL_DURATIONS.map(item => bestGoals(item.duration)).filter(value => value !== EM).map(Number);
-    return values.length ? `${Math.max(...values)}` : EM;
-  }
-  function bestSurfaceSummary(){ return GOAL_DURATIONS.map(item => bestSurface(item.duration)).find(value => value !== EM) || EM; }
   function secondaryShell(title, body){
     return `<div class="profileSubView"><div class="profileSubHead"><button class="profileBackBtn" data-profile-action="main" type="button" aria-label="Volver">&lsaquo;</button><h3>${esc(title)}</h3></div><div class="profileSubBody">${body}</div></div>`;
   }
@@ -194,13 +170,12 @@
     const world = campaignWorlds().find(item => +item.world === +worldNum);
     if(!world) return renderMain();
     const best = bestByLevel();
-    const owned = flattenOwnedRecords(profileStats());
-    const rows = worldLevels(world).filter(level => level.implemented).map(level => {
+    const rows = implementedWorldLevels(world).map(level => {
       const key = `${world.world}-${level.n}`;
       const personal = personalCampaignRecord(best, key);
       const worldRec = cachedCampaignWorldRecord(key);
-      const own = ownsWorldRecord(owned, key);
-      return `<div class="profileDetailRow"><span>M${world.world}-N${level.n}</span><b>${personal ? secondsLabel(personal) : EM}</b><em>${worldRec ? secondsLabel(worldRec) : EM}${own ? ' ' + STAR : ''}</em></div>`;
+      const own = isOwnedRecord(worldRec);
+      return `<div class="profileDetailRow world"><span>M${world.world}-N${level.n}</span><b>${personal ? secondsLabel(personal) : EM}</b><em>${worldRec ? secondsLabel(worldRec) : EM}${own ? ' ' + STAR : ''}</em></div>`;
     }).join('') || '<p class="profileEmpty">Mundo no implementado.</p>';
     return secondaryShell(`Mundo ${world.world}`, `<div class="profileDetailLegend"><span>Nivel</span><b>Personal</b><em>Mundial</em></div><div class="profileDetailRows">${rows}</div>`);
   }
@@ -214,7 +189,7 @@
     if(kind === 'goals'){
       return secondaryShell('Goles', detailRows(GOAL_DURATIONS.map(item => {
         const world = cachedGoalWorldRecord('mostGoalsFixedDuration', {duration:item.duration});
-        return {label:item.label, personal:bestGoals(item.duration), world:world ? String(world.goals || 0) : EM};
+        return {label:item.label, personal:bestGoalsLabel(item.duration), world:world ? `${world.goals || 0} goles` : EM};
       })));
     }
     return secondaryShell('Superficie', detailRows(GOAL_DURATIONS.map(item => {
@@ -223,19 +198,63 @@
     })));
   }
   function detailRows(items){
-    return `<div class="profileDetailLegend"><span>Marca</span><b>Personal</b><em>Mundial</em></div><div class="profileDetailRows">${items.map(item => `<div class="profileDetailRow"><span>${esc(item.label)}</span><b>${esc(item.personal)}</b><em>${esc(item.world)}</em></div>`).join('')}</div>`;
+    return `<div class="profileVariantCards">${items.map(item => `<article class="profileVariantCard"><div class="profileVariantName">${esc(item.label)}</div><div class="profileVariantStats"><div><span>Personal</span><b>${esc(item.personal)}</b></div><div><span>Mundial</span><b>${esc(item.world)}</b></div></div></article>`).join('')}</div>`;
   }
-  function renderOwned(){
-    const rows = flattenOwnedRecords(profileStats());
-    const body = rows.length ? `<div class="profileOwnedRows">${rows.map(row => `<div class="profileOwnedRow"><span>${esc(row.kind)}</span><b>${esc(row.label)}</b><em>${esc(row.value)}</em></div>`).join('')}</div>` : '<p class="profileEmpty large">A\u00fan no tienes r\u00e9cords mundiales.</p>';
-    return secondaryShell('Mundiales', body);
+  function goalWorldRequests(){
+    return [
+      ...FASTEST_TARGETS.map(item => ({metricKey:'fastestNGoles', params:{goals:item.goals}, group:'Rapidez', label:item.label, format:r=>secondsLabel(r)})),
+      ...GOAL_DURATIONS.map(item => ({metricKey:'mostGoalsFixedDuration', params:{duration:item.duration}, group:'Goles', label:item.label, format:r=>r ? `${r.goals || 0} goles` : EM})),
+      ...GOAL_DURATIONS.map(item => ({metricKey:'maxSurfaceUsage', params:{duration:item.duration}, group:'Superficie', label:item.label, format:r=>r ? percentLabel(r.bestUtil || r.surface || 0) : EM}))
+    ];
+  }
+  function campaignWorldRequests(){
+    return implementedLevels().map(item => ({levelKey:item.key, group:'Campa\u00f1a', label:`M${item.world}-N${item.level}`, format:r=>secondsLabel(r)}));
+  }
+  function prefetchWorldRecordsForProfile(){
+    if(!window.DATA_PROVIDER) return;
+    if(typeof DATA_PROVIDER.prefetchGoalWorldRecords === 'function'){
+      DATA_PROVIDER.prefetchGoalWorldRecords(goalWorldRequests().map(item => ({metricKey:item.metricKey, params:item.params})));
+    }
+    if(typeof DATA_PROVIDER.prefetchCampaignWorldRecords === 'function'){
+      DATA_PROVIDER.prefetchCampaignWorldRecords(campaignWorldRequests().map(item => item.levelKey));
+    }
+  }
+  function recordHolder(record){
+    if(!record) return EM;
+    return record.holderNick || record.nick || (record.best && (record.best.holderNick || record.best.nick)) || EM;
+  }
+  function recordOwnerUid(record){
+    if(!record) return '';
+    return String(record.holderUid || record.uid || (record.best && (record.best.holderUid || record.best.uid)) || '');
+  }
+  function isOwnedRecord(record){
+    const uid = currentUid();
+    const owner = recordOwnerUid(record);
+    return !!(uid && owner && uid === owner);
+  }
+  function worldRecordRow(item, record){
+    const value = record ? item.format(record) : EM;
+    const holder = recordHolder(record);
+    const owned = isOwnedRecord(record);
+    return `<article class="profileWorldRecordRow ${owned ? 'owned' : ''}"><div><span>${esc(item.group)}</span><b>${esc(item.label)}</b></div><strong>${esc(value)}</strong><em>${esc(holder)}</em>${owned ? '<i>TU R\u00c9CORD</i>' : ''}</article>`;
+  }
+  function renderWorldRecords(){
+    prefetchWorldRecordsForProfile();
+    const goalRows = goalWorldRequests().map(item => worldRecordRow(item, DATA_PROVIDER.getGoalWorldRecord(item.metricKey, item.params))).join('');
+    const campaignRows = campaignWorldRequests().map(item => worldRecordRow(item, DATA_PROVIDER.getCampaignWorldRecord(item.levelKey))).join('');
+    return secondaryShell('R\u00e9cords mundiales', `
+      <div class="profileWorldRecordsView">
+        <section><h4>GOL</h4><div class="profileWorldRecordRows">${goalRows}</div></section>
+        <section><h4>Campa\u00f1a</h4><div class="profileWorldRecordRows">${campaignRows || '<p class="profileEmpty">No hay niveles implementados.</p>'}</div></section>
+      </div>
+    `);
   }
   function renderProfile(){
     const box = el('profileContent');
     if(!box || !window.DATA_PROVIDER) return;
     if(currentView.type === 'world') box.innerHTML = renderWorld(currentView.world);
     else if(currentView.type === 'goal') box.innerHTML = renderGoal(currentView.kind);
-    else if(currentView.type === 'owned') box.innerHTML = renderOwned();
+    else if(currentView.type === 'worldRecords') box.innerHTML = renderWorldRecords();
     else box.innerHTML = renderMain();
     bindProfileActions();
   }
@@ -244,7 +263,7 @@
       btn.onclick = () => {
         const action = btn.dataset.profileAction || 'main';
         if(action === 'main') currentView = {type:'main'};
-        else if(action === 'owned') currentView = {type:'owned'};
+        else if(action === 'worldRecords') currentView = {type:'worldRecords'};
         else if(action.startsWith('world:')) currentView = {type:'world', world:+action.split(':')[1]};
         else if(action.startsWith('goal:')) currentView = {type:'goal', kind:action.split(':')[1]};
         renderProfile();
@@ -259,9 +278,13 @@
   function initProfileUi(){
     const btn = el('profileBtn');
     if(btn) btn.onclick = openProfile;
-    window.addEventListener('trianota:playerStatsUpdated', () => {
+    window.addEventListener('trianota:goalWorldRecordUpdated', () => {
       const modal = el('profileModal');
-      if(modal && modal.classList.contains('show')) renderProfile();
+      if(modal && modal.classList.contains('show') && currentView.type === 'worldRecords') renderProfile();
+    });
+    window.addEventListener('trianota:campaignWorldRecordUpdated', () => {
+      const modal = el('profileModal');
+      if(modal && modal.classList.contains('show') && (currentView.type === 'worldRecords' || currentView.type === 'world')) renderProfile();
     });
   }
 

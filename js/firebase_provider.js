@@ -1,4 +1,4 @@
-// Optional Firebase provider.
+﻿// Optional Firebase provider.
 // GitHub Pages remains the frontend host; this stage writes candidate entries and updates provisional best docs.
 var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
   let readyResolved = false;
@@ -262,7 +262,23 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
   function recordFromDoc(data){
     if(!data || typeof data !== 'object') return null;
     const plain = toPlain(data);
-    return plain.best || plain.record || plain.worldRecord || plain;
+    const best = plain.best || plain.record || plain.worldRecord || null;
+    if(best && typeof best === 'object' && !Array.isArray(best)){
+      return {
+        ...best,
+        bestEntryId: plain.bestEntryId || best.bestEntryId,
+        holderUid: plain.holderUid || best.holderUid || best.uid || '',
+        holderNick: plain.holderNick || best.holderNick || best.nick || '',
+        summary: plain.summary || best.summary || '',
+        valueLabel: plain.valueLabel || best.valueLabel || '',
+        updatedAtText: plain.updatedAtText || best.updatedAtText || '',
+        metricKey: plain.metricKey || best.metricKey,
+        variantKey: plain.variantKey || best.variantKey,
+        levelKey: plain.levelKey || best.levelKey,
+        params: plain.params || best.params
+      };
+    }
+    return plain;
   }
 
   function rankingSort(metricKey){
@@ -852,6 +868,7 @@ var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
   initPendingQueueRetries();
   return api;
 })();
+
 
 
 
