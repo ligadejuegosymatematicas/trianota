@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'trianota-pwa-v19.85-config-auto-ui';
+const CACHE_NAME = 'trianota-pwa-v19.87-modales-premium';
 const LOCAL_ASSETS = [
   './',
   './index.html',
