@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'trianota-pwa-v19.90-record-owners-ui';
+const CACHE_NAME = 'trianota-pwa-v19.92-home-premium-ui';
 const LOCAL_ASSETS = [
   './',
   './index.html',

@@ -1646,3 +1646,481 @@ $124px;
   .profileWorldStat .profileOwnerName{font-size:8px;}
   .profileOwnerBadge{font-size:7px;padding:2px 5px;}
 }
+
+/* v19.91 - Refinamiento visual del Perfil principal */
+.profileModalCard{
+  height:min(708px,calc(100svh - 18px));
+}
+.profileMainView.noMiniStats{
+  grid-template-rows:auto minmax(0,1fr) auto auto;
+  gap:10px;
+  align-content:stretch;
+  padding:1px;
+}
+.profileHero.compact{
+  margin:0 40px 1px 0;
+  min-height:62px;
+  padding:9px 11px;
+  gap:11px;
+  border-radius:20px;
+  background:
+    radial-gradient(circle at 13% 16%,rgba(250,204,21,.10),rgba(250,204,21,0) 34%),
+    linear-gradient(145deg,rgba(24,32,50,.82),rgba(5,10,22,.62));
+  border-color:rgba(226,232,240,.13);
+  box-shadow:0 12px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.10);
+}
+.profileHero.compact::after{
+  inset:auto 14px 0 70px;
+  opacity:.72;
+}
+.profileHero.compact .profileAvatar{
+  width:46px;
+  height:46px;
+  flex-basis:46px;
+  font-size:16px;
+}
+.profileHero.compact .profileNick{
+  font-size:21px;
+  letter-spacing:-.015em;
+}
+.profileHero.compact .profileStatus{
+  margin-top:4px;
+  transform:translateY(0);
+}
+.profileMainView.noMiniStats .profileCompactSection{
+  gap:7px;
+}
+.profileMainView.noMiniStats .profileCompactSection.campaign{
+  justify-content:space-between;
+  padding-top:1px;
+}
+.profileMainView.noMiniStats .profileCompactSection.goal{
+  padding-top:2px;
+}
+.profileSectionTitle{
+  display:flex;
+  align-items:center;
+  min-height:13px;
+  padding-left:3px;
+  color:rgba(226,232,240,.66);
+  font-size:10px;
+  font-weight:1000;
+  letter-spacing:.105em;
+}
+.profileMainView.noMiniStats .profileWorldGrid{
+  grid-template-rows:repeat(2,minmax(68px,1fr));
+  gap:7px;
+}
+.profileWorldTile{
+  grid-template-rows:28px 13px 12px;
+  align-content:center;
+  gap:2px;
+  min-height:68px;
+  padding:6px 3px 5px;
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(125,211,252,.09),rgba(125,211,252,0) 48%),
+    linear-gradient(155deg,rgba(22,31,48,.80),rgba(8,13,28,.72));
+  border-color:rgba(226,232,240,.105);
+  box-shadow:0 8px 16px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.07);
+}
+.profileWorldTile::after{display:none;}
+.profileWorldSymbol{
+  width:26px;
+  height:26px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#dff7ff!important;
+  font-size:16px!important;
+  font-weight:1000;
+  line-height:1;
+  background:linear-gradient(145deg,rgba(34,211,238,.16),rgba(15,23,42,.70));
+  border:1px solid rgba(226,232,240,.12);
+  text-shadow:0 0 10px rgba(34,211,238,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.profileWorldTile b{
+  font-size:11px;
+  letter-spacing:.01em;
+}
+.profileWorldTile em{
+  font-size:9px;
+  font-weight:900;
+  color:rgba(226,232,240,.68);
+}
+.profileWorldStateLabel{
+  position:absolute;
+  top:4px;
+  right:4px;
+  min-width:17px;
+  height:13px;
+  padding:2px 4px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:7px;
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:.04em;
+  font-style:normal;
+  pointer-events:none;
+}
+.profileWorldTile.completed{
+  border-color:rgba(134,239,172,.34);
+  background:
+    radial-gradient(circle at 50% 0%,rgba(34,197,94,.15),rgba(34,197,94,0) 48%),
+    linear-gradient(155deg,rgba(20,83,45,.48),rgba(8,13,28,.74));
+  box-shadow:0 8px 16px rgba(0,0,0,.20),0 0 14px rgba(34,197,94,.10),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.profileWorldTile.completed .profileWorldSymbol{
+  color:#dcfce7!important;
+  background:linear-gradient(145deg,rgba(34,197,94,.22),rgba(12,34,24,.78));
+  border-color:rgba(134,239,172,.18);
+  text-shadow:0 0 10px rgba(34,197,94,.28);
+}
+.profileWorldTile.completed .profileWorldStateLabel{
+  color:#bbf7d0;
+  background:rgba(34,197,94,.16);
+  border:1px solid rgba(134,239,172,.26);
+}
+.profileWorldTile.current{
+  border-color:rgba(250,204,21,.46);
+  background:
+    radial-gradient(circle at 50% 0%,rgba(250,204,21,.18),rgba(250,204,21,0) 48%),
+    radial-gradient(circle at 50% 110%,rgba(34,211,238,.09),rgba(34,211,238,0) 44%),
+    linear-gradient(155deg,rgba(54,45,18,.66),rgba(8,13,28,.76));
+  box-shadow:0 10px 20px rgba(0,0,0,.24),0 0 18px rgba(250,204,21,.15),inset 0 1px 0 rgba(255,255,255,.10);
+}
+.profileWorldTile.current .profileWorldSymbol{
+  color:#fff7bd!important;
+  background:linear-gradient(145deg,rgba(250,204,21,.24),rgba(34,211,238,.12),rgba(15,23,42,.78));
+  border-color:rgba(250,204,21,.24);
+  text-shadow:0 0 10px rgba(250,204,21,.30);
+}
+.profileWorldTile.current .profileWorldStateLabel{
+  left:50%;
+  right:auto;
+  top:4px;
+  transform:translateX(-50%);
+  height:13px;
+  color:#1f1600;
+  background:linear-gradient(180deg,#fde047,#eab308);
+  border:1px solid rgba(250,204,21,.30);
+  box-shadow:0 0 10px rgba(250,204,21,.16);
+}
+.profileWorldTile.locked{
+  opacity:1;
+  filter:saturate(.55);
+  border-color:rgba(148,163,184,.10);
+  background:
+    linear-gradient(155deg,rgba(30,41,59,.36),rgba(8,13,28,.70));
+  color:rgba(226,232,240,.48);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.profileWorldTile.locked .profileWorldSymbol{
+  color:rgba(203,213,225,.48)!important;
+  background:linear-gradient(145deg,rgba(71,85,105,.18),rgba(15,23,42,.58));
+  border-color:rgba(148,163,184,.10);
+  text-shadow:none;
+}
+.profileWorldTile.locked b,
+.profileWorldTile.locked em{color:rgba(203,213,225,.46);}
+.profileWorldTile.locked .profileWorldStateLabel{
+  color:rgba(226,232,240,.62);
+  background:rgba(15,23,42,.72);
+  border:1px solid rgba(148,163,184,.16);
+}
+.profileWorldTile.comingSoon{
+  opacity:1;
+  filter:saturate(.30);
+  border-style:dashed;
+  border-color:rgba(148,163,184,.16);
+  background:linear-gradient(155deg,rgba(15,23,42,.26),rgba(2,6,23,.54));
+}
+.profileWorldTile.comingSoon .profileWorldSymbol{
+  color:rgba(203,213,225,.38)!important;
+  background:rgba(15,23,42,.42);
+  border-color:rgba(148,163,184,.08);
+  text-shadow:none;
+}
+.profileWorldTile.comingSoon b,
+.profileWorldTile.comingSoon em{color:rgba(203,213,225,.42);}
+.profileGoalCards{
+  gap:8px;
+}
+.profileGoalCard{
+  height:78px;
+  justify-content:center;
+  gap:4px;
+  padding:7px 5px;
+  border-radius:17px;
+  background:
+    radial-gradient(circle at 24% 0%,rgba(34,211,238,.13),rgba(34,211,238,0) 46%),
+    linear-gradient(155deg,rgba(15,23,42,.86),rgba(8,13,28,.78));
+  border-color:rgba(226,232,240,.12);
+  box-shadow:0 10px 20px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.07);
+}
+.profileGoalCard::after{
+  width:5px;
+  height:5px;
+  opacity:.68;
+}
+.profileGoalCard i{
+  width:20px;
+  height:20px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(250,204,21,.08);
+  border:1px solid rgba(250,204,21,.13);
+  font-size:12px;
+}
+.profileGoalCard span{
+  font-size:9px;
+  letter-spacing:.07em;
+  color:rgba(226,232,240,.62);
+}
+.profileGoalCard small{
+  font-size:10px;
+  color:rgba(226,232,240,.82);
+}
+.profileGoalCard b{
+  font-size:14px;
+  letter-spacing:-.01em;
+}
+.profileWorldRecordsBtn{
+  min-height:46px;
+  padding:9px 11px;
+  border-radius:16px;
+  border-color:rgba(226,232,240,.11);
+  background:
+    radial-gradient(circle at 12% 0%,rgba(250,204,21,.09),rgba(250,204,21,0) 44%),
+    linear-gradient(155deg,rgba(15,23,42,.74),rgba(8,13,28,.66));
+  box-shadow:0 9px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.profileWorldRecordsBtn span{
+  color:rgba(253,230,138,.88);
+  font-size:11px;
+}
+.profileWorldRecordsBtn b{
+  color:rgba(226,232,240,.62);
+  font-size:11px;
+}
+@media (max-width:380px){
+  .profileMainView.noMiniStats{gap:8px;}
+  .profileHero.compact{min-height:58px;padding:8px 9px;margin-right:36px;}
+  .profileHero.compact .profileAvatar{width:42px;height:42px;flex-basis:42px;}
+  .profileHero.compact .profileNick{font-size:19px;}
+  .profileMainView.noMiniStats .profileWorldGrid{grid-template-rows:repeat(2,minmax(61px,1fr));gap:6px;}
+  .profileWorldTile{min-height:61px;padding:5px 2px 4px;grid-template-rows:25px 12px 11px;}
+  .profileWorldSymbol{width:23px;height:23px;border-radius:8px;font-size:14px!important;}
+  .profileWorldTile b{font-size:10px;}
+  .profileWorldTile em{font-size:8px;}
+  .profileWorldStateLabel{font-size:6.5px;height:12px;padding:2px 3px;}
+  .profileGoalCard{height:70px;padding:6px 4px;}
+  .profileGoalCard i{width:18px;height:18px;font-size:11px;}
+  .profileGoalCard b{font-size:13px;}
+  .profileWorldRecordsBtn{min-height:43px;padding:8px 10px;}
+}
+/* v19.92 - Home premium launcher */
+#home.screen{
+  padding:10px;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(34,211,238,.10),rgba(34,211,238,0) 34%),
+    radial-gradient(circle at 50% 100%,rgba(250,204,21,.07),rgba(250,204,21,0) 38%),
+    var(--app-bg);
+}
+.homeCard{
+  width:min(390px,calc(100vw - 20px));
+  max-height:calc(100svh - 20px);
+  padding:16px 14px 14px;
+  border-radius:26px;
+  background:
+    radial-gradient(circle at 16% 0%,rgba(250,204,21,.08),rgba(250,204,21,0) 28%),
+    radial-gradient(circle at 86% 8%,rgba(34,211,238,.09),rgba(34,211,238,0) 30%),
+    linear-gradient(165deg,rgba(10,15,28,.78),rgba(3,7,18,.72));
+  border:1px solid rgba(226,232,240,.09);
+  box-shadow:0 18px 52px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.07);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.brandLogoWrap{margin:8px auto 5px;}
+.brandLogo{
+  width:min(142px,43vw);
+  border-radius:13px;
+  filter:drop-shadow(0 9px 18px rgba(0,0,0,.34)) drop-shadow(0 0 10px rgba(250,204,21,.08));
+}
+.profileBlock{margin:0 0 3px;gap:5px;}
+.profileSummary{
+  width:max-content;
+  max-width:100%;
+  margin:0 auto;
+  padding:1px 7px;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+  color:rgba(226,232,240,.76);
+  font-size:12px;
+  line-height:1.15;
+  font-weight:800;
+}
+.profileCheck{
+  color:#86efac;
+  font-size:11px;
+  text-shadow:0 0 8px rgba(34,197,94,.20);
+}
+.profileEditor{
+  margin-top:2px;
+  padding:9px;
+  border:1px solid rgba(250,204,21,.12);
+  border-radius:15px;
+  background:rgba(2,6,23,.22);
+}
+.profileEditor label{font-size:12px;color:rgba(226,232,240,.80);}
+.profileInputRow{gap:7px;}
+.profileInputRow input{min-height:39px;padding:8px 10px;}
+.profileInputRow .btn{min-height:39px;padding:8px 11px;border-radius:12px;}
+#playerNickMsg{
+  margin:0 0 4px;
+  text-align:center;
+  font-size:11px;
+  line-height:1.2;
+  color:rgba(253,230,138,.86);
+}
+#playerNickMsg:empty{display:none;}
+.modeGrid.compact{
+  gap:9px;
+  margin:9px 0 9px;
+}
+.modeGrid.compact .modeCard{
+  min-height:134px;
+  padding:13px;
+  border-radius:22px;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto;
+  gap:8px;
+}
+.modeCard.goalMode{
+  background:
+    radial-gradient(circle at 12% 0%,rgba(250,204,21,.18),rgba(250,204,21,0) 38%),
+    linear-gradient(155deg,rgba(31,26,12,.70),rgba(8,13,28,.82));
+  border-color:rgba(250,204,21,.23);
+  box-shadow:0 12px 24px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.modeCard.meta{
+  background:
+    radial-gradient(circle at 12% 0%,rgba(34,211,238,.17),rgba(34,211,238,0) 40%),
+    linear-gradient(155deg,rgba(8,47,73,.54),rgba(8,13,28,.82));
+  border-color:rgba(34,211,238,.22);
+  box-shadow:0 12px 24px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.modeCard.meta::after{opacity:.14;}
+.modeGrid.compact .modeTitle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0;
+  font-size:22px;
+  line-height:1;
+  letter-spacing:.02em;
+}
+.modeIcon{
+  width:26px;
+  height:26px;
+  border-radius:10px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  background:rgba(2,6,23,.34);
+  border:1px solid rgba(226,232,240,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.modeGrid.compact .modeDesc{
+  margin:0;
+  color:rgba(226,232,240,.76);
+  font-size:12.5px;
+  line-height:1.22;
+  align-self:center;
+}
+.modeGrid.compact .modeBtn{
+  min-height:42px;
+  margin:0;
+  padding:10px 14px;
+  border-radius:15px;
+  font-size:14px;
+}
+.modeCard.goalMode .modeBtn{box-shadow:0 5px 0 var(--gold-deep);}
+.modeCard.meta .modeBtn{
+  border-color:rgba(34,211,238,.22)!important;
+  background:linear-gradient(180deg,rgba(36,50,68,.96),rgba(15,23,42,.96));
+  box-shadow:0 4px 0 #0f172a,inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+.homeActions{
+  display:grid;
+  gap:7px;
+  margin-top:0;
+}
+.homeActions .btn{
+  margin:0;
+  box-shadow:none;
+}
+.homeProfileBtn{
+  min-height:44px;
+  padding:9px 12px!important;
+  border-radius:16px!important;
+  border-color:rgba(34,211,238,.16)!important;
+  background:
+    radial-gradient(circle at 12% 0%,rgba(34,211,238,.10),rgba(34,211,238,0) 44%),
+    linear-gradient(155deg,rgba(15,23,42,.76),rgba(8,13,28,.66))!important;
+  color:rgba(248,250,252,.92)!important;
+  font-size:13px!important;
+  font-weight:950;
+}
+.homeUtilityRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+.homeUtilityRow .btn{
+  min-height:38px;
+  padding:8px 9px!important;
+  border-radius:14px!important;
+  background:rgba(15,23,42,.54)!important;
+  border-color:rgba(226,232,240,.09)!important;
+  color:rgba(226,232,240,.74)!important;
+  font-size:12px!important;
+  font-weight:850;
+}
+.modeCard:active,.homeProfileBtn:active,.homeUtilityRow .btn:active{
+  transform:scale(.985);
+  filter:brightness(1.06);
+}
+@media (max-width:380px){
+  #home.screen{padding:7px;}
+  .homeCard{width:calc(100vw - 14px);max-height:calc(100svh - 14px);padding:13px 11px 12px;border-radius:23px;}
+  .brandLogoWrap{margin:6px auto 4px;}
+  .brandLogo{width:min(128px,42vw);}
+  .profileSummary{font-size:11.5px;}
+  .modeGrid.compact{gap:8px;margin:8px 0;}
+  .modeGrid.compact .modeCard{min-height:125px;padding:11px;border-radius:20px;gap:7px;}
+  .modeGrid.compact .modeTitle{font-size:20px;}
+  .modeIcon{width:24px;height:24px;font-size:13px;border-radius:9px;}
+  .modeGrid.compact .modeDesc{font-size:12px;line-height:1.18;}
+  .modeGrid.compact .modeBtn{min-height:40px;padding:9px 12px;font-size:13.5px;}
+  .homeProfileBtn{min-height:42px;font-size:12.5px!important;}
+  .homeUtilityRow .btn{min-height:36px;font-size:11.5px!important;}
+}
+@media (max-height:720px){
+  .homeCard{padding-top:11px;padding-bottom:11px;}
+  .brandLogo{width:min(122px,40vw);}
+  .modeGrid.compact .modeCard{min-height:118px;}
+  .modeGrid.compact .modeDesc{font-size:11.7px;}
+  .modeGrid.compact .modeBtn{min-height:38px;}
+  .homeProfileBtn{min-height:40px;}
+  .homeUtilityRow .btn{min-height:34px;}
+}

@@ -1,4 +1,4 @@
-﻿// Perfil v19.83. UI premium compacta con r\u00e9cords mundiales bajo demanda.
+// Perfil v19.83. UI premium compacta con r\u00e9cords mundiales bajo demanda.
 (function(){
   'use strict';
 
@@ -157,8 +157,10 @@
     const progress = worldProgress(world, best);
     const enabled = stateClass === 'completed' || stateClass === 'current';
     const detail = stateClass === 'comingSoon' ? 'Pr\u00f3x.' : `${progress.done}/${progress.total}`;
+    const stateLabel = stateClass === 'current' ? 'ACTUAL' : (stateClass === 'completed' ? '\u2713' : (stateClass === 'locked' ? 'BLOQ.' : ''));
     const symbol = WORLD_SYMBOLS[(world.world || 1) - 1] || '*';
-    return `<button class="profileWorldTile ${stateClass}" ${enabled ? '' : 'disabled'} data-profile-action="world:${world.world}" type="button"><span>${esc(symbol)}</span><b>M${world.world}</b><em>${esc(detail)}</em></button>`;
+    const aria = stateClass === 'comingSoon' ? `Mundo ${world.world}, pr\u00f3ximamente` : `Mundo ${world.world}, ${detail}`;
+    return `<button class="profileWorldTile ${stateClass}" ${enabled ? '' : 'disabled'} data-profile-action="world:${world.world}" type="button" aria-label="${esc(aria)}"><span class="profileWorldSymbol">${esc(symbol)}</span><b>M${world.world}</b><em>${esc(detail)}</em>${stateLabel ? `<small class="profileWorldStateLabel">${esc(stateLabel)}</small>` : ''}</button>`;
   }
   function goalCard(title, variant, value, action, icon){
     return `<button class="profileGoalCard" data-profile-action="${esc(action)}" type="button"><i aria-hidden="true">${esc(icon)}</i><span>${esc(title)}</span><small>${esc(variant)}</small><b>${esc(value)}</b></button>`;
