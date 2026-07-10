@@ -2124,3 +2124,70 @@ $124px;
   .homeProfileBtn{min-height:40px;}
   .homeUtilityRow .btn{min-height:34px;}
 }
+/* v19.93 - Perfil principal: grilla de mundos 3-4-3 */
+.profileMainView.noMiniStats{
+  grid-template-rows:auto auto minmax(18px,1fr) auto auto;
+  gap:9px;
+}
+.profileMainView.noMiniStats .profileCompactSection.campaign{
+  grid-row:2;
+  justify-content:flex-start;
+  gap:7px;
+  padding-top:0;
+  overflow:visible;
+}
+.profileMainView.noMiniStats .profileCompactSection.goal{
+  grid-row:4;
+  align-self:end;
+  padding-top:0;
+}
+.profileMainView.noMiniStats .profileWorldRecordsBtn{
+  grid-row:5;
+}
+.profileMainView.noMiniStats .profileWorldGrid{
+  display:grid;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  grid-template-rows:repeat(3,60px);
+  gap:7px;
+  align-content:start;
+  min-height:0;
+}
+.profileMainView.noMiniStats .profileWorldTile{
+  min-height:60px;
+  grid-column:span 3;
+}
+.profileMainView.noMiniStats .profileWorldTile:nth-child(1){grid-column:2 / span 3;grid-row:1;}
+.profileMainView.noMiniStats .profileWorldTile:nth-child(2){grid-column:5 / span 3;grid-row:1;}
+.profileMainView.noMiniStats .profileWorldTile:nth-child(3){grid-column:8 / span 3;grid-row:1;}
+.profileMainView.noMiniStats .profileWorldTile:nth-child(4){grid-column:1 / span 3;grid-row:2;}
+.profileMainView.noMiniStats .profileWorldTile:nth-child(5){grid-column:4 / span 3;grid-row:2;}
+.profileMainView.noMiniStats .profileWorldTile:nth-child(6){grid-column:7 / span 3;grid-row:2;}
+.profileMainView.noMiniStats .profileWorldTile:nth-child(7){grid-column:10 / span 3;grid-row:2;}
+.profileMainView.noMiniStats .profileWorldTile:nth-child(8){grid-column:2 / span 3;grid-row:3;}
+.profileMainView.noMiniStats .profileWorldTile:nth-child(9){grid-column:5 / span 3;grid-row:3;}
+.profileMainView.noMiniStats .profileWorldTile:nth-child(10){grid-column:8 / span 3;grid-row:3;}
+.profileWorldTile.comingSoon{
+  opacity:.88;
+  filter:saturate(.22);
+  border-color:rgba(148,163,184,.12);
+  background:linear-gradient(155deg,rgba(15,23,42,.20),rgba(2,6,23,.50));
+}
+.profileWorldTile.comingSoon .profileWorldSymbol{
+  color:rgba(203,213,225,.32)!important;
+  background:rgba(15,23,42,.36);
+}
+.profileWorldTile.comingSoon b,
+.profileWorldTile.comingSoon em{color:rgba(203,213,225,.36);}
+@media (max-width:380px){
+  .profileMainView.noMiniStats{gap:8px;}
+  .profileMainView.noMiniStats .profileCompactSection.campaign{gap:6px;}
+  .profileMainView.noMiniStats .profileWorldGrid{
+    grid-template-rows:repeat(3,54px);
+    gap:6px;
+  }
+  .profileMainView.noMiniStats .profileWorldTile{
+    min-height:54px;
+    padding:4px 2px;
+    grid-template-rows:22px 11px 10px;
+  }
+}
