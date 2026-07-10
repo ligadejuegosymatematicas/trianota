@@ -14,7 +14,7 @@
     {goals:5, label:'5 goles'}
   ];
   const WORLD_SYMBOLS = ['\u25b3','\u25e5','\u25cf','\u25c7','\u21af','!','\u25cc','\u221e','\u2726','\u2605'];
-  const GOAL_ICONS = {fastest:'\u26a1', goals:'\u26bd', surface:'\u25c8'};
+  const GOAL_ICONS = {fastest:'iconSpeed', goals:'iconGoal', surface:'iconSurface'};
   let currentView = {type:'main'};
 
   function el(id){ return document.getElementById(id); }
@@ -146,7 +146,7 @@
             ${goalCard('Superficie', '2 min', bestSurface(120), 'goal:surface', GOAL_ICONS.surface)}
           </div>
         </section>
-        <button class="profileWorldRecordsBtn" data-profile-action="worldRecords" type="button"><span>R\u00e9cords mundiales</span><b>Ver marcas globales</b></button>
+        <button class="profileWorldRecordsBtn" data-profile-action="worldRecords" type="button"><span>R\u00e9cords mundiales</span><b>Ver marcas globales</b><i class="uiIcon iconChevron" aria-hidden="true"></i></button>
       </div>
     `;
   }
@@ -157,16 +157,20 @@
     const progress = worldProgress(world, best);
     const enabled = stateClass === 'completed' || stateClass === 'current';
     const detail = stateClass === 'comingSoon' ? 'Pr\u00f3x.' : `${progress.done}/${progress.total}`;
-    const stateLabel = stateClass === 'current' ? 'ACTUAL' : (stateClass === 'completed' ? '\u2713' : (stateClass === 'locked' ? 'BLOQ.' : ''));
+    const stateLabel = stateClass === 'current' ? 'ACTUAL' : (stateClass === 'completed' ? iconHtml('iconCheck', 'profileStateIcon') : (stateClass === 'locked' ? 'BLOQ.' : ''));
+    const stateLabelHtml = stateLabel ? `<small class="profileWorldStateLabel">${stateClass === 'completed' ? stateLabel : esc(stateLabel)}</small>` : '';
     const symbol = WORLD_SYMBOLS[(world.world || 1) - 1] || '*';
     const aria = stateClass === 'comingSoon' ? `Mundo ${world.world}, pr\u00f3ximamente` : `Mundo ${world.world}, ${detail}`;
-    return `<button class="profileWorldTile ${stateClass}" ${enabled ? '' : 'disabled'} data-profile-action="world:${world.world}" type="button" aria-label="${esc(aria)}"><span class="profileWorldSymbol">${esc(symbol)}</span><b>M${world.world}</b><em>${esc(detail)}</em>${stateLabel ? `<small class="profileWorldStateLabel">${esc(stateLabel)}</small>` : ''}</button>`;
+    return `<button class="profileWorldTile ${stateClass}" ${enabled ? '' : 'disabled'} data-profile-action="world:${world.world}" type="button" aria-label="${esc(aria)}"><span class="profileWorldSymbol">${esc(symbol)}</span><b>M${world.world}</b><em>${esc(detail)}</em>${stateLabelHtml}</button>`;
+  }
+  function iconHtml(name, extraClass=''){
+    return `<span class="uiIcon ${esc(name)}${extraClass ? ` ${esc(extraClass)}` : ''}" aria-hidden="true"></span>`;
   }
   function goalCard(title, variant, value, action, icon){
-    return `<button class="profileGoalCard" data-profile-action="${esc(action)}" type="button"><i aria-hidden="true">${esc(icon)}</i><span>${esc(title)}</span><small>${esc(variant)}</small><b>${esc(value)}</b></button>`;
+    return `<button class="profileGoalCard" data-profile-action="${esc(action)}" type="button"><i aria-hidden="true">${iconHtml(icon)}</i><span>${esc(title)}</span><small>${esc(variant)}</small><b>${esc(value)}</b></button>`;
   }
   function secondaryShell(title, body){
-    return `<div class="profileSubView"><div class="profileSubHead"><button class="profileBackBtn" data-profile-action="main" type="button" aria-label="Volver">&lsaquo;</button><h3>${esc(title)}</h3></div><div class="profileSubBody">${body}</div></div>`;
+    return `<div class="profileSubView"><div class="profileSubHead"><button class="profileBackBtn" data-profile-action="main" type="button" aria-label="Volver"><span class="uiIcon iconBack" aria-hidden="true"></span></button><h3>${esc(title)}</h3></div><div class="profileSubBody">${body}</div></div>`;
   }
   function renderWorld(worldNum){
     const world = campaignWorlds().find(item => +item.world === +worldNum);

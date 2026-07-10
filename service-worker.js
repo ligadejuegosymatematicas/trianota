@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v19.96-profile-responsive-robustness';
+const CACHE_NAME = 'trianota-pwa-v19.97-ui-icon-system';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -10,6 +10,15 @@ const LOCAL_ASSETS = [
   './assets/icons/favicon.png',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
+  './assets/icons/ui/goal.svg',
+  './assets/icons/ui/meta.svg',
+  './assets/icons/ui/speed.svg',
+  './assets/icons/ui/surface.svg',
+  './assets/icons/ui/check.svg',
+  './assets/icons/ui/lock.svg',
+  './assets/icons/ui/close.svg',
+  './assets/icons/ui/back.svg',
+  './assets/icons/ui/chevron.svg',
   './assets/worlds/triangle.png',
   './assets/worlds/corridor.png',
   './assets/worlds/painters.png',
