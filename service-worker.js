@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v19.93-profile-world-grid-spacing';
+const CACHE_NAME = 'trianota-pwa-v19.94-profile-world-grid-3322';
 const LOCAL_ASSETS = [
   './',
   './index.html',
