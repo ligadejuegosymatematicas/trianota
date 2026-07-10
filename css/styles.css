@@ -2309,3 +2309,81 @@ $124px;
   }
   .profileMainView.noMiniStats .profileWorldTile{min-height:60px;}
 }
+/* v19.96 - Perfil principal: robustez responsive sin superposicion */
+.profileMainView.noMiniStats{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  scrollbar-width:none;
+  padding:1px;
+}
+.profileMainView.noMiniStats::-webkit-scrollbar{display:none;}
+.profileMainView.noMiniStats .profileHero.compact{
+  flex:0 0 auto;
+  margin-bottom:9px;
+}
+.profileMainView.noMiniStats .profileCompactSection.campaign{
+  flex:0 0 auto;
+  min-height:auto;
+  gap:8px;
+  padding-top:0;
+  overflow:visible;
+}
+.profileMainView.noMiniStats .profileWorldGrid{
+  flex:0 0 auto;
+  width:min(100%,336px);
+  max-width:336px;
+  margin-inline:auto;
+  grid-template-rows:repeat(4,clamp(58px,7.5svh,64px));
+  column-gap:8px;
+  row-gap:clamp(10px,1.75svh,15px);
+}
+.profileMainView.noMiniStats .profileWorldTile{
+  min-height:clamp(58px,7.5svh,64px);
+}
+.profileMainView.noMiniStats .profileCompactSection.goal{
+  flex:0 0 auto;
+  align-self:stretch;
+  margin-top:clamp(22px,4.8svh,42px);
+  padding-top:0;
+}
+.profileMainView.noMiniStats .profileWorldRecordsBtn{
+  flex:0 0 auto;
+  margin-top:9px;
+}
+@media (max-width:380px){
+  .profileMainView.noMiniStats .profileHero.compact{margin-bottom:8px;}
+  .profileMainView.noMiniStats .profileCompactSection.campaign{gap:6px;}
+  .profileMainView.noMiniStats .profileWorldGrid{
+    width:100%;
+    max-width:none;
+    grid-template-rows:repeat(4,58px);
+    column-gap:7px;
+    row-gap:clamp(8px,1.55svh,12px);
+  }
+  .profileMainView.noMiniStats .profileWorldTile{min-height:58px;}
+  .profileMainView.noMiniStats .profileCompactSection.goal{margin-top:clamp(20px,4.4svh,32px);}
+}
+@media (min-width:381px) and (max-height:720px){
+  .profileMainView.noMiniStats .profileHero.compact{margin-bottom:8px;}
+  .profileMainView.noMiniStats .profileWorldGrid{
+    max-width:334px;
+    grid-template-rows:repeat(4,56px);
+    row-gap:10px;
+  }
+  .profileMainView.noMiniStats .profileWorldTile{
+    min-height:56px;
+    grid-template-rows:25px 11px 10px;
+    padding:5px 4px 4px;
+  }
+  .profileMainView.noMiniStats .profileWorldSymbol{
+    width:25px;
+    height:25px;
+    font-size:14px!important;
+  }
+  .profileMainView.noMiniStats .profileCompactSection.goal{margin-top:22px;}
+  .profileMainView.noMiniStats .profileGoalCard{height:72px;}
+  .profileMainView.noMiniStats .profileWorldRecordsBtn{min-height:44px;margin-top:8px;}
+}
