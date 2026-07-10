@@ -174,8 +174,9 @@
       const key = `${world.world}-${level.n}`;
       const personal = personalCampaignRecord(best, key);
       const worldRec = cachedCampaignWorldRecord(key);
-      const own = isOwnedRecord(worldRec);
-      return `<div class="profileDetailRow world"><span>M${world.world}-N${level.n}</span><b>${personal ? secondsLabel(personal) : EM}</b><em>${worldRec ? secondsLabel(worldRec) : EM}${own ? ' ' + STAR : ''}</em></div>`;
+      const worldValue = worldRec ? secondsLabel(worldRec) : EM;
+      const owned = isOwnedRecord(worldRec);
+      return `<div class="profileDetailRow world ${owned ? 'owned' : ''}"><span>M${world.world}-N${level.n}</span><b>${personal ? secondsLabel(personal) : EM}</b>${worldRecordCell(worldRec, worldValue)}</div>`;
     }).join('') || '<p class="profileEmpty">Mundo no implementado.</p>';
     return secondaryShell(`Mundo ${world.world}`, `<div class="profileDetailLegend"><span>Nivel</span><b>Personal</b><em>Mundial</em></div><div class="profileDetailRows">${rows}</div>`);
   }
@@ -183,22 +184,22 @@
     if(kind === 'fastest'){
       return secondaryShell('Rapidez', detailRows(FASTEST_TARGETS.map(item => {
         const world = cachedGoalWorldRecord('fastestNGoles', {goals:item.goals});
-        return {label:item.label, personal:personalFastest(item.goals), world:world ? secondsLabel(world) : EM};
+        return {label:item.label, personal:personalFastest(item.goals), world:world ? secondsLabel(world) : EM, worldRecord:world};
       })));
     }
     if(kind === 'goals'){
       return secondaryShell('Goles', detailRows(GOAL_DURATIONS.map(item => {
         const world = cachedGoalWorldRecord('mostGoalsFixedDuration', {duration:item.duration});
-        return {label:item.label, personal:bestGoalsLabel(item.duration), world:world ? `${world.goals || 0} goles` : EM};
+        return {label:item.label, personal:bestGoalsLabel(item.duration), world:world ? `${world.goals || 0} goles` : EM, worldRecord:world};
       })));
     }
     return secondaryShell('Superficie', detailRows(GOAL_DURATIONS.map(item => {
       const world = cachedGoalWorldRecord('maxSurfaceUsage', {duration:item.duration});
-      return {label:item.label, personal:bestSurface(item.duration), world:world ? percentLabel(world.bestUtil || world.surface || 0) : EM};
+      return {label:item.label, personal:bestSurface(item.duration), world:world ? percentLabel(world.bestUtil || world.surface || 0) : EM, worldRecord:world};
     })));
   }
   function detailRows(items){
-    return `<div class="profileVariantCards">${items.map(item => `<article class="profileVariantCard"><div class="profileVariantName">${esc(item.label)}</div><div class="profileVariantStats"><div><span>Personal</span><b>${esc(item.personal)}</b></div><div><span>Mundial</span><b>${esc(item.world)}</b></div></div></article>`).join('')}</div>`;
+    return `<div class="profileVariantCards">${items.map(item => `<article class="profileVariantCard"><div class="profileVariantName">${esc(item.label)}</div><div class="profileVariantStats"><div><span>Personal</span><b>${esc(item.personal)}</b></div>${worldStatBlock(item.worldRecord, item.world)}</div></article>`).join('')}</div>`;
   }
   function goalWorldRequests(){
     return [
@@ -219,24 +220,49 @@
       DATA_PROVIDER.prefetchCampaignWorldRecords(campaignWorldRequests().map(item => item.levelKey));
     }
   }
+  function nestedBest(record){
+    return record && typeof record === 'object' ? (record.best || record.record || record.worldRecord || null) : null;
+  }
   function recordHolder(record){
-    if(!record) return EM;
-    return record.holderNick || record.nick || (record.best && (record.best.holderNick || record.best.nick)) || EM;
+    if(!record || typeof record !== 'object') return '';
+    const best = nestedBest(record) || {};
+    const nick = record.holderNick || record.nick || best.holderNick || best.nick || '';
+    if(nick) return String(nick).trim().slice(0, 24);
+    return recordOwnerUid(record) ? 'Jugador' : '';
   }
   function recordOwnerUid(record){
-    if(!record) return '';
-    return String(record.holderUid || record.uid || (record.best && (record.best.holderUid || record.best.uid)) || '');
+    if(!record || typeof record !== 'object') return '';
+    const best = nestedBest(record) || {};
+    return String(record.holderUid || record.uid || best.holderUid || best.uid || '');
   }
   function isOwnedRecord(record){
     const uid = currentUid();
     const owner = recordOwnerUid(record);
     return !!(uid && owner && uid === owner);
   }
+  function recordOwnerMeta(record){
+    const owned = isOwnedRecord(record);
+    const holder = recordHolder(record);
+    return {owned, holder};
+  }
+  function ownerLine(record){
+    const meta = recordOwnerMeta(record);
+    if(meta.owned) return '<small class="profileOwnerBadge">TU R\u00c9CORD</small>';
+    return meta.holder ? `<small class="profileOwnerName" title="${esc(meta.holder)}">${esc(meta.holder)}</small>` : '';
+  }
+  function worldRecordCell(record, value){
+    const meta = recordOwnerMeta(record);
+    return `<em class="profileWorldCell ${meta.owned ? 'owned' : ''}"><strong>${esc(value)}</strong>${record ? ownerLine(record) : ''}</em>`;
+  }
+  function worldStatBlock(record, value){
+    const meta = recordOwnerMeta(record);
+    return `<div class="profileWorldStat ${meta.owned ? 'owned' : ''}"><span>Mundial</span><b>${esc(value)}</b>${record ? ownerLine(record) : ''}</div>`;
+  }
   function worldRecordRow(item, record){
     const value = record ? item.format(record) : EM;
-    const holder = recordHolder(record);
-    const owned = isOwnedRecord(record);
-    return `<article class="profileWorldRecordRow ${owned ? 'owned' : ''}"><div><span>${esc(item.group)}</span><b>${esc(item.label)}</b></div><strong>${esc(value)}</strong><em>${esc(holder)}</em>${owned ? '<i>TU R\u00c9CORD</i>' : ''}</article>`;
+    const meta = recordOwnerMeta(record);
+    const holder = record && !meta.owned ? meta.holder : '';
+    return `<article class="profileWorldRecordRow ${meta.owned ? 'owned' : ''}"><div><span>${esc(item.group)}</span><b>${esc(item.label)}</b></div><strong>${esc(value)}</strong><em title="${esc(holder)}">${esc(holder)}</em>${meta.owned ? '<i>TU R\u00c9CORD</i>' : ''}</article>`;
   }
   function renderWorldRecords(){
     prefetchWorldRecordsForProfile();
@@ -292,4 +318,6 @@
   window.openProfile = openProfile;
   initProfileUi();
 })();
+
+
 

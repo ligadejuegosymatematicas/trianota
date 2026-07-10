@@ -185,14 +185,89 @@
     updatePlayerProfileGate();
   }
 
+  const CONFIG_CHOICES = {
+    duration: [
+      {value:'60', label:'1 min', note:'PRUEBA'},
+      {value:'120', label:'2 min'},
+      {value:'180', label:'3 min'},
+      {value:'300', label:'5 min'}
+    ],
+    surface: [
+      {value:'grass', label:'Pasto'},
+      {value:'concrete', label:'Cemento'},
+      {value:'dirt', label:'Tierra'},
+      {value:'wood', label:'Madera'},
+      {value:'hockey', label:'Hielo'}
+    ],
+    kickMode: [
+      {value:'sling', label:'Golpe directo', note:'Arrastra y suelta'},
+      {value:'dirforce', label:'Golpe de precisión', note:'Dirección y fuerza'}
+    ],
+    directionSpeed: [
+      {value:'0.55', label:'Lenta'},
+      {value:'0.8', label:'Normal'},
+      {value:'1.1', label:'Rápida'}
+    ]
+  };
+  const CONFIG_TITLES = { duration:'Duración', surface:'Fondo', kickMode:'Modo de golpeo', directionSpeed:'Velocidad de puntería' };
   function setSelectValueFromCfg(id, value){
     const control = $(id);
     if(!control) return;
     control.value = String(value);
   }
+  function configChoice(id, value){
+    const list = CONFIG_CHOICES[id] || [];
+    return list.find(item => String(item.value) === String(value)) || list[0] || {value, label:String(value)};
+  }
+  function surfaceThumbHtml(value, large=false){
+    return `<span class="surfaceThumb surface-${escapeHtml(String(value))}${large ? ' large' : ''}" aria-hidden="true"></span>`;
+  }
+  function updateConfigSummaries(){
+    const duration = configChoice('duration', $('duration')?.value || cfg.duration);
+    const surface = configChoice('surface', $('surface')?.value || cfg.surface);
+    const kickMode = configChoice('kickMode', $('kickMode')?.value || cfg.kickMode);
+    const speed = configChoice('directionSpeed', $('directionSpeed')?.value || cfg.directionSpeed);
+    if($('durationValue')) $('durationValue').innerHTML = `${escapeHtml(duration.label)}${duration.note ? ` <small>${escapeHtml(duration.note)}</small>` : ''}`;
+    if($('surfaceValue')) $('surfaceValue').innerHTML = `${surfaceThumbHtml(surface.value)}${escapeHtml(surface.label)}`;
+    if($('kickModeValue')) $('kickModeValue').textContent = kickMode.label;
+    if($('directionSpeedValue')) $('directionSpeedValue').textContent = speed.label;
+  }
+  function closeConfigChoice(){
+    const overlay = $('configChoiceOverlay');
+    if(!overlay) return;
+    overlay.hidden = true;
+    overlay.dataset.setting = '';
+  }
+  function renderConfigChoice(setting){
+    const overlay = $('configChoiceOverlay'), sheet = $('configChoiceSheet'), title = $('configChoiceTitle'), box = $('configChoiceOptions');
+    if(!overlay || !sheet || !title || !box) return;
+    const control = $(setting);
+    if(!control) return;
+    const current = String(control.value);
+    title.textContent = CONFIG_TITLES[setting] || '';
+    sheet.className = `configChoiceSheet ${setting}`;
+    box.className = `configChoiceOptions ${setting}`;
+    box.innerHTML = (CONFIG_CHOICES[setting] || []).map(item => {
+      const selected = String(item.value) === current;
+      const className = `configChoiceOption${selected ? ' selected' : ''}`;
+      const note = item.note ? `<small>${escapeHtml(item.note)}</small>` : '';
+      const visual = setting === 'surface' ? surfaceThumbHtml(item.value, true) : '';
+      return `<button class="${className}" type="button" data-config-value="${escapeHtml(item.value)}">${visual}<span>${escapeHtml(item.label)}</span>${note}</button>`;
+    }).join('');
+    box.querySelectorAll('[data-config-value]').forEach(btn=>{
+      btn.onclick = () => {
+        control.value = btn.dataset.configValue;
+        applyConfigFromUI();
+        closeConfigChoice();
+      };
+    });
+    overlay.dataset.setting = setting;
+    overlay.hidden = false;
+  }
   function updateConfigConditionalUI(){
     const speedRow = $('directionSpeedRow');
     if(speedRow) speedRow.hidden = cfg.kickMode !== 'dirforce';
+    if(cfg.kickMode !== 'dirforce' && $('configChoiceOverlay')?.dataset.setting === 'directionSpeed') closeConfigChoice();
   }
   function syncConfigUIFromState(){
     setSelectValueFromCfg('duration', cfg.duration);
@@ -200,6 +275,8 @@
     setSelectValueFromCfg('kickMode', cfg.kickMode);
     setSelectValueFromCfg('directionSpeed', cfg.directionSpeed);
     updateConfigConditionalUI();
+    updateConfigSummaries();
+    closeConfigChoice();
   }
   function applyConfigFromUI(){
     cfg.duration = +$('duration').value;
@@ -207,13 +284,17 @@
     cfg.kickMode = $('kickMode').value;
     cfg.directionSpeed = +$('directionSpeed').value;
     updateConfigConditionalUI();
+    updateConfigSummaries();
     updatePlayerProfileGate();
   }
   ['duration','surface','kickMode','directionSpeed'].forEach(id=>{
     const control = $(id);
     if(control) control.onchange = applyConfigFromUI;
   });
-
+  document.querySelectorAll('[data-config-setting]').forEach(btn=>{
+    btn.onclick = () => renderConfigChoice(btn.dataset.configSetting);
+  });
+  if($('configChoiceBackdrop')) $('configChoiceBackdrop').onclick = closeConfigChoice;
   if($('configBtn')) $('configBtn').onclick=()=>{ syncConfigUIFromState(); syncProfileInputs(isPlayerNickConfirmed() ? profileNick() : ''); setProfileMessage('configNickMsg',''); showScreen('config'); };
   if($('configCloseBtn')) $('configCloseBtn').onclick=()=>{ showScreen('home'); updatePlayerProfileGate(); };
   if($('aboutBtn')) $('aboutBtn').onclick=()=>showModal('aboutModal');
