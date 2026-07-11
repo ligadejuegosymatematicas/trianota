@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -8,13 +8,14 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/styles.css?v=19.99_micro_game_emblems" />
-  <script src="js/version.js?v=19.99_micro_game_emblems"></script>
+  <link rel="stylesheet" href="css/styles.css?v=20.00_bottom_navigation_foundation" />
+  <script src="js/version.js?v=20.00_bottom_navigation_foundation"></script>
 </head>
 <body>
   <section id="home" class="screen active">
     <div class="card homeCard">
       <div class="brandLogoWrap"><img class="brandLogo" src="assets/trianota_logo.png" alt="Trianota"></div>
+      <div class="homeTagline" aria-label="Identidad de Trianota"><span>Estrategia</span><i></i><span>Triangulaciones</span><i></i><span>Conquista</span></div>
 
       <div class="profileBlock" id="homeProfileBlock">
         <div class="profileSummary" id="profileSummary" hidden><span><b id="homePlayerNick"></b> <span class="uiIcon iconCheck profileCheck" aria-hidden="true"></span></span></div>
@@ -39,13 +40,6 @@
         </div>
       </div>
 
-      <div class="homeActions">
-        <button class="btn secondary homeProfileBtn" id="profileBtn" type="button">Perfil</button>
-        <div class="homeUtilityRow">
-          <button class="btn secondary" id="configBtn">Configuración</button>
-          <button class="btn secondary" id="aboutBtn">Acerca</button>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -60,8 +54,7 @@
 
   <section id="config" class="screen">
     <div class="card configCard">
-      <button class="configCloseX" id="configCloseBtn" type="button" aria-label="Cerrar"><span class="uiIcon iconClose" aria-hidden="true"></span></button>
-      <h2>Configuración</h2>
+      <h2>Ajustes</h2>
       <div class="settingsGroup profileSettings">
         <h3>Perfil</h3>
         <label for="configNickInput">Nick</label>
@@ -78,6 +71,10 @@
         <select id="kickMode" class="configNativeSelect" hidden><option value="sling">Golpe directo</option><option value="dirforce">Golpe de precisión</option></select>
         <button class="configSettingRow" type="button" data-config-setting="directionSpeed" id="directionSpeedRow"><span>Velocidad de puntería</span><b id="directionSpeedValue">Normal</b><i class="uiIcon iconChevron" aria-hidden="true"></i></button>
         <select id="directionSpeed" class="configNativeSelect" hidden><option value="0.55">Lenta</option><option value="0.8" selected>Normal</option><option value="1.1">Rápida</option></select>
+      </div>
+      <div class="settingsGroup appSettings">
+        <h3>Aplicación</h3>
+        <button class="configSettingRow appAboutRow" type="button" id="settingsAboutBtn"><span>Acerca de Trianota</span><b>Versión <span id="settingsVersion"></span></b><i class="uiIcon iconChevron" aria-hidden="true"></i></button>
       </div>
       <div class="tiny configSaveHint">Los cambios se aplican automáticamente.</div>
       <div class="configChoiceOverlay" id="configChoiceOverlay" hidden><button class="configChoiceBackdrop" id="configChoiceBackdrop" type="button" aria-label="Cerrar opciones"></button><div class="configChoiceSheet" id="configChoiceSheet"><h3 id="configChoiceTitle"></h3><div id="configChoiceOptions"></div></div></div></div>
@@ -192,27 +189,37 @@
   <div id="profileModal" class="modal"><div class="card profileModalCard"><button class="profileCloseX" data-close="profileModal" type="button" aria-label="Cerrar"><span class="uiIcon iconClose" aria-hidden="true"></span></button><div id="profileContent"></div></div></div>
   <div id="profileToast" class="profileToast" role="status" aria-live="polite"></div>
 
-<script src="js/campaign_levels.js?v=19.99_micro_game_emblems"></script>
-<script src="js/assets.js?v=19.99_micro_game_emblems"></script>
+  <nav class="appTabBar" aria-label="Navegación principal">
+    <button class="appTab is-active" id="tabHomeBtn" type="button" data-tab-target="home" aria-label="Inicio" aria-current="page"><span class="uiIcon iconNavHome" aria-hidden="true"></span><span>Inicio</span></button>
+    <button class="appTab" id="tabProfileBtn" type="button" data-tab-target="profile" aria-label="Perfil"><span class="uiIcon iconNavProfile" aria-hidden="true"></span><span>Perfil</span></button>
+    <button class="appTab" id="tabSettingsBtn" type="button" data-tab-target="settings" aria-label="Ajustes"><span class="uiIcon iconNavSettings" aria-hidden="true"></span><span>Ajustes</span></button>
+  </nav>
+
+<script src="js/campaign_levels.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/assets.js?v=20.00_bottom_navigation_foundation"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="js/firebase_provider.js?v=19.99_micro_game_emblems"></script>
-<script src="js/data_provider.js?v=19.99_micro_game_emblems"></script>
-<script src="js/metrics.js?v=19.99_micro_game_emblems"></script>
-<script src="js/records.js?v=19.99_micro_game_emblems"></script>
-<script src="js/zones.js?v=19.99_micro_game_emblems"></script>
-<script src="js/campaign.js?v=19.99_micro_game_emblems"></script>
-<script src="js/audio.js?v=19.99_micro_game_emblems"></script>
-<script src="js/ui.js?v=19.99_micro_game_emblems"></script>
-<script src="js/history.js?v=19.99_micro_game_emblems"></script>
-<script src="js/ui_records.js?v=19.99_micro_game_emblems"></script>
-<script src="js/profile_ui.js?v=19.99_micro_game_emblems"></script>
-<script src="js/goal.js?v=19.99_micro_game_emblems"></script>
-<script src="js/main.js?v=19.99_micro_game_emblems"></script>
+<script src="js/firebase_provider.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/data_provider.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/metrics.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/records.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/zones.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/campaign.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/audio.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/ui.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/history.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/ui_records.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/profile_ui.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/goal.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/main.js?v=20.00_bottom_navigation_foundation"></script>
+<script src="js/navigation.js?v=20.00_bottom_navigation_foundation"></script>
 <script>
+  const versionLabel = window.TRIANOTA_VERSION_LABEL || window.TRIANOTA_VERSION || '';
   const versionEl = document.getElementById('appVersion');
-  if(versionEl) versionEl.textContent = window.TRIANOTA_VERSION_LABEL || window.TRIANOTA_VERSION || '';
+  if(versionEl) versionEl.textContent = versionLabel;
+  const settingsVersionEl = document.getElementById('settingsVersion');
+  if(settingsVersionEl) settingsVersionEl.textContent = versionLabel;
   if('serviceWorker' in navigator){
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js').catch(() => {});

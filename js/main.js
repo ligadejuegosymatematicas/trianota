@@ -295,8 +295,20 @@
     btn.onclick = () => renderConfigChoice(btn.dataset.configSetting);
   });
   if($('configChoiceBackdrop')) $('configChoiceBackdrop').onclick = closeConfigChoice;
-  if($('configBtn')) $('configBtn').onclick=()=>{ syncConfigUIFromState(); syncProfileInputs(isPlayerNickConfirmed() ? profileNick() : ''); setProfileMessage('configNickMsg',''); showScreen('config'); };
-  if($('configCloseBtn')) $('configCloseBtn').onclick=()=>{ showScreen('home'); updatePlayerProfileGate(); };
+  function openConfigScreen(){
+    syncConfigUIFromState();
+    syncProfileInputs(isPlayerNickConfirmed() ? profileNick() : '');
+    setProfileMessage('configNickMsg','');
+    showScreen('config');
+  }
+  function closeConfigScreen(){
+    showScreen('home');
+    updatePlayerProfileGate();
+  }
+  window.openConfigScreen = openConfigScreen;
+  window.closeConfigScreen = closeConfigScreen;
+  if($('configBtn')) $('configBtn').onclick=openConfigScreen;
+  if($('configCloseBtn')) $('configCloseBtn').onclick=closeConfigScreen;
   if($('aboutBtn')) $('aboutBtn').onclick=()=>showModal('aboutModal');
   if($('recordsBtn')) $('recordsBtn').onclick=()=>{renderRecords(); showModal('recordsModal');};
   if($('goalPlayBtn')) $('goalPlayBtn').onclick=()=>{ if(requirePlayerNick()) startGame(); };

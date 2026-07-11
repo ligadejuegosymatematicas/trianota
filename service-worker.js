@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'trianota-pwa-v19.99-micro-game-emblems';
+﻿const CACHE_NAME = 'trianota-pwa-v20.00-bottom-navigation-foundation';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -19,6 +19,9 @@ const LOCAL_ASSETS = [
   './assets/icons/ui/close.svg',
   './assets/icons/ui/back.svg',
   './assets/icons/ui/chevron.svg',
+  './assets/icons/ui/nav-home.svg',
+  './assets/icons/ui/nav-profile.svg',
+  './assets/icons/ui/nav-settings.svg',
   './assets/icons/game/goal.svg',
   './assets/icons/game/meta.svg',
   './assets/icons/game/speed.svg',
@@ -44,6 +47,7 @@ const LOCAL_ASSETS = [
   './js/goal.js',
   './js/history.js',
   './js/main.js',
+  './js/navigation.js',
   './js/metrics.js',
   './js/records.js',
   './js/ui.js',
@@ -104,6 +108,7 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(freshAsset ? networkFirst(event.request) : cacheFirst(event.request));
 });
+
 
 
 

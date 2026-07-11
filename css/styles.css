@@ -1,4 +1,4 @@
-﻿:root{
+:root{
   /* Trianota visual tokens v19.86 */
   --bg:#0b1220;
   --bg-deep:#020617;
@@ -2458,4 +2458,150 @@ $124px;
   .modeIcon.gameMedallion .gameIcon{width:27px;height:27px;}
   .profileGoalCard i{width:25px;height:23px;border-radius:10px;}
   .profileGoalCard i .gameIcon{width:23px;height:23px;}
+}
+
+/* v20.00 - Navegacion inferior principal */
+:root{
+  --app-tabbar-height:70px;
+  --app-tabbar-space:calc(var(--app-tabbar-height) + env(safe-area-inset-bottom) + 12px);
+}
+.iconNavHome{--icon-url:url('../assets/icons/ui/nav-home.svg');}
+.iconNavProfile{--icon-url:url('../assets/icons/ui/nav-profile.svg');}
+.iconNavSettings{--icon-url:url('../assets/icons/ui/nav-settings.svg');}
+.appTabBar{
+  position:fixed;
+  left:50%;
+  bottom:max(10px,env(safe-area-inset-bottom));
+  z-index:80;
+  transform:translateX(-50%);
+  width:min(390px,calc(100vw - 22px));
+  min-height:var(--app-tabbar-height);
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:0;
+  padding:7px;
+  border-radius:23px;
+  border:1px solid rgba(226,232,240,.14);
+  background:
+    radial-gradient(circle at 10% 0%,rgba(250,204,21,.10),rgba(250,204,21,0) 42%),
+    radial-gradient(circle at 92% 0%,rgba(34,211,238,.09),rgba(34,211,238,0) 40%),
+    linear-gradient(180deg,rgba(13,20,34,.94),rgba(4,8,18,.94));
+  box-shadow:0 18px 42px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.10);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.appNavHidden .appTabBar{display:none;}
+.appTab{
+  min-height:54px;
+  border:0;
+  border-radius:17px;
+  background:transparent;
+  color:rgba(203,213,225,.70);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  font-weight:950;
+  font-size:11px;
+  letter-spacing:.02em;
+  cursor:pointer;
+  transition:background .14s ease,color .14s ease,transform .12s ease,box-shadow .14s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.appTab .uiIcon{width:22px;height:22px;}
+.appTab.is-active{
+  color:var(--gold-soft);
+  background:
+    radial-gradient(circle at 50% 0%,rgba(250,204,21,.18),rgba(250,204,21,0) 58%),
+    linear-gradient(180deg,rgba(30,41,59,.66),rgba(15,23,42,.58));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 0 18px rgba(250,204,21,.09);
+}
+.appTab[data-tab-target="profile"].is-active{color:#7dd3fc;box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 0 18px rgba(34,211,238,.09);}
+.appTab[data-tab-target="settings"].is-active{color:#dbeafe;}
+.appTab:active{transform:scale(.96);filter:brightness(1.08);}
+.appTab:focus-visible{outline:2px solid rgba(125,211,252,.78);outline-offset:3px;}
+#home.screen,
+#config.screen{
+  padding-bottom:var(--app-tabbar-space);
+}
+.homeCard{
+  max-height:calc(100svh - var(--app-tabbar-space) - 14px);
+}
+.homeTagline{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  margin:3px 0 1px;
+  color:rgba(226,232,240,.58);
+  font-size:10.5px;
+  font-weight:850;
+  letter-spacing:.025em;
+  white-space:nowrap;
+}
+.homeTagline i{
+  display:block;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 8px rgba(34,211,238,.28);
+}
+.homeTagline i:last-of-type{background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,.24);}
+.configCard{
+  max-height:calc(100svh - var(--app-tabbar-space) - 14px);
+}
+.configCloseX,
+.profileCloseX{
+  display:none!important;
+}
+.configCard h2{
+  margin-right:2px;
+}
+.profileHero.compact{
+  margin-right:0;
+}
+#profileModal.show{
+  padding:10px 10px calc(var(--app-tabbar-space) + 8px);
+}
+.profileModalCard{
+  height:min(708px,calc(100svh - var(--app-tabbar-space) - 22px));
+  max-height:calc(100svh - var(--app-tabbar-space) - 22px);
+}
+.appSettings .appAboutRow b{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  color:rgba(226,232,240,.78);
+  font-size:12px;
+}
+@media (max-width:380px){
+  :root{--app-tabbar-height:66px;--app-tabbar-space:calc(var(--app-tabbar-height) + env(safe-area-inset-bottom) + 10px);}
+  .appTabBar{width:calc(100vw - 16px);min-height:var(--app-tabbar-height);padding:6px;border-radius:20px;}
+  .appTab{min-height:50px;border-radius:15px;font-size:10.5px;}
+  .appTab .uiIcon{width:20px;height:20px;}
+  #home.screen{padding-bottom:var(--app-tabbar-space);}
+  .homeCard{max-height:calc(100svh - var(--app-tabbar-space) - 10px);}
+  .homeTagline{font-size:9.5px;gap:5px;}
+  .profileModalCard{height:calc(100svh - var(--app-tabbar-space) - 16px);max-height:calc(100svh - var(--app-tabbar-space) - 16px);}
+}
+@media (max-height:720px){
+  :root{--app-tabbar-height:64px;--app-tabbar-space:calc(var(--app-tabbar-height) + env(safe-area-inset-bottom) + 8px);}
+  .appTabBar{min-height:var(--app-tabbar-height);padding:6px;}
+  .appTab{min-height:48px;font-size:10px;}
+  .appTab .uiIcon{width:20px;height:20px;}
+  .profileModalCard{height:calc(100svh - var(--app-tabbar-space) - 14px);max-height:calc(100svh - var(--app-tabbar-space) - 14px);}
+  .profileMainView.noMiniStats .profileCompactSection.goal{margin-top:18px;}
+  .profileMainView.noMiniStats .profileWorldGrid{grid-template-rows:repeat(4,52px);row-gap:8px;}
+  .profileMainView.noMiniStats .profileWorldTile{min-height:52px;}
+  .profileMainView.noMiniStats .profileGoalCard{height:66px;}
+  .profileMainView.noMiniStats .profileWorldRecordsBtn{min-height:40px;margin-top:6px;}
+}
+/* v20.00 - Separacion de modales con barra inferior */
+body:not(.appNavHidden) .modal:not(#profileModal){
+  padding-bottom:calc(var(--app-tabbar-space) + 10px);
+}
+body:not(.appNavHidden) .modal:not(#profileModal) .card{
+  max-height:calc(100svh - var(--app-tabbar-space) - 20px);
 }
