@@ -1,0 +1,13 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Superficie">
+  <defs>
+    <radialGradient id="surfaceNode" cx="34%" cy="24%" r="72%"><stop offset="0" stop-color="#ecfeff"/><stop offset="0.56" stop-color="#22d3ee"/><stop offset="1" stop-color="#2563eb"/></radialGradient>
+    <linearGradient id="claim" x1="16" y1="45" x2="46" y2="18" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22c55e"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+  </defs>
+  <path d="M16 45 32 17l16 28Z" fill="rgba(34,211,238,.10)" stroke="#67e8f9" stroke-width="3.8" stroke-linejoin="round"/>
+  <path d="M16 45 32 17l6 28Z" fill="url(#claim)" opacity=".86"/>
+  <path d="M16 45h32" fill="none" stroke="#86efac" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="16" cy="45" r="6.4" fill="#22c55e" stroke="#ecfeff" stroke-width="2"/>
+  <circle cx="32" cy="17" r="6.4" fill="url(#surfaceNode)" stroke="#ecfeff" stroke-width="2"/>
+  <circle cx="48" cy="45" r="6.4" fill="#22c55e" stroke="#ecfeff" stroke-width="2"/>
+  <path d="M29 14 35 17 29 20Z" fill="rgba(2,6,23,.42)" stroke="#ecfeff" stroke-width="1.6" stroke-linejoin="round"/>
+</svg>

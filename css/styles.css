@@ -1,4 +1,4 @@
-:root{
+﻿:root{
   /* Trianota visual tokens v19.86 */
   --bg:#0b1220;
   --bg-deep:#020617;
@@ -138,7 +138,7 @@
     .worldShape.topology{background:linear-gradient(90deg,transparent 20%,rgba(255,255,255,.86) 21%,rgba(255,255,255,.86) 79%,transparent 80%) center/100% 8px no-repeat;}
 
 
-    /* v19.1 · Mundos bloqueados y revelación del primer acceso */
+    /* v19.1 Â· Mundos bloqueados y revelaciÃ³n del primer acceso */
     .worldVisual.lockedWorld{
       background:
         radial-gradient(circle at 50% 20%,rgba(148,163,184,.18),rgba(148,163,184,0) 46%),
@@ -214,8 +214,8 @@
     .levelTile.available{border-color:rgba(250,204,21,.75);box-shadow:0 10px 20px rgba(0,0,0,.40),0 0 24px rgba(250,204,21,.30),inset 0 1px 0 rgba(255,255,255,.24),inset 0 -9px 15px rgba(0,0,0,.34);}
     .levelTile.done{border-color:rgba(34,197,94,.70);box-shadow:0 10px 20px rgba(0,0,0,.40),0 0 22px rgba(34,197,94,.26),inset 0 1px 0 rgba(255,255,255,.24),inset 0 -9px 15px rgba(0,0,0,.34);}
     .levelTile.locked{opacity:.38;filter:saturate(.45);}
-    .levelTile.locked::after{content:"🔒";position:absolute;right:9px;top:7px;font-size:18px;opacity:.78;}
-    .levelTile.done::after{content:"✓";position:absolute;right:11px;top:5px;color:#86efac;font-size:22px;text-shadow:0 0 12px rgba(34,197,94,.7);}
+    .levelTile.locked::after{content:"ðŸ”’";position:absolute;right:9px;top:7px;font-size:18px;opacity:.78;}
+    .levelTile.done::after{content:"âœ“";position:absolute;right:11px;top:5px;color:#86efac;font-size:22px;text-shadow:0 0 12px rgba(34,197,94,.7);}
     .metaNav{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:14px;}
     .navPuck{width:74px;height:54px;border-radius:22px;border:1px solid rgba(248,250,252,.22);background:linear-gradient(145deg,#475569 0%,#1e293b 42%,#020617 100%);color:#f8fafc;font-size:28px;font-weight:1000;box-shadow:0 10px 18px rgba(0,0,0,.40),0 0 16px rgba(34,211,238,.15),inset 0 1px 0 rgba(255,255,255,.23),inset 0 -8px 14px rgba(0,0,0,.34);}
     .navPuck.hidden{visibility:hidden;}
@@ -522,7 +522,7 @@
     .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px;}
   
 
-    /* v16.7 · Emblemas premium de mundos Meta */
+    /* v16.7 Â· Emblemas premium de mundos Meta */
     .worldVisual{
       background:
         radial-gradient(circle at 50% 14%,rgba(255,255,255,.20),rgba(255,255,255,0) 38%),
@@ -552,7 +552,7 @@
       filter:drop-shadow(0 12px 18px rgba(0,0,0,.30));
       z-index:1;
     }
-    /* Mundo 1: Mickey correcto: dos fichas adelante y una atrás */
+    /* Mundo 1: Mickey correcto: dos fichas adelante y una atrÃ¡s */
     .worldShape.triangle{
       inset:15px 56px 17px;
       clip-path:none;
@@ -569,7 +569,7 @@
     .worldShape.triangle::before,
     .worldShape.triangle::after{content:none;}
 
-    /* Mundo 2: pasillo angosto metálico con ficha atravesando */
+    /* Mundo 2: pasillo angosto metÃ¡lico con ficha atravesando */
     .worldShape.corridor{
       inset:18px 70px;
       background:
@@ -611,7 +611,7 @@
       filter:drop-shadow(0 0 10px rgba(56,189,248,.60));
     }
 
-    /* Mundo 4: obstáculo cobre como objeto sólido */
+    /* Mundo 4: obstÃ¡culo cobre como objeto sÃ³lido */
     .worldShape.hole{
       inset:20px 52px;
       border-radius:18px;
@@ -633,7 +633,7 @@
         inset 0 -8px 14px rgba(67,20,7,.38);
     }
 
-    /* Mundo 5: Portales. Línea turquesa doble + punto magenta doble */
+    /* Mundo 5: Portales. LÃ­nea turquesa doble + punto magenta doble */
     .worldShape.topology{
       inset:18px 44px;
       background:none;
@@ -664,7 +664,7 @@
 
   
 
-    /* v19.15 · Home META más protagonista + logos Mickey corregidos */
+    /* v19.15 Â· Home META mÃ¡s protagonista + logos Mickey corregidos */
     .modeCard.meta{
       background:
         radial-gradient(circle at 18% 0%,rgba(34,211,238,.38),rgba(34,211,238,0) 42%),
@@ -696,7 +696,7 @@
     .metaCampaignBtn:active{box-shadow:0 3px 0 #155e75,0 0 16px rgba(34,211,238,.22),inset 0 1px 0 rgba(255,255,255,.35)!important;}
 
 
-    /* v19.16 · Logos ilustrados premium integrados como banners */
+    /* v19.16 Â· Logos ilustrados premium integrados como banners */
     .worldVisual.artLogo{
       height:132px;
       padding:0;
@@ -733,7 +733,7 @@
     }
 
 
-    /* v19.17 · Pantalla de mundos más premium */
+    /* v19.17 Â· Pantalla de mundos mÃ¡s premium */
     .worldMini{display:none!important;}
     .metaCard{padding:18px 18px 16px;}
     .metaTitle{
@@ -836,7 +836,7 @@
       100%{filter:saturate(1.10) brightness(1.03) blur(0) drop-shadow(0 14px 25px rgba(0,0,0,.52));}
     }
 
-    /* v19.18 · Emblemas circulares retirados: el banner queda como protagonista visual. */
+    /* v19.18 Â· Emblemas circulares retirados: el banner queda como protagonista visual. */
     .worldBadge{display:none!important;}
 
     .pageDots{min-width:132px;letter-spacing:0;}
@@ -1101,7 +1101,7 @@
 .profileWorldTile.comingSoon span{color:rgba(203,213,225,.64);}
 .profileWorldTile.current:not(:disabled):hover,.profileWorldTile.completed:not(:disabled):hover{transform:translateY(-1px);filter:brightness(1.06);}
 .profileWorldRecordsBtn{position:relative;min-height:48px;border-radius:16px;border:1px solid rgba(250,204,21,.18);background:radial-gradient(circle at 18% 0%,rgba(250,204,21,.12),rgba(250,204,21,0) 44%),linear-gradient(155deg,rgba(15,23,42,.82),rgba(8,13,28,.74));color:#f8fafc;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;box-shadow:0 12px 22px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.07);cursor:pointer;transition:transform .13s ease,filter .13s ease,border-color .13s ease;}
-.profileWorldRecordsBtn::after{content:"›";font-size:22px;line-height:1;color:#fde68a;opacity:.86;}
+.profileWorldRecordsBtn::after{content:"â€º";font-size:22px;line-height:1;color:#fde68a;opacity:.86;}
 .profileWorldRecordsBtn span{font-size:12px;font-weight:1000;letter-spacing:.06em;text-transform:uppercase;color:#fde68a;}
 .profileWorldRecordsBtn b{font-size:12px;color:rgba(226,232,240,.72);font-weight:850;margin-left:auto;}
 .profileWorldRecordsBtn:active{transform:scale(.98);filter:brightness(1.08);}
@@ -2392,3 +2392,70 @@ $124px;
 .iconGoal{--icon-url:url('../assets/icons/ui/goal.svg');}.iconMeta{--icon-url:url('../assets/icons/ui/meta.svg');}.iconSpeed{--icon-url:url('../assets/icons/ui/speed.svg');}.iconSurface{--icon-url:url('../assets/icons/ui/surface.svg');}.iconCheck{--icon-url:url('../assets/icons/ui/check.svg');}.iconLock{--icon-url:url('../assets/icons/ui/lock.svg');}.iconClose{--icon-url:url('../assets/icons/ui/close.svg');}.iconBack{--icon-url:url('../assets/icons/ui/back.svg');}.iconChevron{--icon-url:url('../assets/icons/ui/chevron.svg');}
 .profileCheck.uiIcon{width:.95em;height:.95em;color:#86efac;vertical-align:-.12em;}.modeIcon{color:var(--gold-soft);}.modeIcon .uiIcon{width:16px;height:16px;}.modeCard.meta .modeIcon{color:var(--cyan);}.profileCloseX .uiIcon,.configCloseX .uiIcon,.aboutCloseX .uiIcon{width:18px;height:18px;}.profileBackBtn .uiIcon{width:19px;height:19px;}.profileGoalCard i .uiIcon{width:13px;height:13px;}.profileGoalCard[data-profile-action="goal:fastest"] i{color:#7dd3fc;}.profileGoalCard[data-profile-action="goal:goals"] i{color:#fde68a;}.profileGoalCard[data-profile-action="goal:surface"] i{color:#5eead4;}.profileWorldStateLabel .profileStateIcon{width:9px;height:9px;color:#bbf7d0;}.profileWorldRecordsBtn::after{content:none!important;}.profileWorldRecordsBtn>i.uiIcon{width:18px;height:18px;color:#fde68a;opacity:.86;margin-left:2px;}.configSettingRow i.uiIcon{width:18px;height:18px;color:var(--gold-soft);opacity:.86;}
 @media (max-width:380px){.modeIcon .uiIcon{width:15px;height:15px;}.profileGoalCard i .uiIcon{width:12px;height:12px;}.profileCloseX .uiIcon,.configCloseX .uiIcon,.aboutCloseX .uiIcon{width:17px;height:17px;}}
+/* v19.99 - Familia B micro-emblemas de juego */
+.gameIcon{
+  display:inline-block;
+  width:1em;
+  height:1em;
+  flex:0 0 auto;
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:contain;
+  line-height:1;
+}
+.gameGoal{background-image:url('../assets/icons/game/goal.svg');}
+.gameMeta{background-image:url('../assets/icons/game/meta.svg');}
+.gameSpeed{background-image:url('../assets/icons/game/speed.svg');}
+.gameGoals{background-image:url('../assets/icons/game/goals.svg');}
+.gameSurface{background-image:url('../assets/icons/game/surface.svg');}
+.modeIcon.gameMedallion{
+  width:35px;
+  height:35px;
+  border-radius:15px;
+  background:
+    radial-gradient(circle at 35% 18%,rgba(255,255,255,.18),rgba(255,255,255,0) 43%),
+    radial-gradient(circle at 50% 78%,rgba(0,0,0,.30),rgba(0,0,0,0) 58%),
+    linear-gradient(155deg,rgba(17,24,39,.84),rgba(2,6,23,.68));
+  border:1px solid rgba(226,232,240,.14);
+  box-shadow:0 7px 13px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -5px 10px rgba(0,0,0,.16);
+  color:inherit;
+}
+.modeIcon.gameMedallion .gameIcon{
+  width:30px;
+  height:30px;
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,.36));
+}
+.modeCard.goalMode .modeIcon.gameMedallion{
+  border-color:rgba(250,204,21,.22);
+  box-shadow:0 7px 13px rgba(0,0,0,.25),0 0 14px rgba(250,204,21,.11),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -5px 10px rgba(0,0,0,.16);
+}
+.modeCard.meta .modeIcon.gameMedallion{
+  border-color:rgba(34,211,238,.22);
+  box-shadow:0 7px 13px rgba(0,0,0,.25),0 0 14px rgba(34,211,238,.13),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -5px 10px rgba(0,0,0,.16);
+}
+.profileGoalCard i{
+  width:28px;
+  height:26px;
+  border-radius:12px;
+  background:
+    radial-gradient(circle at 35% 18%,rgba(255,255,255,.16),rgba(255,255,255,0) 43%),
+    radial-gradient(circle at 50% 82%,rgba(0,0,0,.24),rgba(0,0,0,0) 58%),
+    linear-gradient(155deg,rgba(17,24,39,.66),rgba(2,6,23,.46));
+  border:1px solid rgba(226,232,240,.10);
+  box-shadow:0 5px 9px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.08);
+  filter:none;
+}
+.profileGoalCard i .gameIcon{
+  width:25px;
+  height:25px;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.34));
+}
+.profileGoalCard[data-profile-action="goal:fastest"] i,
+.profileGoalCard[data-profile-action="goal:goals"] i,
+.profileGoalCard[data-profile-action="goal:surface"] i{color:inherit;}
+@media (max-width:380px){
+  .modeIcon.gameMedallion{width:32px;height:32px;border-radius:13px;}
+  .modeIcon.gameMedallion .gameIcon{width:27px;height:27px;}
+  .profileGoalCard i{width:25px;height:23px;border-radius:10px;}
+  .profileGoalCard i .gameIcon{width:23px;height:23px;}
+}

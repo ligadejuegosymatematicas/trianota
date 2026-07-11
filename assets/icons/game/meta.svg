@@ -1,0 +1,14 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="META">
+  <defs>
+    <radialGradient id="nodeA" cx="34%" cy="24%" r="72%"><stop offset="0" stop-color="#ecfeff"/><stop offset="0.55" stop-color="#22d3ee"/><stop offset="1" stop-color="#2563eb"/></radialGradient>
+    <radialGradient id="nodeB" cx="34%" cy="24%" r="72%"><stop offset="0" stop-color="#fecaca"/><stop offset="0.58" stop-color="#ef4444"/><stop offset="1" stop-color="#7f1d1d"/></radialGradient>
+    <radialGradient id="nodeC" cx="34%" cy="24%" r="72%"><stop offset="0" stop-color="#f5d0fe"/><stop offset="0.55" stop-color="#a855f7"/><stop offset="1" stop-color="#581c87"/></radialGradient>
+  </defs>
+  <path d="M17 42 32 19l15 23H17Z" fill="rgba(34,211,238,.13)" stroke="#22d3ee" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M32 19 32 10" fill="none" stroke="#67e8f9" stroke-width="3.2" stroke-linecap="round" opacity=".82"/>
+  <circle cx="32" cy="10" r="4.1" fill="#fde68a" stroke="#ecfeff" stroke-width="1.7"/>
+  <circle cx="17" cy="42" r="8.2" fill="url(#nodeA)" stroke="#ecfeff" stroke-width="2.2"/>
+  <circle cx="47" cy="42" r="8.2" fill="url(#nodeB)" stroke="#fecaca" stroke-width="2.2"/>
+  <circle cx="32" cy="19" r="8.2" fill="url(#nodeC)" stroke="#f5d0fe" stroke-width="2.2"/>
+  <path d="M29 15 36 19 29 23Z" fill="rgba(2,6,23,.42)" stroke="#ecfeff" stroke-width="1.8" stroke-linejoin="round"/>
+</svg>

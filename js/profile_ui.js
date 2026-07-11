@@ -1,4 +1,4 @@
-// Perfil v19.83. UI premium compacta con r\u00e9cords mundiales bajo demanda.
+﻿// Perfil v19.83. UI premium compacta con r\u00e9cords mundiales bajo demanda.
 (function(){
   'use strict';
 
@@ -14,7 +14,7 @@
     {goals:5, label:'5 goles'}
   ];
   const WORLD_SYMBOLS = ['\u25b3','\u25e5','\u25cf','\u25c7','\u21af','!','\u25cc','\u221e','\u2726','\u2605'];
-  const GOAL_ICONS = {fastest:'iconSpeed', goals:'iconGoal', surface:'iconSurface'};
+  const GOAL_ICONS = {fastest:'gameSpeed', goals:'gameGoals', surface:'gameSurface'};
   let currentView = {type:'main'};
 
   function el(id){ return document.getElementById(id); }
@@ -164,7 +164,8 @@
     return `<button class="profileWorldTile ${stateClass}" ${enabled ? '' : 'disabled'} data-profile-action="world:${world.world}" type="button" aria-label="${esc(aria)}"><span class="profileWorldSymbol">${esc(symbol)}</span><b>M${world.world}</b><em>${esc(detail)}</em>${stateLabelHtml}</button>`;
   }
   function iconHtml(name, extraClass=''){
-    return `<span class="uiIcon ${esc(name)}${extraClass ? ` ${esc(extraClass)}` : ''}" aria-hidden="true"></span>`;
+    const family = String(name || '').indexOf('game') === 0 ? 'gameIcon' : 'uiIcon';
+    return `<span class="${family} ${esc(name)}${extraClass ? ` ${esc(extraClass)}` : ''}" aria-hidden="true"></span>`;
   }
   function goalCard(title, variant, value, action, icon){
     return `<button class="profileGoalCard" data-profile-action="${esc(action)}" type="button"><i aria-hidden="true">${iconHtml(icon)}</i><span>${esc(title)}</span><small>${esc(variant)}</small><b>${esc(value)}</b></button>`;
@@ -324,6 +325,7 @@
   window.openProfile = openProfile;
   initProfileUi();
 })();
+
 
 
 

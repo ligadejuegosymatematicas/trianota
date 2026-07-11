@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v19.97-ui-icon-system';
+﻿const CACHE_NAME = 'trianota-pwa-v19.99-micro-game-emblems';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -19,6 +19,11 @@ const LOCAL_ASSETS = [
   './assets/icons/ui/close.svg',
   './assets/icons/ui/back.svg',
   './assets/icons/ui/chevron.svg',
+  './assets/icons/game/goal.svg',
+  './assets/icons/game/meta.svg',
+  './assets/icons/game/speed.svg',
+  './assets/icons/game/goals.svg',
+  './assets/icons/game/surface.svg',
   './assets/worlds/triangle.png',
   './assets/worlds/corridor.png',
   './assets/worlds/painters.png',
@@ -99,6 +104,8 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(freshAsset ? networkFirst(event.request) : cacheFirst(event.request));
 });
+
+
 
 
 

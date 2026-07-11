@@ -1,0 +1,14 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Goles">
+  <defs>
+    <radialGradient id="goalsDisc" cx="35%" cy="24%" r="72%">
+      <stop offset="0" stop-color="#fff7ad"/>
+      <stop offset="0.54" stop-color="#facc15"/>
+      <stop offset="1" stop-color="#b45309"/>
+    </radialGradient>
+  </defs>
+  <path d="M16 21h32v24H16Z" fill="rgba(15,23,42,.26)" stroke="#fde68a" stroke-width="3.8" stroke-linejoin="round" opacity=".68"/>
+  <path d="M16 35h32" fill="none" stroke="#22d3ee" stroke-width="4.6" stroke-linecap="round"/>
+  <circle cx="34" cy="34" r="11.7" fill="url(#goalsDisc)" stroke="#fff7ed" stroke-width="2.4"/>
+  <path d="M30 28 40 34 30 40Z" fill="rgba(2,6,23,.42)" stroke="#fff7ad" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M47 23v7M43.5 26.5h7" fill="none" stroke="#22d3ee" stroke-width="2.8" stroke-linecap="round" opacity=".84"/>
+</svg>
