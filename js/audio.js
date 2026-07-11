@@ -152,10 +152,11 @@ function playTone(kind, opts={}){
       tone(3920,0.012,.060,'sine',.014,.004,master);
       clickBuffer(0.000,.120,.010,'bandpass',2600,14,2.4,master);
     } else if(kind==='tab'){
-      const room=shortRoom(master,.028);
-      clickBuffer(0.000,.018,.018,'bandpass',1900,9,3.6,master);
-      tone(880,0.000,.045,'triangle',.018,.003,room);
-      tone(1320,0.026,.052,'sine',.010,.004,master);
+      const room=shortRoom(master,.024);
+      clickBuffer(0.000,.014,.013,'bandpass',2350,10,4.0,master);
+      resonator(740,0.000,.046,.010,20,room);
+      tone(1046,0.004,.036,'triangle',.014,.003,room);
+      bendTone(1480,1760,0.022,.040,'sine',.007,.004,master);
     } else {
       tone(440,0,.10,'triangle',.04);
     }

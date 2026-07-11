@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'trianota-pwa-v20.01-premium-tab-interactions';
+const CACHE_NAME = 'trianota-pwa-v20.02-navigation-polish';
 const LOCAL_ASSETS = [
   './',
   './index.html',

@@ -138,7 +138,7 @@
     .worldShape.topology{background:linear-gradient(90deg,transparent 20%,rgba(255,255,255,.86) 21%,rgba(255,255,255,.86) 79%,transparent 80%) center/100% 8px no-repeat;}
 
 
-    /* v19.1 Â· Mundos bloqueados y revelaciÃ³n del primer acceso */
+    /* v19.1 · Mundos bloqueados y revelación del primer acceso */
     .worldVisual.lockedWorld{
       background:
         radial-gradient(circle at 50% 20%,rgba(148,163,184,.18),rgba(148,163,184,0) 46%),
@@ -215,7 +215,7 @@
     .levelTile.done{border-color:rgba(34,197,94,.70);box-shadow:0 10px 20px rgba(0,0,0,.40),0 0 22px rgba(34,197,94,.26),inset 0 1px 0 rgba(255,255,255,.24),inset 0 -9px 15px rgba(0,0,0,.34);}
     .levelTile.locked{opacity:.38;filter:saturate(.45);}
     .levelTile.locked::after{content:"ðŸ”’";position:absolute;right:9px;top:7px;font-size:18px;opacity:.78;}
-    .levelTile.done::after{content:"âœ“";position:absolute;right:11px;top:5px;color:#86efac;font-size:22px;text-shadow:0 0 12px rgba(34,197,94,.7);}
+    .levelTile.done::after{content:"✓";position:absolute;right:11px;top:5px;color:#86efac;font-size:22px;text-shadow:0 0 12px rgba(34,197,94,.7);}
     .metaNav{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:14px;}
     .navPuck{width:74px;height:54px;border-radius:22px;border:1px solid rgba(248,250,252,.22);background:linear-gradient(145deg,#475569 0%,#1e293b 42%,#020617 100%);color:#f8fafc;font-size:28px;font-weight:1000;box-shadow:0 10px 18px rgba(0,0,0,.40),0 0 16px rgba(34,211,238,.15),inset 0 1px 0 rgba(255,255,255,.23),inset 0 -8px 14px rgba(0,0,0,.34);}
     .navPuck.hidden{visibility:hidden;}
@@ -522,7 +522,7 @@
     .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px;}
   
 
-    /* v16.7 Â· Emblemas premium de mundos Meta */
+    /* v16.7 · Emblemas premium de mundos Meta */
     .worldVisual{
       background:
         radial-gradient(circle at 50% 14%,rgba(255,255,255,.20),rgba(255,255,255,0) 38%),
@@ -552,7 +552,7 @@
       filter:drop-shadow(0 12px 18px rgba(0,0,0,.30));
       z-index:1;
     }
-    /* Mundo 1: Mickey correcto: dos fichas adelante y una atrÃ¡s */
+    /* Mundo 1: Mickey correcto: dos fichas adelante y una atrás */
     .worldShape.triangle{
       inset:15px 56px 17px;
       clip-path:none;
@@ -569,7 +569,7 @@
     .worldShape.triangle::before,
     .worldShape.triangle::after{content:none;}
 
-    /* Mundo 2: pasillo angosto metÃ¡lico con ficha atravesando */
+    /* Mundo 2: pasillo angosto metálico con ficha atravesando */
     .worldShape.corridor{
       inset:18px 70px;
       background:
@@ -611,7 +611,7 @@
       filter:drop-shadow(0 0 10px rgba(56,189,248,.60));
     }
 
-    /* Mundo 4: obstÃ¡culo cobre como objeto sÃ³lido */
+    /* Mundo 4: obstáculo cobre como objeto sólido */
     .worldShape.hole{
       inset:20px 52px;
       border-radius:18px;
@@ -633,7 +633,7 @@
         inset 0 -8px 14px rgba(67,20,7,.38);
     }
 
-    /* Mundo 5: Portales. LÃ­nea turquesa doble + punto magenta doble */
+    /* Mundo 5: Portales. Línea turquesa doble + punto magenta doble */
     .worldShape.topology{
       inset:18px 44px;
       background:none;
@@ -664,7 +664,7 @@
 
   
 
-    /* v19.15 Â· Home META mÃ¡s protagonista + logos Mickey corregidos */
+    /* v19.15 · Home META más protagonista + logos Mickey corregidos */
     .modeCard.meta{
       background:
         radial-gradient(circle at 18% 0%,rgba(34,211,238,.38),rgba(34,211,238,0) 42%),
@@ -696,7 +696,7 @@
     .metaCampaignBtn:active{box-shadow:0 3px 0 #155e75,0 0 16px rgba(34,211,238,.22),inset 0 1px 0 rgba(255,255,255,.35)!important;}
 
 
-    /* v19.16 Â· Logos ilustrados premium integrados como banners */
+    /* v19.16 · Logos ilustrados premium integrados como banners */
     .worldVisual.artLogo{
       height:132px;
       padding:0;
@@ -733,7 +733,7 @@
     }
 
 
-    /* v19.17 Â· Pantalla de mundos mÃ¡s premium */
+    /* v19.17 · Pantalla de mundos más premium */
     .worldMini{display:none!important;}
     .metaCard{padding:18px 18px 16px;}
     .metaTitle{
@@ -836,7 +836,7 @@
       100%{filter:saturate(1.10) brightness(1.03) blur(0) drop-shadow(0 14px 25px rgba(0,0,0,.52));}
     }
 
-    /* v19.18 Â· Emblemas circulares retirados: el banner queda como protagonista visual. */
+    /* v19.18 · Emblemas circulares retirados: el banner queda como protagonista visual. */
     .worldBadge{display:none!important;}
 
     .pageDots{min-width:132px;letter-spacing:0;}
@@ -1101,7 +1101,7 @@
 .profileWorldTile.comingSoon span{color:rgba(203,213,225,.64);}
 .profileWorldTile.current:not(:disabled):hover,.profileWorldTile.completed:not(:disabled):hover{transform:translateY(-1px);filter:brightness(1.06);}
 .profileWorldRecordsBtn{position:relative;min-height:48px;border-radius:16px;border:1px solid rgba(250,204,21,.18);background:radial-gradient(circle at 18% 0%,rgba(250,204,21,.12),rgba(250,204,21,0) 44%),linear-gradient(155deg,rgba(15,23,42,.82),rgba(8,13,28,.74));color:#f8fafc;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;box-shadow:0 12px 22px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.07);cursor:pointer;transition:transform .13s ease,filter .13s ease,border-color .13s ease;}
-.profileWorldRecordsBtn::after{content:"â€º";font-size:22px;line-height:1;color:#fde68a;opacity:.86;}
+.profileWorldRecordsBtn::after{content:"›";font-size:22px;line-height:1;color:#fde68a;opacity:.86;}
 .profileWorldRecordsBtn span{font-size:12px;font-weight:1000;letter-spacing:.06em;text-transform:uppercase;color:#fde68a;}
 .profileWorldRecordsBtn b{font-size:12px;color:rgba(226,232,240,.72);font-weight:850;margin-left:auto;}
 .profileWorldRecordsBtn:active{transform:scale(.98);filter:brightness(1.08);}
@@ -2752,5 +2752,91 @@ body:not(.appNavHidden) .modal:not(#profileModal) .card{
   }
   .appTab.is-activating::after{
     display:none!important;
+  }
+}
+/* v20.02 - Navigation polish */
+.appTabBar{
+  bottom:max(12px,env(safe-area-inset-bottom));
+  border-color:rgba(226,232,240,.18);
+  background:
+    radial-gradient(circle at 22% 0%,rgba(250,204,21,.115),rgba(250,204,21,0) 42%),
+    radial-gradient(circle at 78% 0%,rgba(34,211,238,.105),rgba(34,211,238,0) 42%),
+    linear-gradient(180deg,rgba(13,20,34,.80),rgba(4,8,18,.90));
+  box-shadow:0 18px 40px rgba(0,0,0,.40),0 2px 0 rgba(255,255,255,.035) inset,0 0 0 1px rgba(255,255,255,.03);
+}
+.appTab{
+  transition:background .19s cubic-bezier(.2,.8,.2,1),color .19s ease,transform .096s ease,box-shadow .19s ease;
+}
+.appTab::before{
+  inset:4px 8px;
+  transform:scale(.72);
+  transition:opacity .18s ease-out,transform .18s cubic-bezier(.16,.9,.25,1);
+}
+.appTab .uiIcon,
+.appTab span:last-child{
+  transition:transform .205s cubic-bezier(.18,1.32,.25,1),color .19s ease,filter .19s ease,opacity .19s ease;
+}
+.appTab.is-active{
+  transform:translateY(-1px);
+}
+.appTab.is-active .uiIcon{
+  transform:translateY(-2px) scale(1.25);
+}
+.appTab.is-activating .uiIcon{
+  animation:tabIconPop .205s cubic-bezier(.18,1.32,.25,1) both;
+}
+.appTab.is-pressing{
+  transform:translateY(1px) scale(.955);
+}
+.appTab.is-activating::after{
+  width:42px;
+  height:42px;
+  background:radial-gradient(circle,rgba(255,255,255,.16),rgba(255,255,255,.055) 38%,rgba(255,255,255,0) 72%);
+  animation:tabHaloBurst .185s cubic-bezier(.16,.9,.25,1) both;
+}
+.screen.tabEntering.active{
+  animation:tabContentIn .21s cubic-bezier(.2,.8,.2,1) both;
+}
+.screen.tabLeaving{
+  animation:tabContentOut .15s cubic-bezier(.4,0,1,1) both;
+}
+#profileModal .profileModalCard.tabEntering{
+  animation:tabPanelIn .21s cubic-bezier(.2,.8,.2,1) both;
+}
+#profileModal .profileModalCard.tabLeaving{
+  animation:tabPanelOut .15s cubic-bezier(.4,0,1,1) both;
+}
+@keyframes tabIconPop{
+  0%{transform:translateY(0) scale(.98);}
+  56%{transform:translateY(-2px) scale(1.34);}
+  100%{transform:translateY(-2px) scale(1.25);}
+}
+@keyframes tabHaloBurst{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.45);}
+  38%{opacity:.92;}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.72);}
+}
+@keyframes tabContentIn{
+  from{opacity:.64;transform:translateY(5px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes tabContentOut{
+  from{opacity:1;transform:translateY(0);}
+  to{opacity:.84;transform:translateY(-3px);}
+}
+@keyframes tabPanelIn{
+  from{opacity:.64;transform:translateY(5px) scale(.994);}
+  to{opacity:1;transform:translateY(0) scale(1);}
+}
+@keyframes tabPanelOut{
+  from{opacity:1;transform:translateY(0) scale(1);}
+  to{opacity:.84;transform:translateY(-3px) scale(.997);}
+}
+@media (max-height:720px){
+  .appTabBar{bottom:max(9px,env(safe-area-inset-bottom));}
+}
+@media (prefers-reduced-motion: reduce){
+  .appTab.is-activating .uiIcon{
+    animation:none!important;
   }
 }

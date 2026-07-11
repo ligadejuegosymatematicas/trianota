@@ -1,4 +1,4 @@
-﻿(function(){
+(function(){
   'use strict';
 
   const TABS = {
@@ -9,9 +9,13 @@
   const NAV_SCREENS = new Set(['home', 'config']);
   const HIDDEN_SCREENS = new Set(['gameScreen', 'metaScreen']);
   const originalShowScreen = window.showScreen;
-  const TRANSITION_MS = 230;
+  const TRANSITION_MS = 210;
+  const PRESS_MS = 96;
+  const ACTIVATION_MS = 205;
   let activeTab = 'home';
   let transitionTimer = 0;
+  let pendingFrame = 0;
+  let switchingTab = false;
 
   function el(id){ return document.getElementById(id); }
   function tabButton(tab){ return el(TABS[tab]); }
@@ -66,7 +70,7 @@
     incoming.classList.remove('tabEntering');
     void incoming.offsetWidth;
     incoming.classList.add('tabEntering');
-    transitionTimer = window.setTimeout(() => incoming.classList.remove('tabEntering'), TRANSITION_MS + 60);
+    transitionTimer = window.setTimeout(() => incoming.classList.remove('tabEntering'), TRANSITION_MS + 55);
   }
 
   function markLeaving(){
@@ -75,7 +79,7 @@
     outgoing.classList.remove('tabLeaving');
     void outgoing.offsetWidth;
     outgoing.classList.add('tabLeaving');
-    window.setTimeout(() => outgoing.classList.remove('tabLeaving'), 180);
+    window.setTimeout(() => outgoing.classList.remove('tabLeaving'), 150);
   }
 
   function animateTab(tab){
@@ -84,14 +88,14 @@
     btn.classList.remove('is-activating');
     void btn.offsetWidth;
     btn.classList.add('is-activating');
-    window.setTimeout(() => btn.classList.remove('is-activating'), 240);
+    window.setTimeout(() => btn.classList.remove('is-activating'), ACTIVATION_MS + 40);
   }
 
   function pressTab(tab){
     const btn = tabButton(tab);
     if(!btn) return;
     btn.classList.add('is-pressing');
-    window.setTimeout(() => btn.classList.remove('is-pressing'), 120);
+    window.setTimeout(() => btn.classList.remove('is-pressing'), PRESS_MS);
   }
 
   function vibrateTab(){
@@ -118,6 +122,7 @@
       return;
     }
     if(NAV_SCREENS.has(id)) setNavVisible(true);
+    if(switchingTab) return;
     if(id === 'home') setActive('home');
     if(id === 'config') setActive('settings');
   }
@@ -132,12 +137,22 @@
 
   function switchTab(tab, action){
     if(activeTab === tab) return;
+    if(pendingFrame) cancelAnimationFrame(pendingFrame);
     markLeaving();
     feedback(tab);
-    action();
-    setNavVisible(true);
-    setActive(tab, {animate:true, force:true});
-    animateSurface(tab);
+    setActive(tab, {animate:true});
+    pendingFrame = requestAnimationFrame(() => {
+      pendingFrame = 0;
+      switchingTab = true;
+      try{
+        action();
+      }finally{
+        switchingTab = false;
+      }
+      setNavVisible(true);
+      setActive(tab);
+      animateSurface(tab);
+    });
   }
 
   function goHome(){
