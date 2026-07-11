@@ -2605,3 +2605,152 @@ body:not(.appNavHidden) .modal:not(#profileModal){
 body:not(.appNavHidden) .modal:not(#profileModal) .card{
   max-height:calc(100svh - var(--app-tabbar-space) - 20px);
 }
+/* v20.01 - Premium tab interactions */
+.homeTagline,
+.configSaveHint{
+  display:none!important;
+}
+.appTabBar{
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 18% 0%,rgba(250,204,21,.13),rgba(250,204,21,0) 40%),
+    radial-gradient(circle at 82% 0%,rgba(34,211,238,.12),rgba(34,211,238,0) 40%),
+    linear-gradient(180deg,rgba(13,20,34,.86),rgba(4,8,18,.92));
+  border-color:rgba(226,232,240,.16);
+  box-shadow:0 16px 38px rgba(0,0,0,.42),0 0 0 1px rgba(255,255,255,.035),inset 0 1px 0 rgba(255,255,255,.12);
+}
+.appTabBar::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.095),rgba(255,255,255,0) 38%);
+  opacity:.74;
+}
+.appTab{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  color:rgba(203,213,225,.66);
+  transition:background .2s ease,color .2s ease,transform .1s ease,box-shadow .2s ease;
+}
+.appTab::before{
+  content:"";
+  position:absolute;
+  inset:5px 10px;
+  z-index:-1;
+  border-radius:15px;
+  background:radial-gradient(circle at 50% 15%,rgba(250,204,21,.20),rgba(250,204,21,0) 62%);
+  opacity:0;
+  transform:scale(.78);
+  transition:opacity .2s ease,transform .2s ease;
+}
+.appTab[data-tab-target="profile"]::before{background:radial-gradient(circle at 50% 15%,rgba(34,211,238,.22),rgba(34,211,238,0) 62%);}
+.appTab[data-tab-target="settings"]::before{background:radial-gradient(circle at 50% 15%,rgba(226,232,240,.16),rgba(226,232,240,0) 62%);}
+.appTab .uiIcon,
+.appTab span:last-child{
+  position:relative;
+  transition:transform .2s cubic-bezier(.2,.8,.2,1),color .2s ease,filter .2s ease,opacity .2s ease;
+}
+.appTab .uiIcon{
+  transform-origin:center;
+  opacity:.86;
+}
+.appTab.is-active{
+  transform:translateY(-1px);
+  background:
+    radial-gradient(circle at 50% 0%,rgba(250,204,21,.22),rgba(250,204,21,0) 57%),
+    linear-gradient(180deg,rgba(30,41,59,.70),rgba(15,23,42,.58));
+}
+.appTab.is-active::before{
+  opacity:1;
+  transform:scale(1);
+}
+.appTab.is-active .uiIcon{
+  transform:translateY(-1px) scale(1.16);
+  opacity:1;
+  filter:drop-shadow(0 0 9px rgba(250,204,21,.28));
+}
+.appTab[data-tab-target="profile"].is-active .uiIcon{filter:drop-shadow(0 0 9px rgba(34,211,238,.28));}
+.appTab[data-tab-target="settings"].is-active .uiIcon{filter:drop-shadow(0 0 8px rgba(226,232,240,.18));}
+.appTab.is-active span:last-child{
+  transform:translateY(1px);
+}
+.appTab.is-pressing{
+  transform:translateY(1px) scale(.965);
+}
+.appTab.is-activating::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.18),rgba(255,255,255,0) 68%);
+  transform:translate(-50%,-50%) scale(.65);
+  animation:tabHaloBurst .22s ease-out both;
+  pointer-events:none;
+}
+.screen.tabEntering.active{
+  animation:tabContentIn .22s ease-out both;
+}
+.screen.tabLeaving{
+  animation:tabContentOut .16s ease-in both;
+}
+#profileModal .profileModalCard.tabEntering{
+  animation:tabPanelIn .22s ease-out both;
+}
+#profileModal .profileModalCard.tabLeaving{
+  animation:tabPanelOut .16s ease-in both;
+}
+@keyframes tabHaloBurst{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.55);}
+  32%{opacity:1;}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.35);}
+}
+@keyframes tabContentIn{
+  from{opacity:.58;transform:translateY(7px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes tabContentOut{
+  from{opacity:1;transform:translateY(0);}
+  to{opacity:.76;transform:translateY(-4px);}
+}
+@keyframes tabPanelIn{
+  from{opacity:.58;transform:translateY(7px) scale(.992);}
+  to{opacity:1;transform:translateY(0) scale(1);}
+}
+@keyframes tabPanelOut{
+  from{opacity:1;transform:translateY(0) scale(1);}
+  to{opacity:.78;transform:translateY(-4px) scale(.996);}
+}
+@media (hover:hover){
+  .appTab:not(.is-active):hover{
+    color:rgba(248,250,252,.84);
+    background:rgba(226,232,240,.045);
+  }
+  .appTab:not(.is-active):hover .uiIcon{
+    transform:translateY(-1px) scale(1.06);
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  .appTab,
+  .appTab::before,
+  .appTab .uiIcon,
+  .appTab span:last-child,
+  .screen.tabEntering.active,
+  .screen.tabLeaving,
+  #profileModal .profileModalCard.tabEntering,
+  #profileModal .profileModalCard.tabLeaving{
+    animation:none!important;
+    transition:color .01s linear,background .01s linear,opacity .01s linear!important;
+    transform:none!important;
+  }
+  .appTab.is-active .uiIcon{
+    transform:none!important;
+  }
+  .appTab.is-activating::after{
+    display:none!important;
+  }
+}

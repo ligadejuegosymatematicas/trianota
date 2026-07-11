@@ -1,4 +1,4 @@
-(function(){
+﻿(function(){
   'use strict';
 
   const TABS = {
@@ -9,18 +9,26 @@
   const NAV_SCREENS = new Set(['home', 'config']);
   const HIDDEN_SCREENS = new Set(['gameScreen', 'metaScreen']);
   const originalShowScreen = window.showScreen;
+  const TRANSITION_MS = 230;
+  let activeTab = 'home';
+  let transitionTimer = 0;
 
   function el(id){ return document.getElementById(id); }
+  function tabButton(tab){ return el(TABS[tab]); }
 
-  function setActive(tab){
+  function setActive(tab, opts={}){
+    if(!TABS[tab]) return;
+    const changed = activeTab !== tab;
+    activeTab = tab;
     Object.keys(TABS).forEach(key => {
-      const btn = el(TABS[key]);
+      const btn = tabButton(key);
       if(!btn) return;
       const active = key === tab;
       btn.classList.toggle('is-active', active);
       if(active) btn.setAttribute('aria-current', 'page');
       else btn.removeAttribute('aria-current');
     });
+    if((changed || opts.force) && opts.animate) animateTab(tab);
   }
 
   function setNavVisible(visible){
@@ -37,6 +45,71 @@
   function closeModals(){
     document.querySelectorAll('.modal.show').forEach(modal => modal.classList.remove('show'));
     closeConfigChoice();
+  }
+
+  function currentSurface(){
+    if(activeTab === 'profile') return document.querySelector('#profileModal.show .profileModalCard');
+    if(activeTab === 'settings') return el('config');
+    return document.querySelector('.screen.active');
+  }
+
+  function surfaceFor(tab){
+    if(tab === 'profile') return document.querySelector('#profileModal.show .profileModalCard');
+    if(tab === 'settings') return el('config');
+    return el('home');
+  }
+
+  function animateSurface(tab){
+    const incoming = surfaceFor(tab);
+    if(!incoming) return;
+    clearTimeout(transitionTimer);
+    incoming.classList.remove('tabEntering');
+    void incoming.offsetWidth;
+    incoming.classList.add('tabEntering');
+    transitionTimer = window.setTimeout(() => incoming.classList.remove('tabEntering'), TRANSITION_MS + 60);
+  }
+
+  function markLeaving(){
+    const outgoing = currentSurface();
+    if(!outgoing) return;
+    outgoing.classList.remove('tabLeaving');
+    void outgoing.offsetWidth;
+    outgoing.classList.add('tabLeaving');
+    window.setTimeout(() => outgoing.classList.remove('tabLeaving'), 180);
+  }
+
+  function animateTab(tab){
+    const btn = tabButton(tab);
+    if(!btn) return;
+    btn.classList.remove('is-activating');
+    void btn.offsetWidth;
+    btn.classList.add('is-activating');
+    window.setTimeout(() => btn.classList.remove('is-activating'), 240);
+  }
+
+  function pressTab(tab){
+    const btn = tabButton(tab);
+    if(!btn) return;
+    btn.classList.add('is-pressing');
+    window.setTimeout(() => btn.classList.remove('is-pressing'), 120);
+  }
+
+  function vibrateTab(){
+    try{
+      if(navigator && typeof navigator.vibrate === 'function') navigator.vibrate(10);
+    }catch(e){}
+  }
+
+  function soundTab(){
+    try{
+      if(typeof window.playTone === 'function') window.playTone('tab');
+    }catch(e){}
+  }
+
+  function feedback(tab){
+    pressTab(tab);
+    soundTab();
+    vibrateTab();
   }
 
   function syncForScreen(id){
@@ -57,27 +130,37 @@
     };
   }
 
-  function goHome(){
-    closeModals();
-    if(typeof window.showScreen === 'function') window.showScreen('home');
+  function switchTab(tab, action){
+    if(activeTab === tab) return;
+    markLeaving();
+    feedback(tab);
+    action();
     setNavVisible(true);
-    setActive('home');
+    setActive(tab, {animate:true, force:true});
+    animateSurface(tab);
+  }
+
+  function goHome(){
+    switchTab('home', () => {
+      closeModals();
+      if(typeof window.showScreen === 'function') window.showScreen('home');
+    });
   }
 
   function goProfile(){
-    closeModals();
-    if(typeof window.showScreen === 'function') window.showScreen('home');
-    if(typeof window.openProfile === 'function') window.openProfile();
-    setNavVisible(true);
-    setActive('profile');
+    switchTab('profile', () => {
+      closeModals();
+      if(typeof window.showScreen === 'function') window.showScreen('home');
+      if(typeof window.openProfile === 'function') window.openProfile();
+    });
   }
 
   function goSettings(){
-    closeModals();
-    if(typeof window.openConfigScreen === 'function') window.openConfigScreen();
-    else if(typeof window.showScreen === 'function') window.showScreen('config');
-    setNavVisible(true);
-    setActive('settings');
+    switchTab('settings', () => {
+      closeModals();
+      if(typeof window.openConfigScreen === 'function') window.openConfigScreen();
+      else if(typeof window.showScreen === 'function') window.showScreen('config');
+    });
   }
 
   function bindTabs(){
@@ -100,7 +183,7 @@
     bindTabs();
     bindSettingsAbout();
     setNavVisible(true);
-    setActive('home');
+    setActive('home', {force:true});
   }
 
   init();
