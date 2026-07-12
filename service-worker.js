@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v20.03.6-home-final-swipe-and-scenes';
+const CACHE_NAME = 'trianota-pwa-v20.03.7-home-official-art';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -27,8 +27,8 @@ const LOCAL_ASSETS = [
   './assets/icons/game/speed.svg',
   './assets/icons/game/goals.svg',
   './assets/icons/game/surface.svg',
-  './assets/illustrations/home-goal-scene.svg',
-  './assets/illustrations/home-meta-scene.svg',
+  './assets/illustrations/home/home-goal-scene.webp',
+  './assets/illustrations/home/home-meta-scene.webp',
   './assets/worlds/triangle.png',
   './assets/worlds/corridor.png',
   './assets/worlds/painters.png',
@@ -110,8 +110,6 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(freshAsset ? networkFirst(event.request) : cacheFirst(event.request));
 });
-
-
 
 
 

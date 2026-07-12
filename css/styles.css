@@ -3280,17 +3280,15 @@ body:not(.appNavHidden) .modal:not(#profileModal) .card{
 }
 .modeCard.goalMode.homeModeScene{
   background:
-    linear-gradient(90deg,rgba(23,17,6,.98) 0%,rgba(18,16,14,.94) 34%,rgba(8,13,28,.35) 60%,rgba(8,13,28,.14) 100%),
-    url('../assets/illustrations/home-goal-scene.svg') right center / auto 100% no-repeat,
-    radial-gradient(circle at 76% 48%,rgba(250,204,21,.24),rgba(250,204,21,0) 44%),
-    linear-gradient(150deg,rgba(42,33,12,.82),rgba(8,13,28,.92));
+    linear-gradient(90deg,rgba(9,6,2,.98) 0%,rgba(12,9,4,.92) 31%,rgba(6,9,17,.48) 55%,rgba(2,6,23,.10) 100%),
+    linear-gradient(180deg,rgba(250,204,21,.07),rgba(2,6,23,.11)),
+    url('../assets/illustrations/home/home-goal-scene.webp') calc(50% + 42px) 50% / cover no-repeat;
 }
 .modeCard.meta.homeModeScene{
   background:
-    linear-gradient(90deg,rgba(5,30,46,.98) 0%,rgba(7,28,43,.93) 34%,rgba(8,13,28,.33) 60%,rgba(8,13,28,.12) 100%),
-    url('../assets/illustrations/home-meta-scene.svg') right center / auto 100% no-repeat,
-    radial-gradient(circle at 76% 48%,rgba(34,211,238,.24),rgba(34,211,238,0) 45%),
-    linear-gradient(150deg,rgba(8,54,80,.76),rgba(8,13,28,.92));
+    linear-gradient(90deg,rgba(3,17,24,.98) 0%,rgba(4,20,29,.91) 31%,rgba(4,15,23,.44) 55%,rgba(2,6,23,.08) 100%),
+    linear-gradient(180deg,rgba(34,211,238,.06),rgba(2,6,23,.10)),
+    url('../assets/illustrations/home/home-meta-scene.webp') calc(50% + 42px) 50% / cover no-repeat;
 }
 .modeCard.goalMode.homeModeScene::before,
 .modeCard.meta.homeModeScene::before{
@@ -3315,10 +3313,6 @@ body:not(.appNavHidden) .modal:not(#profileModal) .card{
   .modeGrid.compact .homeModeScene .modeDesc{
     max-width:16ch;
   }
-  .modeCard.goalMode.homeModeScene,
-  .modeCard.meta.homeModeScene{
-    background-size:auto,auto 104%,auto,auto;
-  }
 }
 @media (max-height:720px){
   .modeGrid.compact .homeModeScene .modeTitle,
@@ -3329,10 +3323,6 @@ body:not(.appNavHidden) .modal:not(#profileModal) .card{
   }
   .modeGrid.compact .homeModeScene .modeDesc{
     max-width:17ch;
-  }
-  .modeCard.goalMode.homeModeScene,
-  .modeCard.meta.homeModeScene{
-    background-size:auto,auto 104%,auto,auto;
   }
 }
 
