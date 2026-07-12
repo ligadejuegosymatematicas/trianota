@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 // Logica de audio extraida desde main.js. Mantiene playTone como funcion global clasica.
 
@@ -46,7 +46,7 @@ function playTone(kind, opts={}){
       for(let i=0;i<n;i++){
         const x=i/n;
         const decay=Math.pow(1-x,decayPow);
-        // mezcla ruido + pequeños impulsos irregulares para evitar sonido electrónico puro
+        // mezcla ruido + pequeÃ±os impulsos irregulares para evitar sonido electrÃ³nico puro
         data[i]=(Math.random()*2-1)*decay;
         if(i<Math.min(16,n)) data[i]+= (Math.random()>.5?1:-1)*(1-i/16)*0.65;
       }
@@ -84,7 +84,7 @@ function playTone(kind, opts={}){
     }
 
     function shortRoom(dest=master, wet=.08){
-      // reverberación mínima mediante delay corto; da cuerpo sin parecer eco.
+      // reverberaciÃ³n mÃ­nima mediante delay corto; da cuerpo sin parecer eco.
       const delay=ac.createDelay(.08);
       const fb=ac.createGain();
       const wetGain=ac.createGain();
@@ -106,13 +106,13 @@ function playTone(kind, opts={}){
       resonator(1160,0.004,.055,.026*s,22,master);
       tone(290,0.002,.040,'triangle',.010*s,.002,master);
     } else if(kind==='pass'){
-      // Pase válido v15.8: acompañamiento mínimo.
-      // Un "tink" leve después del clack físico; no debe sonar a notificación.
+      // Pase vÃ¡lido v15.8: acompaÃ±amiento mÃ­nimo.
+      // Un "tink" leve despuÃ©s del clack fÃ­sico; no debe sonar a notificaciÃ³n.
       resonator(1180,0.000,.055,.012,24,master);
       tone(1680,0.030,.055,'sine',.010,.004,master);
       clickBuffer(0.002,.018,.010,'bandpass',2100,10,3.6,master);
     } else if(kind==='restart'){
-      // Saque inicial: tres fichas acomodándose rápidamente.
+      // Saque inicial: tres fichas acomodÃ¡ndose rÃ¡pidamente.
       clickBuffer(0.000,.032,.045,'bandpass',1300,9,3.0,master);
       resonator(510,0.000,.065,.024,15,master);
       clickBuffer(0.060,.034,.040,'bandpass',1550,9,3.0,master);
@@ -128,7 +128,7 @@ function playTone(kind, opts={}){
       tone(1046, 0.36, .34, 'triangle', .08);
       tone(1318, 0.39, .30, 'sine', .045);
     } else if(kind==='foul'){
-      // Silbato corto de árbitro: tono agudo con vibrato y caída final.
+      // Silbato corto de Ã¡rbitro: tono agudo con vibrato y caÃ­da final.
       const g=envGain(0,.245,.105,.010);
       const o=ac.createOscillator();
       const lfo=ac.createOscillator();
@@ -152,11 +152,11 @@ function playTone(kind, opts={}){
       tone(3920,0.012,.060,'sine',.014,.004,master);
       clickBuffer(0.000,.120,.010,'bandpass',2600,14,2.4,master);
     } else if(kind==='tab'){
-      const room=shortRoom(master,.024);
-      clickBuffer(0.000,.014,.013,'bandpass',2350,10,4.0,master);
-      resonator(740,0.000,.046,.010,20,room);
-      tone(1046,0.004,.036,'triangle',.014,.003,room);
-      bendTone(1480,1760,0.022,.040,'sine',.007,.004,master);
+      const room=shortRoom(master,.020);
+      clickBuffer(0.000,.012,.010,'bandpass',2600,12,4.4,master);
+      resonator(880,0.000,.042,.011,22,room);
+      tone(1320,0.006,.032,'triangle',.012,.003,room);
+      bendTone(1760,2200,0.020,.036,'sine',.006,.004,master);
     } else {
       tone(440,0,.10,'triangle',.04);
     }
@@ -164,4 +164,5 @@ function playTone(kind, opts={}){
     setTimeout(()=>ac.close(),1500);
   }catch(e){}
 }
+
 

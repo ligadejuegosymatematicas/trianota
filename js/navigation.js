@@ -1,4 +1,4 @@
-(function(){
+﻿(function(){
   'use strict';
 
   const TABS = {
@@ -9,9 +9,9 @@
   const NAV_SCREENS = new Set(['home', 'config']);
   const HIDDEN_SCREENS = new Set(['gameScreen', 'metaScreen']);
   const originalShowScreen = window.showScreen;
-  const TRANSITION_MS = 210;
-  const PRESS_MS = 96;
-  const ACTIVATION_MS = 205;
+  const TRANSITION_MS = 215;
+  const PRESS_MS = 90;
+  const ACTIVATION_MS = 235;
   let activeTab = 'home';
   let transitionTimer = 0;
   let pendingFrame = 0;

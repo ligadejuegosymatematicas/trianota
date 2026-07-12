@@ -3030,3 +3030,158 @@ body:not(.appNavHidden) .modal:not(#profileModal) .card{
   .brandLogoWrap{width:168px;}
   .modeGrid.compact .modeCard{min-height:110px;}
 }
+/* v20.03.1 - Home polish and premium tab response */
+.appTabBar{
+  bottom:max(13px,env(safe-area-inset-bottom));
+  border-color:rgba(226,232,240,.20);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,0) 32%),
+    radial-gradient(circle at 20% 0%,rgba(250,204,21,.16),rgba(250,204,21,0) 39%),
+    radial-gradient(circle at 80% 0%,rgba(34,211,238,.13),rgba(34,211,238,0) 40%),
+    linear-gradient(180deg,rgba(13,20,34,.83),rgba(3,7,18,.93));
+  box-shadow:
+    0 18px 42px rgba(0,0,0,.43),
+    0 8px 18px rgba(2,6,23,.28),
+    0 0 0 1px rgba(255,255,255,.035),
+    inset 0 1px 0 rgba(255,255,255,.15),
+    inset 0 -10px 24px rgba(0,0,0,.18);
+}
+.appTab{
+  color:rgba(203,213,225,.64);
+  transition:background .2s cubic-bezier(.2,.8,.2,1),color .2s ease,transform .09s ease,filter .2s ease,box-shadow .2s ease;
+}
+.appTab::before{
+  inset:3px 8px 6px;
+  border-radius:16px;
+  opacity:0;
+  transform:translateY(3px) scale(.70);
+  transition:opacity .19s ease-out,transform .22s cubic-bezier(.14,1.08,.25,1);
+}
+.appTab .uiIcon{
+  width:23px;
+  height:23px;
+  opacity:.80;
+  transition:transform .235s cubic-bezier(.16,1.45,.24,1),filter .2s ease,opacity .2s ease;
+}
+.appTab span:last-child{
+  transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .2s ease,color .2s ease;
+}
+.appTab.is-active{
+  transform:translateY(-1px);
+  filter:saturate(1.08);
+}
+.appTab.is-active::before{
+  opacity:1;
+  transform:translateY(0) scale(1.04);
+}
+.appTab.is-active .uiIcon{
+  transform:translateY(-4px) scale(1.34);
+  opacity:1;
+  filter:drop-shadow(0 3px 8px rgba(250,204,21,.25)) drop-shadow(0 0 12px rgba(250,204,21,.20));
+}
+.appTab[data-tab-target="profile"].is-active .uiIcon{filter:drop-shadow(0 3px 8px rgba(34,211,238,.22)) drop-shadow(0 0 12px rgba(34,211,238,.20));}
+.appTab[data-tab-target="settings"].is-active .uiIcon{filter:drop-shadow(0 3px 8px rgba(226,232,240,.16)) drop-shadow(0 0 10px rgba(226,232,240,.10));}
+.appTab.is-active span:last-child{
+  transform:translateY(1px);
+  opacity:1;
+}
+.appTab.is-pressing{
+  transform:translateY(2px) scale(.948);
+}
+.appTab.is-activating::after{
+  width:50px;
+  height:50px;
+  background:radial-gradient(circle,rgba(255,255,255,.18),rgba(255,255,255,.06) 35%,rgba(255,255,255,0) 72%);
+  animation:tabHaloBurst .205s cubic-bezier(.14,.92,.24,1) both;
+}
+.appTab.is-activating .uiIcon{
+  animation:tabIconPop .235s cubic-bezier(.16,1.45,.24,1) both;
+}
+.screen.tabEntering.active{
+  animation:tabContentIn .215s cubic-bezier(.2,.86,.2,1) both;
+}
+.screen.tabLeaving{
+  animation:tabContentOut .145s cubic-bezier(.4,0,1,1) both;
+}
+#profileModal .profileModalCard.tabEntering{
+  animation:tabPanelIn .215s cubic-bezier(.2,.86,.2,1) both;
+}
+#profileModal .profileModalCard.tabLeaving{
+  animation:tabPanelOut .145s cubic-bezier(.4,0,1,1) both;
+}
+@keyframes tabIconPop{
+  0%{transform:translateY(1px) scale(.92);}
+  46%{transform:translateY(-6px) scale(1.46);}
+  72%{transform:translateY(-3px) scale(1.28);}
+  100%{transform:translateY(-4px) scale(1.34);}
+}
+@keyframes tabHaloBurst{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.40);}
+  34%{opacity:.88;}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.88);}
+}
+@keyframes tabContentIn{
+  from{opacity:.66;transform:translateY(4px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes tabContentOut{
+  from{opacity:1;transform:translateY(0);}
+  to{opacity:.86;transform:translateY(-2px);}
+}
+@keyframes tabPanelIn{
+  from{opacity:.66;transform:translateY(4px) scale(.995);}
+  to{opacity:1;transform:translateY(0) scale(1);}
+}
+@keyframes tabPanelOut{
+  from{opacity:1;transform:translateY(0) scale(1);}
+  to{opacity:.86;transform:translateY(-2px) scale(.998);}
+}
+.modeIcon.gameMedallion{
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 34% 16%,rgba(255,255,255,.24),rgba(255,255,255,0) 42%),
+    radial-gradient(circle at 50% 82%,rgba(0,0,0,.32),rgba(0,0,0,0) 58%),
+    linear-gradient(155deg,rgba(17,24,39,.82),rgba(2,6,23,.64));
+  border:1px solid rgba(226,232,240,.16);
+  box-shadow:0 10px 17px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.16),inset 0 -7px 13px rgba(0,0,0,.18);
+}
+.modeIcon.gameMedallion .gameIcon{
+  width:clamp(41px,10.4vw,50px);
+  height:clamp(41px,10.4vw,50px);
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.36));
+}
+.modeCard.goalMode .modeIcon.gameMedallion{
+  border-color:rgba(250,204,21,.30);
+  box-shadow:0 10px 17px rgba(0,0,0,.30),0 0 20px rgba(250,204,21,.18),inset 0 1px 0 rgba(255,255,255,.16),inset 0 -7px 13px rgba(0,0,0,.18);
+}
+.modeCard.meta .modeIcon.gameMedallion{
+  border-color:rgba(34,211,238,.30);
+  box-shadow:0 10px 17px rgba(0,0,0,.30),0 0 20px rgba(34,211,238,.20),inset 0 1px 0 rgba(255,255,255,.16),inset 0 -7px 13px rgba(0,0,0,.18);
+}
+.modeCard.goalMode{
+  border-color:rgba(250,204,21,.36);
+  background:
+    radial-gradient(circle at 78% 42%,rgba(250,204,21,.22),rgba(250,204,21,0) 38%),
+    radial-gradient(circle at 8% 0%,rgba(250,204,21,.22),rgba(250,204,21,0) 42%),
+    linear-gradient(150deg,rgba(42,33,12,.78),rgba(8,13,28,.88));
+}
+.modeCard.meta{
+  border-color:rgba(34,211,238,.34);
+  background:
+    radial-gradient(circle at 78% 42%,rgba(34,211,238,.21),rgba(34,211,238,0) 39%),
+    radial-gradient(circle at 8% 0%,rgba(34,211,238,.25),rgba(34,211,238,0) 44%),
+    linear-gradient(150deg,rgba(8,54,80,.70),rgba(8,13,28,.88));
+}
+@media (max-width:380px){
+  .appTab .uiIcon{width:21px;height:21px;}
+  .appTab.is-active .uiIcon{transform:translateY(-3px) scale(1.30);}
+  .modeIcon.gameMedallion .gameIcon{width:37px;height:37px;}
+}
+@media (max-height:720px){
+  .appTabBar{bottom:max(10px,env(safe-area-inset-bottom));}
+  .modeIcon.gameMedallion .gameIcon{width:36px;height:36px;}
+}
+@media (prefers-reduced-motion: reduce){
+  .appTab.is-active .uiIcon{transform:none!important;}
+  .appTab.is-activating .uiIcon{animation:none!important;}
+}

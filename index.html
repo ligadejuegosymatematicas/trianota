@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -8,8 +8,8 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/styles.css?v=20.03_home_final" />
-  <script src="js/version.js?v=20.03_home_final"></script>
+  <link rel="stylesheet" href="css/styles.css?v=20.03.1_home_polish" />
+  <script src="js/version.js?v=20.03.1_home_polish"></script>
 </head>
 <body>
   <section id="home" class="screen active">
@@ -23,7 +23,7 @@
           <div class="profileInputRow"><input id="playerNickInput" maxlength="16" autocomplete="nickname" placeholder="Tu nick"><button class="btn small" id="confirmNickBtn" type="button">Confirmar</button></div>
         </div>
       </div>
-      <div class="tiny profileMsg" id="playerNickMsg">⚠ Debes registrar un nick antes de jugar.</div>
+      <div class="tiny profileMsg" id="playerNickMsg">âš  Debes registrar un nick antes de jugar.</div>
 
       <div class="modeGrid compact">
         <div class="modeCard goalMode">
@@ -34,8 +34,8 @@
 
         <div class="modeCard meta">
           <div class="modeTitle"><span class="modeIcon gameMedallion metaMedallion" aria-hidden="true"><span class="gameIcon gameMeta"></span></span><span>META</span></div>
-          <p class="modeDesc">Supera desafíos con triangulaciones.</p>
-          <button class="btn secondary modeBtn metaCampaignBtn" id="metaBtn" disabled>Campaña</button>
+          <p class="modeDesc">Supera desafÃ­os con triangulaciones.</p>
+          <button class="btn secondary modeBtn metaCampaignBtn" id="metaBtn" disabled>CampaÃ±a</button>
         </div>
       </div>
 
@@ -44,7 +44,7 @@
 
   <section id="metaScreen" class="screen">
     <div class="card metaCard">
-      <button class="metaBack" id="metaBackBtn" aria-label="Volver">‹</button>
+      <button class="metaBack" id="metaBackBtn" aria-label="Volver">â€¹</button>
       <div class="metaTitle" id="metaWorldTitle">Meta</div>
       <div class="worldMini" id="metaWorldMini"></div>
       <div id="metaWorlds"></div>
@@ -62,18 +62,18 @@
       </div>
       <div class="settingsGroup playSettings">
         <h3>Juego</h3>
-        <button class="configSettingRow" type="button" data-config-setting="duration"><span>Duración</span><b id="durationValue">2 min</b><i class="uiIcon iconChevron" aria-hidden="true"></i></button>
+        <button class="configSettingRow" type="button" data-config-setting="duration"><span>DuraciÃ³n</span><b id="durationValue">2 min</b><i class="uiIcon iconChevron" aria-hidden="true"></i></button>
         <select id="duration" class="configNativeSelect" hidden><option value="120">2 min</option><option value="180">3 min</option><option value="300">5 min</option><option value="60">1 min prueba</option></select>
         <button class="configSettingRow" type="button" data-config-setting="surface"><span>Fondo</span><b id="surfaceValue"><span class="surfaceThumb surface-grass"></span>Pasto</b><i class="uiIcon iconChevron" aria-hidden="true"></i></button>
         <select id="surface" class="configNativeSelect" hidden><option value="grass">Pasto</option><option value="concrete">Cemento</option><option value="dirt">Tierra</option><option value="wood">Madera</option><option value="hockey">Hielo</option></select>
         <button class="configSettingRow" type="button" data-config-setting="kickMode"><span>Modo de golpeo</span><b id="kickModeValue">Golpe directo</b><i class="uiIcon iconChevron" aria-hidden="true"></i></button>
-        <select id="kickMode" class="configNativeSelect" hidden><option value="sling">Golpe directo</option><option value="dirforce">Golpe de precisión</option></select>
-        <button class="configSettingRow" type="button" data-config-setting="directionSpeed" id="directionSpeedRow"><span>Velocidad de puntería</span><b id="directionSpeedValue">Normal</b><i class="uiIcon iconChevron" aria-hidden="true"></i></button>
-        <select id="directionSpeed" class="configNativeSelect" hidden><option value="0.55">Lenta</option><option value="0.8" selected>Normal</option><option value="1.1">Rápida</option></select>
+        <select id="kickMode" class="configNativeSelect" hidden><option value="sling">Golpe directo</option><option value="dirforce">Golpe de precisiÃ³n</option></select>
+        <button class="configSettingRow" type="button" data-config-setting="directionSpeed" id="directionSpeedRow"><span>Velocidad de punterÃ­a</span><b id="directionSpeedValue">Normal</b><i class="uiIcon iconChevron" aria-hidden="true"></i></button>
+        <select id="directionSpeed" class="configNativeSelect" hidden><option value="0.55">Lenta</option><option value="0.8" selected>Normal</option><option value="1.1">RÃ¡pida</option></select>
       </div>
       <div class="settingsGroup appSettings">
-        <h3>Aplicación</h3>
-        <button class="configSettingRow appAboutRow" type="button" id="settingsAboutBtn"><span>Acerca de Trianota</span><b>Versión <span id="settingsVersion"></span></b><i class="uiIcon iconChevron" aria-hidden="true"></i></button>
+        <h3>AplicaciÃ³n</h3>
+        <button class="configSettingRow appAboutRow" type="button" id="settingsAboutBtn"><span>Acerca de Trianota</span><b>VersiÃ³n <span id="settingsVersion"></span></b><i class="uiIcon iconChevron" aria-hidden="true"></i></button>
       </div>
       <div class="configChoiceOverlay" id="configChoiceOverlay" hidden><button class="configChoiceBackdrop" id="configChoiceBackdrop" type="button" aria-label="Cerrar opciones"></button><div class="configChoiceSheet" id="configChoiceSheet"><h3 id="configChoiceTitle"></h3><div id="configChoiceOptions"></div></div></div></div>
   </section>
@@ -81,10 +81,10 @@
   <section id="gameScreen" class="screen">
     <div class="gameWrap">
       <div class="hud">
-        <div class="pill"><span id="scoreIcon">⚽</span> <span id="goalsHud">0</span></div>
-        <div class="metaLevelPill" id="metaLevelPill" style="display:none">M1 · N1</div>
+        <div class="pill"><span id="scoreIcon">âš½</span> <span id="goalsHud">0</span></div>
+        <div class="metaLevelPill" id="metaLevelPill" style="display:none">M1 Â· N1</div>
         <div class="status" id="statusText"></div>
-        <div class="pill">⏱ <span id="timeHud">02:00</span></div>
+        <div class="pill">â± <span id="timeHud">02:00</span></div>
       </div>
       <div id="canvasBox">
         <canvas id="game"></canvas>
@@ -179,39 +179,39 @@
     </div>
   </section>
 
-  <div id="attemptModal" class="modal"><div class="card"><h2>Estadísticas del intento</h2><div id="attemptContent"></div><button class="btn secondary" data-close="attemptModal">Cerrar</button></div></div>
+  <div id="attemptModal" class="modal"><div class="card"><h2>EstadÃ­sticas del intento</h2><div id="attemptContent"></div><button class="btn secondary" data-close="attemptModal">Cerrar</button></div></div>
   <div id="historyModal" class="modal"><div class="card"><h2>Historial</h2><div id="historyList"></div><button class="btn secondary" data-close="historyModal">Cerrar</button></div></div>
-  <div id="statsModal" class="modal"><div class="card"><h2>Fin del partido</h2><div id="statsContent"></div><button class="btn" id="againBtn">Jugar nuevamente</button><button class="btn secondary" id="statsHistBtn">📚 Ver historial</button><button class="btn secondary" data-close="statsModal">Cerrar</button></div></div>
-  <div id="recordsModal" class="modal"><div class="card"><h2>Récords</h2><div id="recordsList"></div><button class="btn secondary" data-close="recordsModal">Cerrar</button></div></div>
-  <div id="aboutModal" class="modal"><div class="card aboutCard"><button class="aboutCloseX" data-close="aboutModal" type="button" aria-label="Cerrar"><span class="uiIcon iconClose" aria-hidden="true"></span></button><h2>Acerca de Trianota</h2><div class="aboutIdentity"><img src="assets/trianota_logo.png" alt="Trianota"><div><b>Trianota</b><p class="aboutTagline">Un juego de goles, triangulaciones y precisión.</p></div></div><div class="aboutModes"><div class="aboutMode"><span>GOL</span><p>Convierte goles y conquista la cancha.</p></div><div class="aboutMode"><span>META</span><p>Supera desafíos usando triangulaciones.</p></div></div><p class="tiny aboutVersion">Versión <span id="appVersion"></span></p></div></div>
+  <div id="statsModal" class="modal"><div class="card"><h2>Fin del partido</h2><div id="statsContent"></div><button class="btn" id="againBtn">Jugar nuevamente</button><button class="btn secondary" id="statsHistBtn">ðŸ“š Ver historial</button><button class="btn secondary" data-close="statsModal">Cerrar</button></div></div>
+  <div id="recordsModal" class="modal"><div class="card"><h2>RÃ©cords</h2><div id="recordsList"></div><button class="btn secondary" data-close="recordsModal">Cerrar</button></div></div>
+  <div id="aboutModal" class="modal"><div class="card aboutCard"><button class="aboutCloseX" data-close="aboutModal" type="button" aria-label="Cerrar"><span class="uiIcon iconClose" aria-hidden="true"></span></button><h2>Acerca de Trianota</h2><div class="aboutIdentity"><img src="assets/trianota_logo.png" alt="Trianota"><div><b>Trianota</b><p class="aboutTagline">Un juego de goles, triangulaciones y precisiÃ³n.</p></div></div><div class="aboutModes"><div class="aboutMode"><span>GOL</span><p>Convierte goles y conquista la cancha.</p></div><div class="aboutMode"><span>META</span><p>Supera desafÃ­os usando triangulaciones.</p></div></div><p class="tiny aboutVersion">VersiÃ³n <span id="appVersion"></span></p></div></div>
   <div id="profileModal" class="modal"><div class="card profileModalCard"><button class="profileCloseX" data-close="profileModal" type="button" aria-label="Cerrar"><span class="uiIcon iconClose" aria-hidden="true"></span></button><div id="profileContent"></div></div></div>
   <div id="profileToast" class="profileToast" role="status" aria-live="polite"></div>
 
-  <nav class="appTabBar" aria-label="Navegación principal">
+  <nav class="appTabBar" aria-label="NavegaciÃ³n principal">
     <button class="appTab is-active" id="tabHomeBtn" type="button" data-tab-target="home" aria-label="Inicio" aria-current="page"><span class="uiIcon iconNavHome" aria-hidden="true"></span><span>Inicio</span></button>
     <button class="appTab" id="tabProfileBtn" type="button" data-tab-target="profile" aria-label="Perfil"><span class="uiIcon iconNavProfile" aria-hidden="true"></span><span>Perfil</span></button>
     <button class="appTab" id="tabSettingsBtn" type="button" data-tab-target="settings" aria-label="Ajustes"><span class="uiIcon iconNavSettings" aria-hidden="true"></span><span>Ajustes</span></button>
   </nav>
 
-<script src="js/campaign_levels.js?v=20.03_home_final"></script>
-<script src="js/assets.js?v=20.03_home_final"></script>
+<script src="js/campaign_levels.js?v=20.03.1_home_polish"></script>
+<script src="js/assets.js?v=20.03.1_home_polish"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="js/firebase_provider.js?v=20.03_home_final"></script>
-<script src="js/data_provider.js?v=20.03_home_final"></script>
-<script src="js/metrics.js?v=20.03_home_final"></script>
-<script src="js/records.js?v=20.03_home_final"></script>
-<script src="js/zones.js?v=20.03_home_final"></script>
-<script src="js/campaign.js?v=20.03_home_final"></script>
-<script src="js/audio.js?v=20.03_home_final"></script>
-<script src="js/ui.js?v=20.03_home_final"></script>
-<script src="js/history.js?v=20.03_home_final"></script>
-<script src="js/ui_records.js?v=20.03_home_final"></script>
-<script src="js/profile_ui.js?v=20.03_home_final"></script>
-<script src="js/goal.js?v=20.03_home_final"></script>
-<script src="js/main.js?v=20.03_home_final"></script>
-<script src="js/navigation.js?v=20.03_home_final"></script>
+<script src="js/firebase_provider.js?v=20.03.1_home_polish"></script>
+<script src="js/data_provider.js?v=20.03.1_home_polish"></script>
+<script src="js/metrics.js?v=20.03.1_home_polish"></script>
+<script src="js/records.js?v=20.03.1_home_polish"></script>
+<script src="js/zones.js?v=20.03.1_home_polish"></script>
+<script src="js/campaign.js?v=20.03.1_home_polish"></script>
+<script src="js/audio.js?v=20.03.1_home_polish"></script>
+<script src="js/ui.js?v=20.03.1_home_polish"></script>
+<script src="js/history.js?v=20.03.1_home_polish"></script>
+<script src="js/ui_records.js?v=20.03.1_home_polish"></script>
+<script src="js/profile_ui.js?v=20.03.1_home_polish"></script>
+<script src="js/goal.js?v=20.03.1_home_polish"></script>
+<script src="js/main.js?v=20.03.1_home_polish"></script>
+<script src="js/navigation.js?v=20.03.1_home_polish"></script>
 <script>
   const versionLabel = window.TRIANOTA_VERSION_LABEL || window.TRIANOTA_VERSION || '';
   const versionEl = document.getElementById('appVersion');
@@ -226,6 +226,7 @@
 </script>
 </body>
 </html>
+
 
 
 
