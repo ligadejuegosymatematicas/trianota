@@ -4,9 +4,71 @@
 
 function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); state.screen=id; resize(); }
 
-function showModal(id){ $(id).classList.add('show'); }
+const MODAL_BACKDROP_CLOSE_IDS = new Set(['aboutModal','recordsModal','historyModal','attemptModal']);
+const modalReturnFocus = new Map();
 
-function hideModal(id){ $(id).classList.remove('show'); }
+function modalEl(id){ return document.getElementById(id); }
+function modalFocusable(modal){
+  return Array.from(modal.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter(el => !el.disabled && !el.hidden && el.offsetParent !== null);
+}
+function focusModal(modal){
+  const focusables = modalFocusable(modal);
+  const target = focusables[0] || modal;
+  if(!modal.hasAttribute('tabindex')) modal.setAttribute('tabindex','-1');
+  setTimeout(() => { try { target.focus({preventScroll:true}); } catch { target.focus(); } }, 0);
+}
+function showModal(id){
+  const modal = modalEl(id);
+  if(!modal) return;
+  modalReturnFocus.set(id, document.activeElement);
+  modal.setAttribute('role','dialog');
+  modal.setAttribute('aria-modal','true');
+  modal.classList.add('show');
+  focusModal(modal);
+}
+function hideModal(id){
+  const modal = modalEl(id);
+  if(!modal) return;
+  modal.classList.remove('show');
+  const returnTo = modalReturnFocus.get(id);
+  modalReturnFocus.delete(id);
+  if(returnTo && document.contains(returnTo) && typeof returnTo.focus === 'function'){
+    setTimeout(() => { try { returnTo.focus({preventScroll:true}); } catch { returnTo.focus(); } }, 0);
+  }
+}
+function closeTopLayer(){
+  const choice = modalEl('configChoiceOverlay');
+  if(choice && !choice.hidden && typeof window.closeConfigChoice === 'function'){ window.closeConfigChoice(); return true; }
+  if(typeof window.closeProfileSubview === 'function' && window.closeProfileSubview()) return true;
+  const shown = Array.from(document.querySelectorAll('.modal.show')).reverse();
+  const modal = shown.find(item => MODAL_BACKDROP_CLOSE_IDS.has(item.id));
+  if(modal){ hideModal(modal.id); return true; }
+  return false;
+}
+window.closeTopLayer = closeTopLayer;
+
+document.addEventListener('click', ev => {
+  const modal = ev.target;
+  if(modal && modal.classList && modal.classList.contains('modal') && modal.classList.contains('show') && MODAL_BACKDROP_CLOSE_IDS.has(modal.id)){
+    hideModal(modal.id);
+  }
+});
+document.addEventListener('keydown', ev => {
+  if(ev.key === 'Escape'){
+    if(closeTopLayer()) ev.preventDefault();
+    return;
+  }
+  if(ev.key !== 'Tab') return;
+  const modal = Array.from(document.querySelectorAll('.modal.show')).reverse()[0];
+  const choice = modalEl('configChoiceOverlay');
+  const trap = choice && !choice.hidden ? modalEl('configChoiceSheet') : modal;
+  if(!trap) return;
+  const focusables = modalFocusable(trap);
+  if(!focusables.length) return;
+  const first = focusables[0], last = focusables[focusables.length - 1];
+  if(ev.shiftKey && document.activeElement === first){ last.focus(); ev.preventDefault(); }
+  else if(!ev.shiftKey && document.activeElement === last){ first.focus(); ev.preventDefault(); }
+});
 
 function pulseBtn(id){
   const b=$(id);

@@ -173,6 +173,9 @@
   function secondaryShell(title, body){
     return `<div class="profileSubView"><div class="profileSubHead"><button class="profileBackBtn" data-profile-action="main" type="button" aria-label="Volver"><span class="uiIcon iconBack" aria-hidden="true"></span></button><h3>${esc(title)}</h3></div><div class="profileSubBody">${body}</div></div>`;
   }
+  function profileLayer(content, label){
+    return `<div class="profileLayerOverlay" data-profile-action="main"><div class="profileLayerPanel" role="dialog" aria-modal="true" aria-label="${esc(label || 'Detalle de perfil')}" tabindex="-1">${content}</div></div>`;
+  }
   function renderWorld(worldNum){
     const world = campaignWorlds().find(item => +item.world === +worldNum);
     if(!world) return renderMain();
@@ -285,13 +288,23 @@
   function renderProfile(){
     const box = el('profileContent');
     if(!box || !window.DATA_PROVIDER) return;
-    if(currentView.type === 'world') box.innerHTML = renderWorld(currentView.world);
-    else if(currentView.type === 'goal') box.innerHTML = renderGoal(currentView.kind);
-    else if(currentView.type === 'worldRecords') box.innerHTML = renderWorldRecords();
-    else box.innerHTML = renderMain();
+    if(currentView.type === 'main') box.innerHTML = renderMain();
+    else {
+      let title = 'Detalle de perfil';
+      let content = '';
+      if(currentView.type === 'world'){ title = `Mundo ${currentView.world}`; content = renderWorld(currentView.world); }
+      else if(currentView.type === 'goal'){ title = currentView.kind === 'fastest' ? 'Rapidez' : (currentView.kind === 'goals' ? 'Goles' : 'Superficie'); content = renderGoal(currentView.kind); }
+      else if(currentView.type === 'worldRecords'){ title = 'Récords mundiales'; content = renderWorldRecords(); }
+      box.innerHTML = renderMain() + profileLayer(content, title);
+    }
     bindProfileActions();
+    const panel = box.querySelector('.profileLayerPanel');
+    if(panel) setTimeout(() => { try { panel.focus({preventScroll:true}); } catch { panel.focus(); } }, 0);
   }
   function bindProfileActions(){
+    document.querySelectorAll('.profileLayerPanel').forEach(panel => {
+      panel.onclick = ev => ev.stopPropagation();
+    });
     document.querySelectorAll('[data-profile-action]').forEach(btn => {
       btn.onclick = () => {
         const action = btn.dataset.profileAction || 'main';
@@ -302,6 +315,12 @@
         renderProfile();
       };
     });
+  }
+  function closeProfileSubview(){
+    if(currentView.type === 'main') return false;
+    currentView = {type:'main'};
+    renderProfile();
+    return true;
   }
   function openProfile(){
     currentView = {type:'main'};
@@ -323,6 +342,7 @@
 
   window.renderProfile = renderProfile;
   window.openProfile = openProfile;
+  window.closeProfileSubview = closeProfileSubview;
   initProfileUi();
 })();
 

@@ -232,12 +232,19 @@
     if($('kickModeValue')) $('kickModeValue').textContent = kickMode.label;
     if($('directionSpeedValue')) $('directionSpeedValue').textContent = speed.label;
   }
+  let configChoiceReturnFocus = null;
   function closeConfigChoice(){
     const overlay = $('configChoiceOverlay');
     if(!overlay) return;
     overlay.hidden = true;
     overlay.dataset.setting = '';
+    if(configChoiceReturnFocus && document.contains(configChoiceReturnFocus) && typeof configChoiceReturnFocus.focus === 'function'){
+      const target = configChoiceReturnFocus;
+      configChoiceReturnFocus = null;
+      setTimeout(() => { try { target.focus({preventScroll:true}); } catch { target.focus(); } }, 0);
+    }
   }
+  window.closeConfigChoice = closeConfigChoice;
   function renderConfigChoice(setting){
     const overlay = $('configChoiceOverlay'), sheet = $('configChoiceSheet'), title = $('configChoiceTitle'), box = $('configChoiceOptions');
     if(!overlay || !sheet || !title || !box) return;
@@ -261,8 +268,14 @@
         closeConfigChoice();
       };
     });
+    configChoiceReturnFocus = document.activeElement;
     overlay.dataset.setting = setting;
+    sheet.setAttribute('role', 'dialog');
+    sheet.setAttribute('aria-modal', 'true');
+    sheet.setAttribute('tabindex', '-1');
     overlay.hidden = false;
+    const focusTarget = box.querySelector('.configChoiceOption.selected') || box.querySelector('.configChoiceOption') || sheet;
+    setTimeout(() => { try { focusTarget.focus({preventScroll:true}); } catch { focusTarget.focus(); } }, 0);
   }
   function updateConfigConditionalUI(){
     const speedRow = $('directionSpeedRow');
