@@ -19,6 +19,7 @@
   const DISTANCE_THRESHOLD = 0.30;
   const VELOCITY_THRESHOLD = 0.52;
   const MIN_FLING_DISTANCE = 34;
+  const SWIPE_CAPTURE_SELECTOR = 'canvas,input,textarea,select,[type="range"],[role="slider"],[contenteditable="true"],[data-swipe-lock]';
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let activeTab = 'home';
   let transitionTimer = 0;
@@ -412,6 +413,7 @@
     if(hasBlockingLayer()) return;
     if(ev.clientX <= EDGE_EXCLUSION || ev.clientX >= window.innerWidth - EDGE_EXCLUSION) return;
     if(ev.target && ev.target.closest && ev.target.closest('.appTabBar')) return;
+    if(ev.target && ev.target.closest && ev.target.closest(SWIPE_CAPTURE_SELECTOR)) return;
     gesture = {
       pointerId:ev.pointerId,
       captureEl:ev.target,

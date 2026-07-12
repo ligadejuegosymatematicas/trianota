@@ -3317,7 +3317,7 @@ body:not(.appNavHidden) .modal:not(#profileModal) .card{
   }
   .modeCard.goalMode.homeModeScene,
   .modeCard.meta.homeModeScene{
-    background-size:auto,auto 96%,auto,auto;
+    background-size:auto,auto 104%,auto,auto;
   }
 }
 @media (max-height:720px){
@@ -3332,7 +3332,7 @@ body:not(.appNavHidden) .modal:not(#profileModal) .card{
   }
   .modeCard.goalMode.homeModeScene,
   .modeCard.meta.homeModeScene{
-    background-size:auto,auto 96%,auto,auto;
+    background-size:auto,auto 104%,auto,auto;
   }
 }
 
@@ -3340,6 +3340,27 @@ body:not(.appNavHidden) .modal:not(#profileModal) .card{
 body:not(.appNavHidden){
   touch-action:pan-y;
   overscroll-behavior-x:none;
+}
+html{touch-action:pan-y;}
+body:not(.appNavHidden) #home,
+body:not(.appNavHidden) #home .homeCard,
+body:not(.appNavHidden) #home button,
+body:not(.appNavHidden) #profileModal,
+body:not(.appNavHidden) #profileModal .profileModalCard,
+body:not(.appNavHidden) #profileModal .profileMainView,
+body:not(.appNavHidden) #profileModal button,
+body:not(.appNavHidden) #config,
+body:not(.appNavHidden) #config .configCard,
+body:not(.appNavHidden) #config button{
+  touch-action:pan-y;
+}
+body:not(.appNavHidden) input,
+body:not(.appNavHidden) textarea,
+body:not(.appNavHidden) select,
+body:not(.appNavHidden) [type="range"],
+body:not(.appNavHidden) [role="slider"],
+body:not(.appNavHidden) [contenteditable="true"]{
+  touch-action:manipulation;
 }
 .screen.tabSwipePreview,
 .modal.tabSwipePreview{display:flex;}
