@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v20.03.3-text-integrity-and-modal-layers';
+const CACHE_NAME = 'trianota-pwa-v20.03.4-home-mode-scenes';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -27,6 +27,8 @@ const LOCAL_ASSETS = [
   './assets/icons/game/speed.svg',
   './assets/icons/game/goals.svg',
   './assets/icons/game/surface.svg',
+  './assets/illustrations/home-goal-scene.svg',
+  './assets/illustrations/home-meta-scene.svg',
   './assets/worlds/triangle.png',
   './assets/worlds/corridor.png',
   './assets/worlds/painters.png',
@@ -108,7 +110,6 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(freshAsset ? networkFirst(event.request) : cacheFirst(event.request));
 });
-
 
 
 
