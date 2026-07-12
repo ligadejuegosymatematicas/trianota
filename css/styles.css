@@ -2191,6 +2191,7 @@ $124px;
     grid-template-rows:22px 11px 10px;
   }
 }
+
 /* v19.94 - Perfil principal: grilla de mundos 3-3-2-2 */
 .profileMainView.noMiniStats{
   grid-template-rows:auto auto minmax(12px,1fr) auto auto;
@@ -3333,4 +3334,68 @@ body:not(.appNavHidden) .modal:not(#profileModal) .card{
   .modeCard.meta.homeModeScene{
     background-size:auto,auto 96%,auto,auto;
   }
+}
+
+/* v20.03.5: continuous primary-tab swipe */
+body:not(.appNavHidden){
+  touch-action:pan-y;
+  overscroll-behavior-x:none;
+}
+.screen.tabSwipePreview,
+.modal.tabSwipePreview{display:flex;}
+.tabSwipePanel{
+  position:fixed!important;
+  inset:0!important;
+  will-change:transform;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+.tabSwipeOrigin{z-index:42!important;}
+.tabSwipeTarget{z-index:41!important;}
+body.tabSwipeDragging,
+body.tabSwipeSnapping{
+  user-select:none;
+  -webkit-user-select:none;
+}
+body.tabSwipeDragging .tabSwipePanel,
+body.tabSwipeSnapping .tabSwipePanel{pointer-events:none;}
+#profileModal.tabSwipePreview{
+  align-items:center;
+  justify-content:center;
+  padding:10px 10px calc(var(--app-tabbar-space) + 8px);
+}
+#profileModal.show,
+#profileModal.tabSwipePreview{
+  background:
+    radial-gradient(circle at 50% 5%,rgba(34,211,238,.13),rgba(34,211,238,0) 38%),
+    linear-gradient(180deg,rgba(4,15,29,.74),rgba(2,6,23,.82));
+}
+#config.screen.active,
+#config.screen.tabSwipePreview{
+  background:
+    radial-gradient(circle at 50% 3%,rgba(148,163,184,.10),rgba(148,163,184,0) 38%),
+    linear-gradient(180deg,#09111f 0%,#020617 78%);
+}
+.appTab.is-swipe-origin::before{
+  opacity:calc(1 - var(--tab-swipe-progress,0) * .48);
+}
+.appTab.is-swipe-origin .uiIcon{
+  transform:translateY(calc(-4px + var(--tab-swipe-progress,0) * 2px)) scale(calc(1.34 - var(--tab-swipe-progress,0) * .16))!important;
+  opacity:calc(1 - var(--tab-swipe-progress,0) * .24)!important;
+}
+.appTab.is-swipe-neighbor{
+  color:rgba(241,245,249,calc(.64 + var(--tab-swipe-progress,0) * .36));
+}
+.appTab.is-swipe-neighbor::before{
+  opacity:calc(var(--tab-swipe-progress,0) * .82);
+  transform:translateY(calc(3px - var(--tab-swipe-progress,0) * 3px)) scale(calc(.70 + var(--tab-swipe-progress,0) * .34));
+}
+.appTab.is-swipe-neighbor .uiIcon{
+  transform:translateY(calc(var(--tab-swipe-progress,0) * -4px)) scale(calc(1 + var(--tab-swipe-progress,0) * .34))!important;
+  opacity:calc(.80 + var(--tab-swipe-progress,0) * .20)!important;
+}
+@media (prefers-reduced-motion:reduce){
+  .tabSwipePanel{transition-duration:70ms!important;}
+  .appTab.is-swipe-origin .uiIcon,
+  .appTab.is-swipe-neighbor .uiIcon{filter:none!important;}
 }

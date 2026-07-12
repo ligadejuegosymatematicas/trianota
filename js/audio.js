@@ -46,7 +46,7 @@ function playTone(kind, opts={}){
       for(let i=0;i<n;i++){
         const x=i/n;
         const decay=Math.pow(1-x,decayPow);
-        // mezcla ruido + peque?os impulsos irregulares para evitar sonido electr?nico puro
+        // Mezcla ruido e impulsos irregulares para evitar un sonido electronico puro.
         data[i]=(Math.random()*2-1)*decay;
         if(i<Math.min(16,n)) data[i]+= (Math.random()>.5?1:-1)*(1-i/16)*0.65;
       }
@@ -84,7 +84,7 @@ function playTone(kind, opts={}){
     }
 
     function shortRoom(dest=master, wet=.08){
-      // reverberaci?n m?nima mediante delay corto; da cuerpo sin parecer eco.
+      // Reverberacion minima mediante un delay corto; da cuerpo sin parecer eco.
       const delay=ac.createDelay(.08);
       const fb=ac.createGain();
       const wetGain=ac.createGain();
@@ -106,13 +106,13 @@ function playTone(kind, opts={}){
       resonator(1160,0.004,.055,.026*s,22,master);
       tone(290,0.002,.040,'triangle',.010*s,.002,master);
     } else if(kind==='pass'){
-      // Pase v?lido v15.8: acompa?amiento m?nimo.
-      // Un "tink" leve despu?s del clack f?sico; no debe sonar a notificaci?n.
+      // Pase valido v15.8: acompanamiento minimo.
+      // Un "tink" leve despues del clack fisico; no debe sonar a notificacion.
       resonator(1180,0.000,.055,.012,24,master);
       tone(1680,0.030,.055,'sine',.010,.004,master);
       clickBuffer(0.002,.018,.010,'bandpass',2100,10,3.6,master);
     } else if(kind==='restart'){
-      // Saque inicial: tres fichas acomod?ndose r?pidamente.
+      // Saque inicial: tres fichas acomodandose rapidamente.
       clickBuffer(0.000,.032,.045,'bandpass',1300,9,3.0,master);
       resonator(510,0.000,.065,.024,15,master);
       clickBuffer(0.060,.034,.040,'bandpass',1550,9,3.0,master);
@@ -128,7 +128,7 @@ function playTone(kind, opts={}){
       tone(1046, 0.36, .34, 'triangle', .08);
       tone(1318, 0.39, .30, 'sine', .045);
     } else if(kind==='foul'){
-      // Silbato corto de ?rbitro: tono agudo con vibrato y ca?da final.
+      // Silbato corto de arbitro: tono agudo con vibrato y caida final.
       const g=envGain(0,.245,.105,.010);
       const o=ac.createOscillator();
       const lfo=ac.createOscillator();
@@ -164,5 +164,4 @@ function playTone(kind, opts={}){
     setTimeout(()=>ac.close(),1500);
   }catch(e){}
 }
-
 

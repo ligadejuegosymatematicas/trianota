@@ -1,45 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 180" role="presentation">
   <defs>
-    <linearGradient id="goldLine" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fff3a1"/><stop offset="0.48" stop-color="#facc15"/><stop offset="1" stop-color="#b45309"/>
-    </linearGradient>
-    <radialGradient id="blue" cx="32%" cy="24%" r="76%">
-      <stop offset="0" stop-color="#dff8ff"/><stop offset="0.26" stop-color="#38bdf8"/><stop offset="0.66" stop-color="#0b66d4"/><stop offset="1" stop-color="#072b75"/>
-    </radialGradient>
-    <radialGradient id="red" cx="32%" cy="24%" r="76%">
-      <stop offset="0" stop-color="#ffe3df"/><stop offset="0.25" stop-color="#fb7185"/><stop offset="0.65" stop-color="#dc2626"/><stop offset="1" stop-color="#7f1d1d"/>
-    </radialGradient>
-    <radialGradient id="purple" cx="32%" cy="24%" r="76%">
-      <stop offset="0" stop-color="#f5e8ff"/><stop offset="0.25" stop-color="#c084fc"/><stop offset="0.65" stop-color="#7e22ce"/><stop offset="1" stop-color="#3b0764"/>
-    </radialGradient>
-    <linearGradient id="cyanTrail" x1="92" y1="132" x2="232" y2="93" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#22d3ee" stop-opacity="0"/><stop offset="0.6" stop-color="#22d3ee" stop-opacity="0.58"/><stop offset="1" stop-color="#a5f3fc" stop-opacity="0.88"/>
-    </linearGradient>
-    <pattern id="checks" width="20" height="20" patternUnits="userSpaceOnUse">
-      <rect width="20" height="20" fill="#f8fafc"/>
-      <rect width="10" height="10" fill="#111827"/>
-      <rect x="10" y="10" width="10" height="10" fill="#111827"/>
-    </pattern>
-    <filter id="softGlow" x="-35%" y="-35%" width="170%" height="170%">
-      <feGaussianBlur stdDeviation="2.2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff3a1"/><stop offset=".48" stop-color="#facc15"/><stop offset="1" stop-color="#b45309"/></linearGradient>
+    <radialGradient id="blue" cx="32%" cy="24%" r="76%"><stop stop-color="#dff8ff"/><stop offset=".26" stop-color="#38bdf8"/><stop offset=".66" stop-color="#0b66d4"/><stop offset="1" stop-color="#072b75"/></radialGradient>
+    <radialGradient id="red" cx="32%" cy="24%" r="76%"><stop stop-color="#ffe3df"/><stop offset=".25" stop-color="#fb7185"/><stop offset=".65" stop-color="#dc2626"/><stop offset="1" stop-color="#7f1d1d"/></radialGradient>
+    <radialGradient id="purple" cx="32%" cy="24%" r="76%"><stop stop-color="#f5e8ff"/><stop offset=".25" stop-color="#c084fc"/><stop offset=".65" stop-color="#7e22ce"/><stop offset="1" stop-color="#3b0764"/></radialGradient>
+    <linearGradient id="trail" x1="86" y1="143" x2="236" y2="101" gradientUnits="userSpaceOnUse"><stop stop-color="#22d3ee" stop-opacity="0"/><stop offset=".56" stop-color="#22d3ee" stop-opacity=".66"/><stop offset="1" stop-color="#a5f3fc" stop-opacity=".92"/></linearGradient>
+    <pattern id="checks" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#f8fafc"/><rect width="9" height="9" fill="#111827"/><rect x="9" y="9" width="9" height="9" fill="#111827"/></pattern>
+    <filter id="glow" x="-35%" y="-35%" width="170%" height="170%"><feGaussianBlur stdDeviation="2.1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   </defs>
-  <g filter="url(#softGlow)">
-    <rect x="288" y="25" width="58" height="74" rx="5" fill="url(#checks)" stroke="#facc15" stroke-width="5"/>
-    <rect x="294" y="31" width="46" height="62" rx="2" fill="none" stroke="#ecfeff" stroke-width="1.5" opacity="0.82"/>
-  </g>
-  <path d="M91 140 220 101" fill="none" stroke="url(#cyanTrail)" stroke-width="10" stroke-linecap="round"/>
-  <path d="M112 155 222 117M108 119 224 87" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
-  <path d="M235 66c28-2 43-1 58 1" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 7" opacity="0.68"/>
-  <g stroke="url(#goldLine)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#softGlow)">
-    <path d="M220 67 270 78 238 124 220 67Z" fill="#22d3ee" fill-opacity="0.10"/>
-  </g>
-  <g filter="url(#softGlow)">
-    <circle cx="220" cy="67" r="21" fill="url(#blue)" stroke="url(#goldLine)" stroke-width="4"/>
-    <circle cx="270" cy="78" r="21" fill="url(#red)" stroke="url(#goldLine)" stroke-width="4"/>
-    <circle cx="238" cy="124" r="22" fill="url(#purple)" stroke="url(#goldLine)" stroke-width="4"/>
-    <circle cx="212" cy="59" r="5" fill="#fff" opacity="0.32"/>
-    <circle cx="262" cy="70" r="5" fill="#fff" opacity="0.28"/>
-    <circle cx="230" cy="116" r="5" fill="#fff" opacity="0.28"/>
+  <ellipse cx="318" cy="110" rx="39" ry="11" fill="#22d3ee" opacity=".18" filter="url(#glow)"/>
+  <path d="M286 75 347 65 347 96 286 110Z" fill="url(#checks)" stroke="#facc15" stroke-width="5" stroke-linejoin="round" filter="url(#glow)"/>
+  <path d="M292 79 341 71 341 92 292 103Z" fill="none" stroke="#ecfeff" stroke-width="1.4" opacity=".72"/>
+  <path d="M278 116c22 7 53 6 76-5" fill="none" stroke="#67e8f9" stroke-width="2" opacity=".34"/>
+  <g transform="translate(-29 -12) scale(1.12)">
+    <path d="M112 119 162 130 132 166 112 119Z" fill="#22d3ee" fill-opacity=".05" stroke="#67e8f9" stroke-width="2.5" opacity=".22"/>
+    <path d="M112 119 218 68M162 130 269 79M132 166 238 125" fill="none" stroke="url(#trail)" stroke-width="8.5" stroke-linecap="round"/>
+    <path d="M151 126 220 82M171 140 267 93M153 168 239 137" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" opacity=".25"/>
+    <path d="M220 67 270 78 238 124 220 67Z" fill="#22d3ee" fill-opacity=".11" stroke="url(#gold)" stroke-width="6" stroke-linejoin="round" filter="url(#glow)"/>
+    <path d="M239 67c23-2 36-1 51 2" fill="none" stroke="#fde68a" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="4 7" opacity=".58"/>
+    <g filter="url(#glow)">
+      <circle cx="220" cy="67" r="21" fill="url(#blue)" stroke="url(#gold)" stroke-width="4"/>
+      <circle cx="270" cy="78" r="21" fill="url(#red)" stroke="url(#gold)" stroke-width="4"/>
+      <circle cx="238" cy="124" r="22" fill="url(#purple)" stroke="url(#gold)" stroke-width="4"/>
+      <circle cx="212" cy="59" r="5" fill="#fff" opacity=".32"/><circle cx="262" cy="70" r="5" fill="#fff" opacity=".28"/><circle cx="230" cy="116" r="5" fill="#fff" opacity=".28"/>
+    </g>
   </g>
 </svg>
