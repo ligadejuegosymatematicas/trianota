@@ -1,4 +1,4 @@
-﻿// Perfil v19.83. UI premium compacta con r\u00e9cords mundiales bajo demanda.
+// Perfil v19.83. UI premium compacta con r\u00e9cords mundiales bajo demanda.
 (function(){
   'use strict';
 

@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 // Logica de Campana extraida desde main.js. Mantiene funciones globales clasicas.
 

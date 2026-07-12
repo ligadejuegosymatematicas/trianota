@@ -1,4 +1,4 @@
-﻿function attemptTitle(h,i){ return `${h.type==='meta'?'🏁 Meta':(h.type==='goal'?'⚽ Gol':'❌ Falta')} #${i+1}`; }
+function attemptTitle(h,i){ return `${h.type==='meta'?'🏁 Meta':(h.type==='goal'?'⚽ Gol':'❌ Falta')} #${i+1}`; }
 
 function campaignAttemptLevelKey(h){
   const world = state.currentMetaWorld || 1;

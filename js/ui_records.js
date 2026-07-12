@@ -1,4 +1,4 @@
-﻿let goalPersonalBeforeSave = null;
+let goalPersonalBeforeSave = null;
 
 function goalRecordsForCurrentDuration(){
   return (state.records || []).filter(r => !r.duration || +r.duration === +cfg.duration);

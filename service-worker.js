@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'trianota-pwa-v20.03.1-home-polish';
+const CACHE_NAME = 'trianota-pwa-v20.03.2-encoding-cleanup';
 const LOCAL_ASSETS = [
   './',
   './index.html',

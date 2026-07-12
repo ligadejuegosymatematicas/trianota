@@ -1,4 +1,4 @@
-﻿// Optional Firebase provider.
+// Optional Firebase provider.
 // GitHub Pages remains the frontend host; this stage writes candidate entries and updates provisional best docs.
 var FIREBASE_PROVIDER = window.FIREBASE_PROVIDER = (() => {
   let readyResolved = false;
