@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v20.04.1-profile-structure-cleanup';
+const CACHE_NAME = 'trianota-pwa-v20.04.2-profile-official-art';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -29,6 +29,9 @@ const LOCAL_ASSETS = [
   './assets/icons/game/surface.svg',
   './assets/illustrations/home/home-goal-scene.webp',
   './assets/illustrations/home/home-meta-scene.webp',
+  './assets/art/profile/rapidez_oficial.webp',
+  './assets/art/profile/superficie_oficial.webp',
+  './assets/art/profile/records_mundiales_oficial.webp',
   './assets/worlds/triangle.png',
   './assets/worlds/corridor.png',
   './assets/worlds/painters.png',
@@ -110,8 +113,6 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(freshAsset ? networkFirst(event.request) : cacheFirst(event.request));
 });
-
-
 
 
 
