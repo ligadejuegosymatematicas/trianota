@@ -17,7 +17,7 @@ function focusModal(modal){
   if(!modal.hasAttribute('tabindex')) modal.setAttribute('tabindex','-1');
   setTimeout(() => { try { target.focus({preventScroll:true}); } catch { target.focus(); } }, 0);
 }
-function showModal(id){
+function showModal(id, options={}){
   const modal = modalEl(id);
   if(!modal) return;
   modalReturnFocus.set(id, document.activeElement);
@@ -25,10 +25,16 @@ function showModal(id){
   modal.setAttribute('aria-modal','true');
   modal.classList.add('show');
   focusModal(modal);
+  if(id === 'aboutModal' && !options.fromHistory && window.TRIANOTA_NAVIGATION && typeof window.TRIANOTA_NAVIGATION.layerOpened === 'function'){
+    window.TRIANOTA_NAVIGATION.layerOpened('modal:aboutModal', {id});
+  }
 }
-function hideModal(id){
+function hideModal(id, options={}){
   const modal = modalEl(id);
   if(!modal) return;
+  if(id === 'aboutModal' && !options.fromHistory && modal.classList.contains('show') && window.TRIANOTA_NAVIGATION && typeof window.TRIANOTA_NAVIGATION.requestLayerClose === 'function'){
+    if(window.TRIANOTA_NAVIGATION.requestLayerClose('modal:aboutModal')) return;
+  }
   modal.classList.remove('show');
   const returnTo = modalReturnFocus.get(id);
   modalReturnFocus.delete(id);

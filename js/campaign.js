@@ -70,6 +70,75 @@ function goToNextMetaLevel(){
   startMetaLevel(t.level, true, t.world);
 }
 
+function selectMetaWorld(index){
+  const nextIndex = Math.max(0, Math.min(CAMPAIGN_LEVELS.length - 1, Math.round(+index || 0)));
+  if(nextIndex === state.metaWorldIndex) return;
+  state.metaWorldIndex = nextIndex;
+  renderMetaWorlds();
+}
+
+function bindMetaWorldSwipe(panel){
+  if(!panel) return;
+  let drag = null;
+  let suppressClick = false;
+  const excluded = 'button,input,[role="slider"],[data-meta-level]';
+  panel.addEventListener('pointerdown', ev => {
+    if(ev.pointerType === 'mouse' && ev.button !== 0) return;
+    if(ev.target.closest(excluded)) return;
+    drag = {id:ev.pointerId, x:ev.clientX, y:ev.clientY, lastX:ev.clientX, lastT:ev.timeStamp, axis:'pending'};
+  }, {passive:true});
+  panel.addEventListener('pointermove', ev => {
+    if(!drag || ev.pointerId !== drag.id) return;
+    const dx = ev.clientX - drag.x;
+    const dy = ev.clientY - drag.y;
+    if(drag.axis === 'pending'){
+      if(Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      if(Math.abs(dy) >= Math.abs(dx) * 1.15){ drag = null; return; }
+      if(Math.abs(dx) <= Math.abs(dy) * 1.15) return;
+      drag.axis = 'horizontal';
+      panel.classList.add('metaWorldDragging');
+      try { panel.setPointerCapture(ev.pointerId); } catch(e) {}
+    }
+    if(drag.axis !== 'horizontal') return;
+    ev.preventDefault();
+    drag.lastX = ev.clientX;
+    drag.lastT = ev.timeStamp;
+    const limit = panel.clientWidth * .34;
+    const offset = Math.max(-limit, Math.min(limit, dx));
+    panel.style.setProperty('--meta-world-drag-x', `${offset}px`);
+  }, {passive:false});
+  const finish = ev => {
+    if(!drag || ev.pointerId !== drag.id) return;
+    const current = drag;
+    drag = null;
+    if(current.axis !== 'horizontal') return;
+    ev.preventDefault();
+    const dx = ev.clientX - current.x;
+    const dt = Math.max(1, ev.timeStamp - current.lastT);
+    const velocity = Math.abs(ev.clientX - current.lastX) / dt;
+    const commit = Math.abs(dx) >= Math.min(72, panel.clientWidth * .20) || (Math.abs(dx) >= 34 && velocity >= .42);
+    const direction = dx < 0 ? 1 : -1;
+    const target = state.metaWorldIndex + direction;
+    panel.classList.remove('metaWorldDragging');
+    panel.style.removeProperty('--meta-world-drag-x');
+    suppressClick = true;
+    setTimeout(() => { suppressClick = false; }, 260);
+    if(commit && target >= 0 && target < CAMPAIGN_LEVELS.length) selectMetaWorld(target);
+  };
+  panel.addEventListener('pointerup', finish, {passive:false});
+  panel.addEventListener('pointercancel', ev => {
+    if(!drag || ev.pointerId !== drag.id) return;
+    drag = null;
+    panel.classList.remove('metaWorldDragging');
+    panel.style.removeProperty('--meta-world-drag-x');
+  }, {passive:true});
+  panel.addEventListener('click', ev => {
+    if(!suppressClick) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+  }, true);
+}
+
 function renderMetaWorlds(){
   const box=$('metaWorlds');
   const title=$('metaWorldTitle');
@@ -92,7 +161,7 @@ function renderMetaWorlds(){
   const titleName = w.name;
   if(title){
     title.className = `metaTitle ${themeClass}${reveal ? ' revealTitle' : ''}`;
-    title.innerHTML = `<span class="worldNum">${w.title}</span> <span class="worldSep">·</span> <span class="worldName">${titleName}</span>`;
+    title.innerHTML = `<span class="worldNum">${w.title}</span> <span class="worldSep">&middot;</span> <span class="worldName">${titleName}</span>`;
   }
   if(mini) mini.textContent='';
 
@@ -112,8 +181,8 @@ function renderMetaWorlds(){
           const key = `${worldNumber}-${lv.n}`;
           const rec = unlocked && state.metaBest && state.metaBest[key];
           const worldRec = unlocked && DATA_PROVIDER.getCampaignWorldRecord ? DATA_PROVIDER.getCampaignWorldRecord(key) : null;
-          const personalLabel = rec ? `Personal ${formatMetaTime(rec.time)}` : (lv.state==='locked' ? '' : 'Personal —');
-          const worldLabel = worldRec ? `Mundial ${formatMetaTime(worldRec.time)}` : (lv.state==='locked' ? '' : 'Mundial —');
+          const personalLabel = rec ? `Personal ${formatMetaTime(rec.time)}` : (lv.state==='locked' ? '' : 'Personal \u2014');
+          const worldLabel = worldRec ? `Mundial ${formatMetaTime(worldRec.time)}` : (lv.state==='locked' ? '' : 'Mundial \u2014');
           return `
             <button class="levelTile ${lv.state}" data-meta-level="${worldNumber}-${lv.n}" ${lv.state==='locked'?'disabled':''}>
               <span class="levelNum">${lv.n}</span>
@@ -124,9 +193,12 @@ function renderMetaWorlds(){
         }).join('')}
       </div>
       <div class="metaNav">
-        <button class="navPuck ${wi===0?'hidden':''}" id="metaPrevBtn" aria-label="Mundo anterior">‹</button>
-        <div class="pageDots"><span class="pageTrack"><span class="pageTrackDot" style="left:${CAMPAIGN_LEVELS.length>1 ? (wi/(CAMPAIGN_LEVELS.length-1))*100 : 0}%"></span></span></div>
-        <button class="navPuck ${wi===CAMPAIGN_LEVELS.length-1?'hidden':''}" id="metaNextBtn" aria-label="Mundo siguiente">›</button>
+        <button class="navPuck ${wi===0?'hidden':''}" id="metaPrevBtn" aria-label="Mundo anterior"><span class="uiIcon iconBack" aria-hidden="true"></span></button>
+        <label class="pageDots" aria-label="Seleccionar mundo">
+          <input class="worldPageSlider" id="metaWorldSlider" type="range" min="0" max="${CAMPAIGN_LEVELS.length-1}" step="1" value="${wi}" aria-label="Mundo" aria-valuetext="Mundo ${worldNumber}: ${titleName}">
+          <span class="pageTrack" aria-hidden="true"><span class="pageTrackDot" style="left:${CAMPAIGN_LEVELS.length>1 ? (wi/(CAMPAIGN_LEVELS.length-1))*100 : 0}%"></span></span>
+        </label>
+        <button class="navPuck ${wi===CAMPAIGN_LEVELS.length-1?'hidden':''}" id="metaNextBtn" aria-label="Mundo siguiente"><span class="uiIcon iconChevron" aria-hidden="true"></span></button>
       </div>
     </div>
   `;
@@ -137,8 +209,19 @@ function renderMetaWorlds(){
 
   const prev=$('metaPrevBtn');
   const next=$('metaNextBtn');
-  if(prev) prev.onclick=()=>{state.metaWorldIndex=Math.max(0,state.metaWorldIndex-1); renderMetaWorlds();};
-  if(next) next.onclick=()=>{state.metaWorldIndex=Math.min(CAMPAIGN_LEVELS.length-1,state.metaWorldIndex+1); renderMetaWorlds();};
+  if(prev) prev.onclick=()=>selectMetaWorld(state.metaWorldIndex-1);
+  if(next) next.onclick=()=>selectMetaWorld(state.metaWorldIndex+1);
+  const slider=$('metaWorldSlider');
+  if(slider){
+    slider.oninput=()=>{
+      const dot=box.querySelector('.pageTrackDot');
+      if(dot) dot.style.left=`${CAMPAIGN_LEVELS.length>1 ? (+slider.value/(CAMPAIGN_LEVELS.length-1))*100 : 0}%`;
+      const preview=CAMPAIGN_LEVELS[+slider.value];
+      slider.setAttribute('aria-valuetext', preview ? `${preview.title}: ${preview.name}` : '');
+    };
+    slider.onchange=()=>selectMetaWorld(+slider.value);
+  }
+  bindMetaWorldSwipe(box.querySelector('.worldPanel'));
   document.querySelectorAll('[data-meta-level]').forEach(b=>{
     b.onclick=()=>{
       if(b.disabled) return;

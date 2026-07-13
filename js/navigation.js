@@ -19,6 +19,7 @@
   const DISTANCE_THRESHOLD = 0.30;
   const VELOCITY_THRESHOLD = 0.52;
   const MIN_FLING_DISTANCE = 34;
+  const HISTORY_KEY = 'trianotaInternalNavigation';
   const SWIPE_CAPTURE_SELECTOR = 'canvas,input,textarea,select,[type="range"],[role="slider"],[contenteditable="true"],[data-swipe-lock]';
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let activeTab = 'home';
@@ -29,8 +30,35 @@
   let snapState = null;
   let snapTimer = 0;
   let suppressClickUntil = 0;
+  let applyingHistory = false;
+  let historySerial = 0;
 
   function el(id){ return document.getElementById(id); }
+  function currentScreenId(){
+    return (window.state && window.state.screen) || document.querySelector('.screen.active')?.id || 'home';
+  }
+  function historyState(overrides={}){
+    return Object.assign({
+      [HISTORY_KEY]:true,
+      serial:++historySerial,
+      tab:activeTab,
+      screen:currentScreenId(),
+      layer:null,
+      payload:null
+    }, overrides);
+  }
+  function pushHistory(overrides={}){
+    if(applyingHistory) return;
+    try { history.pushState(historyState(overrides), ''); } catch(e) {}
+  }
+  function replaceHistory(overrides={}){
+    if(applyingHistory) return;
+    try { history.replaceState(historyState(overrides), ''); } catch(e) {}
+  }
+  function currentLayer(){
+    const value = history.state;
+    return value && value[HISTORY_KEY] ? value.layer : null;
+  }
   function tabButton(tab){ return el(TABS[tab]); }
   function panelFor(tab){
     if(tab === 'profile') return el('profileModal');
@@ -61,13 +89,32 @@
   function closeConfigChoice(){
     const overlay = el('configChoiceOverlay');
     if(!overlay) return;
-    overlay.hidden = true;
-    overlay.removeAttribute('data-setting');
+    if(typeof window.closeConfigChoice === 'function') window.closeConfigChoice(true);
+    else {
+      overlay.hidden = true;
+      overlay.removeAttribute('data-setting');
+    }
   }
 
   function closeModals(){
-    document.querySelectorAll('.modal.show').forEach(modal => modal.classList.remove('show'));
+    document.querySelectorAll('.modal.show').forEach(modal => {
+      if(typeof window.hideModal === 'function') window.hideModal(modal.id, {fromHistory:true});
+      else modal.classList.remove('show');
+    });
     closeConfigChoice();
+  }
+
+  function closeBlockingLayersDirect(){
+    if(typeof window.closeProfileSubview === 'function') window.closeProfileSubview(true);
+    closeModals();
+  }
+
+  function discardBlockingLayer(){
+    const hadLayer = hasBlockingLayer() || !!currentLayer();
+    if(!hadLayer) return false;
+    closeBlockingLayersDirect();
+    replaceHistory({tab:activeTab, screen:activeTab === 'settings' ? 'config' : 'home', layer:null, payload:null});
+    return true;
   }
 
   function currentSurface(){
@@ -148,8 +195,13 @@
 
   if(typeof originalShowScreen === 'function'){
     window.showScreen = function(id){
+      const previous = currentScreenId();
       const result = originalShowScreen(id);
       syncForScreen(id);
+      if(!switchingTab && !applyingHistory && previous !== id){
+        const tab = id === 'config' ? 'settings' : id === 'home' ? 'home' : activeTab;
+        pushHistory({tab, screen:id, layer:null, payload:null});
+      }
       return result;
     };
   }
@@ -171,8 +223,13 @@
     else if(typeof window.showScreen === 'function') window.showScreen('config');
   }
 
-  function switchTab(tab){
-    if(activeTab === tab || gesture || snapState || hasBlockingLayer()) return;
+  function switchTab(tab, opts={}){
+    if(!TABS[tab] || gesture || snapState) return;
+    const dismissedLayer = discardBlockingLayer();
+    if(activeTab === tab){
+      if(dismissedLayer) performTabAction(tab);
+      return;
+    }
     if(pendingFrame) cancelAnimationFrame(pendingFrame);
     markLeaving();
     feedback(tab);
@@ -188,6 +245,7 @@
       setNavVisible(true);
       setActive(tab);
       animateSurface(tab);
+      if(!opts.fromHistory) pushHistory({tab, screen:tab === 'settings' ? 'config' : 'home', layer:null, payload:null});
     });
   }
 
@@ -359,6 +417,7 @@
     setNavVisible(true);
     setActive(tab, {animate:true});
     feedback(tab);
+    pushHistory({tab, screen:tab === 'settings' ? 'config' : 'home', layer:null, payload:null});
   }
 
   function finishSnap(complete){
@@ -488,7 +547,79 @@
     window.addEventListener('resize', () => cancelGesture(true), {passive:true});
   }
 
+  function layerOpened(layer, payload=null){
+    if(!layer || applyingHistory || switchingTab) return;
+    const current = history.state;
+    if(current && current[HISTORY_KEY] && current.layer === layer) return;
+    pushHistory({tab:activeTab, screen:currentScreenId(), layer, payload});
+  }
+
+  function requestLayerClose(layer){
+    const current = history.state;
+    if(applyingHistory || !current || !current[HISTORY_KEY] || current.layer !== layer) return false;
+    history.back();
+    return true;
+  }
+
+  function restoreLayer(navState){
+    const payload = navState && navState.payload || {};
+    if(navState.layer === 'profileSubview' && typeof window.restoreProfileSubview === 'function'){
+      window.restoreProfileSubview(payload.view);
+      return;
+    }
+    if(navState.layer === 'configChoice' && typeof window.openConfigChoice === 'function'){
+      window.openConfigChoice(payload.setting, true);
+      return;
+    }
+    if(navState.layer === 'modal:aboutModal' && typeof window.showModal === 'function'){
+      window.showModal('aboutModal', {fromHistory:true});
+    }
+  }
+
+  function applyHistoryState(navState){
+    if(!navState || !navState[HISTORY_KEY]) return;
+    applyingHistory = true;
+    cancelGesture(true);
+    closeBlockingLayersDirect();
+    switchingTab = true;
+    try{
+      if(navState.screen === 'gameScreen' || navState.screen === 'metaScreen'){
+        if(typeof originalShowScreen === 'function') originalShowScreen(navState.screen);
+        syncForScreen(navState.screen);
+      }else{
+        const tab = TABS[navState.tab] ? navState.tab : (navState.screen === 'config' ? 'settings' : 'home');
+        performTabAction(tab);
+        setNavVisible(true);
+        setActive(tab);
+      }
+    }finally{
+      switchingTab = false;
+      applyingHistory = false;
+    }
+    if(navState.layer) restoreLayer(navState);
+  }
+
+  function goBack(fallback='home'){
+    const current = history.state;
+    if(current && current[HISTORY_KEY] && current.serial > 1){
+      history.back();
+      return;
+    }
+    if(typeof originalShowScreen === 'function'){
+      originalShowScreen(fallback);
+      syncForScreen(fallback);
+    }
+  }
+
+  function bindHistory(){
+    const existing = history.state;
+    historySerial = existing && existing[HISTORY_KEY] ? (+existing.serial || 0) : 0;
+    replaceHistory({tab:'home', screen:'home', layer:null, payload:null});
+    window.addEventListener('popstate', ev => applyHistoryState(ev.state));
+  }
+
   function init(){
+    bindHistory();
     bindTabs();
     bindSettingsAbout();
     bindSwipe();
@@ -497,5 +628,8 @@
   }
 
   init();
-  window.TRIANOTA_NAVIGATION = {goHome,goProfile,goSettings,setActive,get activeTab(){return activeTab;}};
+  window.TRIANOTA_NAVIGATION = {
+    goHome,goProfile,goSettings,goBack,setActive,layerOpened,requestLayerClose,
+    get activeTab(){return activeTab;}
+  };
 })();

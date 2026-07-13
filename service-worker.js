@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v20.04.3-world-logos';
+const CACHE_NAME = 'trianota-pwa-v20.04.4-world-navigation';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -123,6 +123,5 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(freshAsset ? networkFirst(event.request) : cacheFirst(event.request));
 });
-
 
 

@@ -55,7 +55,11 @@
   window.GOAL_TOP = GOAL_TOP;
 
   document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>hideModal(b.dataset.close));
-  document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>showScreen('home'));
+  function navigateBack(fallback='home'){
+    if(window.TRIANOTA_NAVIGATION && typeof window.TRIANOTA_NAVIGATION.goBack === 'function') window.TRIANOTA_NAVIGATION.goBack(fallback);
+    else showScreen(fallback);
+  }
+  document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>navigateBack('home'));
 
   const PROFILE_CONFIRMED_KEY = 'tdg_player_nick_confirmed_v1';
   const PROFILE_REQUIRED_MSG = '⚠ Debes registrar un nick antes de jugar.';
@@ -233,9 +237,12 @@
     if($('directionSpeedValue')) $('directionSpeedValue').textContent = speed.label;
   }
   let configChoiceReturnFocus = null;
-  function closeConfigChoice(){
+  function closeConfigChoice(fromHistory=false){
     const overlay = $('configChoiceOverlay');
     if(!overlay) return;
+    if(!fromHistory && !overlay.hidden && window.TRIANOTA_NAVIGATION && typeof window.TRIANOTA_NAVIGATION.requestLayerClose === 'function'){
+      if(window.TRIANOTA_NAVIGATION.requestLayerClose('configChoice')) return;
+    }
     overlay.hidden = true;
     overlay.dataset.setting = '';
     if(configChoiceReturnFocus && document.contains(configChoiceReturnFocus) && typeof configChoiceReturnFocus.focus === 'function'){
@@ -245,7 +252,7 @@
     }
   }
   window.closeConfigChoice = closeConfigChoice;
-  function renderConfigChoice(setting){
+  function renderConfigChoice(setting, fromHistory=false){
     const overlay = $('configChoiceOverlay'), sheet = $('configChoiceSheet'), title = $('configChoiceTitle'), box = $('configChoiceOptions');
     if(!overlay || !sheet || !title || !box) return;
     const control = $(setting);
@@ -274,9 +281,13 @@
     sheet.setAttribute('aria-modal', 'true');
     sheet.setAttribute('tabindex', '-1');
     overlay.hidden = false;
+    if(!fromHistory && window.TRIANOTA_NAVIGATION && typeof window.TRIANOTA_NAVIGATION.layerOpened === 'function'){
+      window.TRIANOTA_NAVIGATION.layerOpened('configChoice', {setting});
+    }
     const focusTarget = box.querySelector('.configChoiceOption.selected') || box.querySelector('.configChoiceOption') || sheet;
     setTimeout(() => { try { focusTarget.focus({preventScroll:true}); } catch { focusTarget.focus(); } }, 0);
   }
+  window.openConfigChoice = renderConfigChoice;
   function updateConfigConditionalUI(){
     const speedRow = $('directionSpeedRow');
     if(speedRow) speedRow.hidden = cfg.kickMode !== 'dirforce';
@@ -326,11 +337,11 @@
   if($('recordsBtn')) $('recordsBtn').onclick=()=>{renderRecords(); showModal('recordsModal');};
   if($('goalPlayBtn')) $('goalPlayBtn').onclick=()=>{ if(requirePlayerNick()) startGame(); };
   if($('metaBtn')) $('metaBtn').onclick=()=>{ if(!requirePlayerNick()) return; state.metaWorldIndex=0; renderMetaWorlds(); showScreen('metaScreen');};
-  if($('metaBackBtn')) $('metaBackBtn').onclick=()=>showScreen('home');
+  if($('metaBackBtn')) $('metaBackBtn').onclick=()=>navigateBack('home');
   if($('endBtn')) $('endBtn').onclick=()=>{
     finishGame(true);
-    if(state.gameMode==='meta'){ state.metaWorldIndex=Math.max(0,(state.currentMetaWorld||1)-1); renderMetaWorlds(); showScreen('metaScreen'); }
-    else showScreen('home');
+    if(state.gameMode==='meta'){ state.metaWorldIndex=Math.max(0,(state.currentMetaWorld||1)-1); renderMetaWorlds(); navigateBack('metaScreen'); }
+    else navigateBack('home');
   };
   if($('triBtn')) $('triBtn').onclick=()=>{pulseBtn('triBtn'); state.showTri=!state.showTri; updateTriButton(); renderLegend();};
   if($('histBtn')) $('histBtn').onclick=()=>{pulseBtn('histBtn'); renderHistory(); showModal('historyModal');};

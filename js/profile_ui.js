@@ -346,9 +346,7 @@
       node.onclick = () => {
         const action = node.dataset.profileAction || 'main';
         if(action === 'main'){
-          currentView = {type:'main'};
-          renderProfile();
-          restoreProfileFocus();
+          closeProfileSubview();
           return;
         }
         returnAction = action;
@@ -357,15 +355,26 @@
         else if(action.startsWith('world:')) currentView = {type:'world', world:+action.split(':')[1]};
         else if(action.startsWith('goal:')) currentView = {type:'goal', kind:action.split(':')[1]};
         renderProfile();
+        if(window.TRIANOTA_NAVIGATION && typeof window.TRIANOTA_NAVIGATION.layerOpened === 'function'){
+          window.TRIANOTA_NAVIGATION.layerOpened('profileSubview', {view:Object.assign({}, currentView)});
+        }
       };
     });
   }
-  function closeProfileSubview(){
+  function closeProfileSubview(fromHistory=false){
     if(currentView.type === 'main') return false;
+    if(!fromHistory && window.TRIANOTA_NAVIGATION && typeof window.TRIANOTA_NAVIGATION.requestLayerClose === 'function'){
+      if(window.TRIANOTA_NAVIGATION.requestLayerClose('profileSubview')) return true;
+    }
     currentView = {type:'main'};
     renderProfile();
     restoreProfileFocus();
     return true;
+  }
+  function restoreProfileSubview(view){
+    if(!view || view.type === 'main') return;
+    currentView = Object.assign({}, view);
+    renderProfile();
   }
   function openProfile(){
     currentView = {type:'main'};
@@ -389,5 +398,6 @@
   window.renderProfile = renderProfile;
   window.openProfile = openProfile;
   window.closeProfileSubview = closeProfileSubview;
+  window.restoreProfileSubview = restoreProfileSubview;
   initProfileUi();
 })();
