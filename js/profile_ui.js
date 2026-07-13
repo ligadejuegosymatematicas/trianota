@@ -161,12 +161,9 @@
         </div>
       </section>`;
   }
-  function worldArt(world){
-    const art = window.WORLD_ART || {};
-    const path = art[world.shape] || '';
-    // The custom property is consumed by css/styles.css, so its relative URL
-    // must be based from the CSS directory rather than from index.html.
-    return path ? `../${path}` : '';
+  function worldLogo(world){
+    const logos = window.WORLD_LOGOS || {};
+    return logos[world.world] || '';
   }
   function worldShowcaseCard(world, compact=false){
     const best = bestByLevel();
@@ -176,9 +173,9 @@
     const progressText = state === 'comingSoon' ? 'Pr\u00f3x.' : `${progress.done}/${progress.total}`;
     const stateText = state === 'completed' ? 'Completado' : state === 'current' ? 'Actual' : state === 'locked' ? 'Bloqueado' : 'Pr\u00f3ximamente';
     const stateIcon = state === 'completed' ? iconHtml('iconCheck') : state === 'locked' ? iconHtml('iconLock') : '';
-    const art = worldArt(world);
-    const style = art ? ` style="--world-art:url('${esc(art)}')"` : '';
-    return `<button class="profileWorldShowcase ${state} ${compact ? 'compact' : ''}" type="button" data-profile-action="world:${world.world}" ${enabled ? '' : 'disabled'}${style} aria-label="Mundo ${world.world}, ${esc(stateText)}, ${esc(progressText)}">
+    const logo = worldLogo(world);
+    return `<button class="profileWorldShowcase ${state} ${compact ? 'compact' : ''}" type="button" data-world="${world.world}" data-profile-action="world:${world.world}" ${enabled ? '' : 'disabled'} aria-label="Mundo ${world.world}, ${esc(stateText)}, ${esc(progressText)}">
+      ${logo ? `<img class="profileWorldLogo" src="${esc(logo)}" alt="" loading="lazy" decoding="async">` : ''}
       <span class="profileWorldShade" aria-hidden="true"></span>
       <span class="profileWorldTop"><b>M${world.world}</b><em>${stateIcon}${esc(stateText)}</em></span>
       <span class="profileWorldCopy"><strong>${esc(world.name || `Mundo ${world.world}`)}</strong><small>${esc(progressText)}</small></span>
@@ -239,7 +236,10 @@
       const owned = isOwnedRecord(worldRec);
       return `<div class="profileDetailRow world ${owned ? 'owned' : ''}"><span>M${world.world}-N${level.n}</span><b>${personal ? secondsLabel(personal) : EM}</b>${worldRecordCell(worldRec, worldValue)}</div>`;
     }).join('') || '<p class="profileEmpty">Este mundo todav\u00eda no est\u00e1 disponible.</p>';
-    return secondaryShell(`Mundo ${world.world}: ${world.name || ''}`, `<div class="profileDetailLegend"><span>Nivel</span><b>Personal</b><em>Mundial</em></div><div class="profileDetailRows">${rows}</div>`, 'CAMPA\u00d1A');
+    const progress = worldProgress(world, best);
+    const logo = worldLogo(world);
+    const hero = `<div class="profileWorldDetailHero">${logo ? `<img src="${esc(logo)}" alt="" loading="lazy" decoding="async">` : ''}<div><span>M${world.world}</span><strong>${esc(world.name || `Mundo ${world.world}`)}</strong><small>${progress.done}/${progress.total} niveles</small></div></div>`;
+    return secondaryShell(`Mundo ${world.world}: ${world.name || ''}`, `${hero}<div class="profileDetailLegend"><span>Nivel</span><b>Personal</b><em>Mundial</em></div><div class="profileDetailRows">${rows}</div>`, 'CAMPA\u00d1A');
   }
   function renderGoal(kind){
     if(kind === 'fastest'){

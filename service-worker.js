@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v20.04.2-profile-official-art';
+const CACHE_NAME = 'trianota-pwa-v20.04.3-world-logos';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -42,6 +42,16 @@ const LOCAL_ASSETS = [
   './assets/worlds/topology.png',
   './assets/worlds/combos.png',
   './assets/worlds/mastery.png',
+  './assets/worlds/logos/world-01-logo.webp',
+  './assets/worlds/logos/world-02-logo.webp',
+  './assets/worlds/logos/world-03-logo.webp',
+  './assets/worlds/logos/world-04-logo.webp',
+  './assets/worlds/logos/world-05-logo.webp',
+  './assets/worlds/logos/world-06-logo.webp',
+  './assets/worlds/logos/world-07-logo.webp',
+  './assets/worlds/logos/world-08-logo.webp',
+  './assets/worlds/logos/world-09-logo.webp',
+  './assets/worlds/logos/world-10-logo.webp',
   './js/version.js',
   './js/assets.js',
   './js/audio.js',
@@ -113,7 +123,6 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(freshAsset ? networkFirst(event.request) : cacheFirst(event.request));
 });
-
 
 
 

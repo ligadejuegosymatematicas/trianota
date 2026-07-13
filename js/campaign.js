@@ -83,13 +83,13 @@ function renderMetaWorlds(){
   const reveal = unlocked && worldNumber > 1 && !(state.metaSeenWorlds && state.metaSeenWorlds[String(worldNumber)]);
   const w={
     title:baseWorld.title,
-    name:unlocked ? baseWorld.name : '?',
+    name:baseWorld.name,
     shape:baseWorld.shape,
     levels:baseWorld.levels.map(lv=>({n:lv.n, state:campaignLevelState(worldNumber, lv.n, unlocked)}))
   };
 
   const themeClass = `theme-${w.shape}`;
-  const titleName = unlocked ? w.name : '?';
+  const titleName = w.name;
   if(title){
     title.className = `metaTitle ${themeClass}${reveal ? ' revealTitle' : ''}`;
     title.innerHTML = `<span class="worldNum">${w.title}</span> <span class="worldSep">·</span> <span class="worldName">${titleName}</span>`;
@@ -100,9 +100,9 @@ function renderMetaWorlds(){
     DATA_PROVIDER.prefetchCampaignWorldRecords(w.levels.filter(lv=>lv.state!=='locked').map(lv=>`${worldNumber}-${lv.n}`));
   }
 
-  const hasArt = !!(WORLD_ART && WORLD_ART[w.shape]);
-  const visualHtml = `${hasArt ? worldEmblem(w.shape) : ''}${unlocked ? '' : '<div class="worldLockOverlay">🔒</div>'}`;
-  const visualClass = `${unlocked ? '' : 'lockedWorld'} ${hasArt ? 'artLogo' : ''} ${themeClass} ${reveal ? 'revealWorld' : ''}`.trim();
+  const logoPath = window.WORLD_LOGOS && window.WORLD_LOGOS[worldNumber];
+  const visualHtml = `${logoPath ? `<img class="worldLogoImg" alt="" src="${logoPath}">` : worldEmblem(w.shape)}${unlocked ? '' : '<div class="worldLockOverlay"><span class="uiIcon iconLock" aria-hidden="true"></span></div>'}`;
+  const visualClass = `${unlocked ? '' : 'lockedWorld'} ${logoPath ? 'officialWorldLogo' : 'artLogo'} ${themeClass} ${reveal ? 'revealWorld' : ''}`.trim();
 
   box.innerHTML = `
     <div class="worldPanel">
