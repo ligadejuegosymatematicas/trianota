@@ -172,7 +172,7 @@
   }
 
   function switchTab(tab){
-    if(activeTab === tab || gesture || snapState) return;
+    if(activeTab === tab || gesture || snapState || hasBlockingLayer()) return;
     if(pendingFrame) cancelAnimationFrame(pendingFrame);
     markLeaving();
     feedback(tab);

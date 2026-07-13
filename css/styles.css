@@ -3720,3 +3720,75 @@ body.tabSwipeSnapping .tabSwipePanel{pointer-events:none;}
 @media (prefers-reduced-motion:reduce){
   .profileWorldShowcase,.profileMarkCard,.profileRecordsLink{transition:none!important;}
 }
+
+/* v20.04.1: limpieza estructural del Perfil */
+.profileShowcaseView{padding-bottom:14px;}
+.profileShowcaseHero{
+  grid-template-columns:60px minmax(0,1fr);
+  gap:12px;
+  padding:12px 14px;
+}
+.profileShowcaseHero .profileAvatar.premium{
+  width:58px;
+  height:58px;
+  font-size:18px;
+}
+.profileShowcaseHero .profileNick{font-size:23px;}
+.profileShowcaseSection{margin-top:11px;}
+.profileShowcaseSection.campaign{padding-top:11px;}
+.profileCampaignMetrics{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  align-items:center;
+  min-height:32px;
+  margin:-2px 0 9px;
+  padding:6px 4px;
+  border-top:1px solid rgba(125,211,252,.09);
+  border-bottom:1px solid rgba(125,211,252,.09);
+  color:rgba(203,213,225,.58);
+  font-size:8px;
+  font-weight:850;
+  letter-spacing:.04em;
+  text-align:center;
+  text-transform:uppercase;
+}
+.profileCampaignMetrics span{min-width:0;border-right:1px solid rgba(226,232,240,.08);white-space:nowrap;}
+.profileCampaignMetrics span:last-child{border-right:0;}
+.profileCampaignMetrics b{margin-left:3px;color:#f8fafc;font-size:11px;letter-spacing:0;}
+.profileWorldShowcase{
+  background-position:center;
+  background-repeat:no-repeat;
+}
+.profileWorldShade{
+  background:linear-gradient(180deg,rgba(2,6,23,.08),rgba(2,6,23,.18) 45%,rgba(2,6,23,.90));
+}
+.profileWorldShowcase.locked{filter:saturate(.52) brightness(.74);}
+.profileWorldShowcase.comingSoon{filter:saturate(.38) brightness(.66);}
+.profileWorldShowcase.comingSoon .profileWorldShade{background:linear-gradient(180deg,rgba(2,6,23,.24),rgba(2,6,23,.38) 45%,rgba(2,6,23,.94));}
+.profileLayer-goal-fastest .profileSubView{max-height:min(430px,calc(100svh - var(--app-tabbar-space) - 42px));}
+.profileLayer-goal-surface .profileSubView{max-height:min(535px,calc(100svh - var(--app-tabbar-space) - 42px));}
+.profileLayer-world .profileSubView{max-height:min(520px,calc(100svh - var(--app-tabbar-space) - 42px));}
+.profileLayer-allWorlds .profileSubView,
+.profileLayer-worldRecords .profileSubView{max-height:calc(100svh - var(--app-tabbar-space) - 42px);}
+body:has(#profileModal.show .profileLayerOverlay) .appTabBar{cursor:default;}
+@media (max-width:380px){
+  .profileShowcaseHero{grid-template-columns:54px minmax(0,1fr);padding:10px 12px;}
+  .profileShowcaseHero .profileAvatar.premium{width:52px;height:52px;font-size:17px;}
+  .profileShowcaseHero .profileNick{font-size:21px;}
+  .profileShowcaseSection{margin-top:9px;}
+  .profileCampaignMetrics{margin-bottom:7px;font-size:7px;}
+  .profileCampaignMetrics b{font-size:10px;}
+  .profileWorldShowcase{min-height:132px;}
+}
+@media (max-height:720px){
+  .profileShowcaseView{padding:9px 11px 10px;}
+  .profileShowcaseHero{grid-template-columns:52px minmax(0,1fr);padding:9px 12px;}
+  .profileShowcaseHero .profileAvatar.premium{width:50px;height:50px;font-size:16px;}
+  .profileShowcaseHero .profileNick{font-size:20px;}
+  .profileShowcaseSection{margin-top:8px;padding:9px 10px;}
+  .profileShowcaseTitle{margin-bottom:6px;}
+  .profileCampaignMetrics{min-height:27px;margin-bottom:6px;padding-block:4px;}
+  .profileFeaturedWorlds .profileWorldShowcase{min-height:126px;}
+  .profileMarkCard{min-height:112px;padding:8px 9px;}
+  .profileRecordsLink{min-height:40px;margin-top:7px;}
+}

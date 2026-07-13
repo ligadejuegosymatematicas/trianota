@@ -151,7 +151,6 @@
     return `<span class="${family} ${esc(name)}${extraClass ? ` ${esc(extraClass)}` : ''}" aria-hidden="true"></span>`;
   }
   function heroHtml(nick){
-    const summary = campaignSummary();
     return `
       <section class="profileShowcaseHero">
         <div class="profileAvatar premium" aria-hidden="true"><span>${esc(initials(nick))}</span></div>
@@ -160,16 +159,14 @@
           <div class="profileNick">${esc(nick)}</div>
           <div class="profileStatus"><i aria-hidden="true"></i> Perfil local</div>
         </div>
-        <div class="profileHeroMetrics" aria-label="Resumen de Campa\u00f1a">
-          <div><span>Progreso</span><b>${summary.percent}%</b></div>
-          <div><span>Mundos</span><b>${summary.completedWorlds}/${summary.totalWorlds}</b></div>
-          <div><span>Niveles</span><b>${summary.done}/${summary.total}</b></div>
-        </div>
       </section>`;
   }
   function worldArt(world){
     const art = window.WORLD_ART || {};
-    return art[world.shape] || '';
+    const path = art[world.shape] || '';
+    // The custom property is consumed by css/styles.css, so its relative URL
+    // must be based from the CSS directory rather than from index.html.
+    return path ? `../${path}` : '';
   }
   function worldShowcaseCard(world, compact=false){
     const best = bestByLevel();
@@ -211,6 +208,7 @@
       ${heroHtml(profileNick())}
       <section class="profileShowcaseSection campaign">
         <div class="profileShowcaseTitle"><div><small>PROGRESO</small><h3>Campa\u00f1a</h3></div><button type="button" data-profile-action="allWorlds">Ver todos los mundos ${iconHtml('iconChevron')}</button></div>
+        <div class="profileCampaignMetrics" aria-label="Resumen de Campa\u00f1a"><span>Progreso <b>${summary.percent}%</b></span><span>Mundos <b>${summary.completedWorlds}/${summary.totalWorlds}</b></span><span>Niveles <b>${summary.done}/${summary.total}</b></span></div>
         <div class="profileFeaturedWorlds">${worlds.slice(0,3).map(world => worldShowcaseCard(world)).join('')}</div>
       </section>
       <section class="profileShowcaseSection marks">
@@ -218,17 +216,13 @@
         <div class="profileMarkGrid">${mainMarkCard('fastest','Rapidez','gameSpeed')}${mainMarkCard('surface','Superficie','gameSurface')}</div>
         <button class="profileRecordsLink" data-profile-action="worldRecords" type="button">${iconHtml('iconGoal')}<span>Ver todos los r\u00e9cords</span>${iconHtml('iconChevron')}</button>
       </section>
-      <section class="profileShowcaseSection stats">
-        <div class="profileShowcaseTitle"><div><small>RESUMEN</small><h3>Estad\u00edsticas personales</h3></div></div>
-        <div class="profileRealStats"><div><span>Niveles</span><b>${summary.done}</b><small>completados</small></div><div><span>Marcas GOL</span><b>${registeredGoalMarks()}/5</b><small>registradas</small></div><div><span>Superficie</span><b>${overallBestSurface()}</b><small>mejor marca</small></div></div>
-      </section>
     </div>`;
   }
   function secondaryShell(title, body, kicker='DETALLE'){
     return `<div class="profileSubView"><div class="profileSubHead"><button class="profileBackBtn" data-profile-action="main" type="button" aria-label="Volver">${iconHtml('iconBack')}</button><div><small>${esc(kicker)}</small><h3>${esc(title)}</h3></div></div><div class="profileSubBody">${body}</div></div>`;
   }
-  function profileLayer(content, label){
-    return `<div class="profileLayerOverlay" data-profile-action="main"><div class="profileLayerPanel" role="dialog" aria-modal="true" aria-label="${esc(label || 'Detalle de perfil')}" tabindex="-1">${content}</div></div>`;
+  function profileLayer(content, label, variant){
+    return `<div class="profileLayerOverlay" data-profile-action="main"><div class="profileLayerPanel profileLayer-${esc(variant || 'detail')}" role="dialog" aria-modal="true" aria-label="${esc(label || 'Detalle de perfil')}" tabindex="-1">${content}</div></div>`;
   }
   function renderAllWorlds(){
     return secondaryShell('Todos los mundos', `<div class="profileAllWorldsGrid">${campaignWorlds().map(world => worldShowcaseCard(world, true)).join('')}</div>`, 'CAMPA\u00d1A');
@@ -330,7 +324,8 @@
       else if(currentView.type === 'world'){ title = `Mundo ${currentView.world}`; content = renderWorld(currentView.world); }
       else if(currentView.type === 'goal'){ title = currentView.kind === 'fastest' ? 'Rapidez' : (currentView.kind === 'goals' ? 'Goles' : 'Superficie'); content = renderGoal(currentView.kind); }
       else if(currentView.type === 'worldRecords'){ title = 'R\u00e9cords globales'; content = renderWorldRecords(); }
-      box.innerHTML = renderMain() + profileLayer(content, title);
+      const variant = currentView.type === 'goal' ? `goal-${currentView.kind}` : currentView.type;
+      box.innerHTML = renderMain() + profileLayer(content, title, variant);
     }
     bindProfileActions();
     const panel = box.querySelector('.profileLayerPanel');
@@ -340,8 +335,10 @@
     if(!returnAction) return;
     const action = returnAction;
     returnAction = '';
-    const target = Array.from(document.querySelectorAll('[data-profile-action]')).find(node => node.dataset.profileAction === action);
-    if(target) try { target.focus({preventScroll:true}); } catch { target.focus(); }
+    window.setTimeout(() => {
+      const target = Array.from(document.querySelectorAll('[data-profile-action]')).find(node => node.dataset.profileAction === action);
+      if(target) try { target.focus({preventScroll:true}); } catch { target.focus(); }
+    }, 40);
   }
   function bindProfileActions(){
     document.querySelectorAll('.profileLayerPanel').forEach(panel => { panel.onclick = ev => ev.stopPropagation(); });
