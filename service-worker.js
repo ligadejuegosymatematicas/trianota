@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trianota-pwa-v20.04.4-world-navigation';
+const CACHE_NAME = 'trianota-pwa-v20.04.5-mobile-asset-cache-and-modal-tab-fix';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -42,16 +42,16 @@ const LOCAL_ASSETS = [
   './assets/worlds/topology.png',
   './assets/worlds/combos.png',
   './assets/worlds/mastery.png',
-  './assets/worlds/logos/world-01-logo.webp',
-  './assets/worlds/logos/world-02-logo.webp',
-  './assets/worlds/logos/world-03-logo.webp',
-  './assets/worlds/logos/world-04-logo.webp',
-  './assets/worlds/logos/world-05-logo.webp',
-  './assets/worlds/logos/world-06-logo.webp',
-  './assets/worlds/logos/world-07-logo.webp',
-  './assets/worlds/logos/world-08-logo.webp',
-  './assets/worlds/logos/world-09-logo.webp',
-  './assets/worlds/logos/world-10-logo.webp',
+  './assets/worlds/logos/world-01-logo-v2.webp',
+  './assets/worlds/logos/world-02-logo-v2.webp',
+  './assets/worlds/logos/world-03-logo-v2.webp',
+  './assets/worlds/logos/world-04-logo-v2.webp',
+  './assets/worlds/logos/world-05-logo-v2.webp',
+  './assets/worlds/logos/world-06-logo-v2.webp',
+  './assets/worlds/logos/world-07-logo-v2.webp',
+  './assets/worlds/logos/world-08-logo-v2.webp',
+  './assets/worlds/logos/world-09-logo-v2.webp',
+  './assets/worlds/logos/world-10-logo-v2.webp',
   './js/version.js',
   './js/assets.js',
   './js/audio.js',
@@ -123,5 +123,4 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(freshAsset ? networkFirst(event.request) : cacheFirst(event.request));
 });
-
 

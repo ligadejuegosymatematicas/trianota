@@ -31,16 +31,26 @@
   let snapTimer = 0;
   let suppressClickUntil = 0;
   let applyingHistory = false;
-  let historySerial = 0;
+  let lastPointerTabActivation = {button:null, time:0};
 
   function el(id){ return document.getElementById(id); }
   function currentScreenId(){
     return (window.state && window.state.screen) || document.querySelector('.screen.active')?.id || 'home';
   }
+  function internalHistoryState(){
+    const value = history.state;
+    return value && value[HISTORY_KEY] ? value : null;
+  }
+  function historyDepth(){
+    const value = internalHistoryState();
+    if(!value) return 0;
+    if(Number.isFinite(+value.depth)) return Math.max(0, +value.depth);
+    return Math.max(0, (+value.serial || 1) - 1);
+  }
   function historyState(overrides={}){
     return Object.assign({
       [HISTORY_KEY]:true,
-      serial:++historySerial,
+      depth:historyDepth(),
       tab:activeTab,
       screen:currentScreenId(),
       layer:null,
@@ -49,15 +59,14 @@
   }
   function pushHistory(overrides={}){
     if(applyingHistory) return;
-    try { history.pushState(historyState(overrides), ''); } catch(e) {}
+    try { history.pushState(historyState(Object.assign({depth:historyDepth() + 1}, overrides)), ''); } catch(e) {}
   }
   function replaceHistory(overrides={}){
     if(applyingHistory) return;
     try { history.replaceState(historyState(overrides), ''); } catch(e) {}
   }
   function currentLayer(){
-    const value = history.state;
-    return value && value[HISTORY_KEY] ? value.layer : null;
+    return internalHistoryState()?.layer || null;
   }
   function tabButton(tab){ return el(TABS[tab]); }
   function panelFor(tab){
@@ -110,11 +119,11 @@
   }
 
   function discardBlockingLayer(){
-    const hadLayer = hasBlockingLayer() || !!currentLayer();
-    if(!hadLayer) return false;
+    const tracked = !!currentLayer();
+    const hadLayer = hasBlockingLayer() || tracked;
+    if(!hadLayer) return {hadLayer:false, tracked:false};
     closeBlockingLayersDirect();
-    replaceHistory({tab:activeTab, screen:activeTab === 'settings' ? 'config' : 'home', layer:null, payload:null});
-    return true;
+    return {hadLayer:true, tracked};
   }
 
   function currentSurface(){
@@ -225,9 +234,13 @@
 
   function switchTab(tab, opts={}){
     if(!TABS[tab] || gesture || snapState) return;
-    const dismissedLayer = discardBlockingLayer();
+    const dismissed = discardBlockingLayer();
     if(activeTab === tab){
-      if(dismissedLayer) performTabAction(tab);
+      if(dismissed.tracked){
+        history.back();
+      }else if(dismissed.hadLayer){
+        performTabAction(tab);
+      }
       return;
     }
     if(pendingFrame) cancelAnimationFrame(pendingFrame);
@@ -245,7 +258,11 @@
       setNavVisible(true);
       setActive(tab);
       animateSurface(tab);
-      if(!opts.fromHistory) pushHistory({tab, screen:tab === 'settings' ? 'config' : 'home', layer:null, payload:null});
+      if(!opts.fromHistory){
+        const nextState = {tab, screen:tab === 'settings' ? 'config' : 'home', layer:null, payload:null};
+        if(dismissed.tracked) replaceHistory(nextState);
+        else pushHistory(nextState);
+      }
     });
   }
 
@@ -254,12 +271,35 @@
   function goSettings(){ switchTab('settings'); }
 
   function bindTabs(){
-    const home = el('tabHomeBtn');
-    const profile = el('tabProfileBtn');
-    const settings = el('tabSettingsBtn');
-    if(home) home.onclick = goHome;
-    if(profile) profile.onclick = goProfile;
-    if(settings) settings.onclick = goSettings;
+    const bindTab = (button, action) => {
+      if(!button || button.dataset.pointerTabBound === 'true') return;
+      button.dataset.pointerTabBound = 'true';
+      let press = null;
+      button.addEventListener('pointerdown', ev => {
+        if(!ev.isPrimary || (ev.pointerType === 'mouse' && ev.button !== 0)) return;
+        press = {id:ev.pointerId, x:ev.clientX, y:ev.clientY};
+      }, {passive:true});
+      button.addEventListener('pointercancel', () => { press = null; }, {passive:true});
+      button.addEventListener('pointerup', ev => {
+        if(!press || press.id !== ev.pointerId) return;
+        const distance = Math.hypot(ev.clientX - press.x, ev.clientY - press.y);
+        press = null;
+        if(distance > 12) return;
+        lastPointerTabActivation = {button, time:performance.now()};
+        ev.preventDefault();
+        action();
+      });
+      button.addEventListener('click', ev => {
+        if(lastPointerTabActivation.button === button && performance.now() - lastPointerTabActivation.time < 500){
+          ev.preventDefault();
+          return;
+        }
+        action();
+      });
+    };
+    bindTab(el('tabHomeBtn'), goHome);
+    bindTab(el('tabProfileBtn'), goProfile);
+    bindTab(el('tabSettingsBtn'), goSettings);
   }
 
   function bindSettingsAbout(){
@@ -550,7 +590,10 @@
   function layerOpened(layer, payload=null){
     if(!layer || applyingHistory || switchingTab) return;
     const current = history.state;
-    if(current && current[HISTORY_KEY] && current.layer === layer) return;
+    if(current && current[HISTORY_KEY] && current.layer === layer){
+      replaceHistory({tab:activeTab, screen:currentScreenId(), layer, payload});
+      return;
+    }
     pushHistory({tab:activeTab, screen:currentScreenId(), layer, payload});
   }
 
@@ -592,16 +635,16 @@
         setNavVisible(true);
         setActive(tab);
       }
+      if(navState.layer) restoreLayer(navState);
     }finally{
       switchingTab = false;
       applyingHistory = false;
     }
-    if(navState.layer) restoreLayer(navState);
   }
 
   function goBack(fallback='home'){
     const current = history.state;
-    if(current && current[HISTORY_KEY] && current.serial > 1){
+    if(current && current[HISTORY_KEY] && historyDepth() > 0){
       history.back();
       return;
     }
@@ -612,9 +655,16 @@
   }
 
   function bindHistory(){
-    const existing = history.state;
-    historySerial = existing && existing[HISTORY_KEY] ? (+existing.serial || 0) : 0;
-    replaceHistory({tab:'home', screen:'home', layer:null, payload:null});
+    try{
+      history.replaceState({
+        [HISTORY_KEY]:true,
+        depth:0,
+        tab:'home',
+        screen:'home',
+        layer:null,
+        payload:null
+      }, '');
+    }catch(e){}
     window.addEventListener('popstate', ev => applyHistoryState(ev.state));
   }
 

@@ -77,6 +77,45 @@ function selectMetaWorld(index){
   renderMetaWorlds();
 }
 
+function bindMetaWorldSlider(slider, onPreview){
+  if(!slider) return;
+  let pointerId = null;
+  const previewAt = clientX => {
+    const rect = slider.getBoundingClientRect();
+    if(!rect.width) return;
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    slider.value = String(Math.round(ratio * (CAMPAIGN_LEVELS.length - 1)));
+    onPreview();
+  };
+  slider.addEventListener('pointerdown', ev => {
+    if(ev.pointerType === 'mouse' && ev.button !== 0) return;
+    pointerId = ev.pointerId;
+    slider.focus({preventScroll:true});
+    previewAt(ev.clientX);
+    try { slider.setPointerCapture(ev.pointerId); } catch(e) {}
+    ev.preventDefault();
+  }, {passive:false});
+  slider.addEventListener('pointermove', ev => {
+    if(pointerId !== ev.pointerId) return;
+    previewAt(ev.clientX);
+    ev.preventDefault();
+  }, {passive:false});
+  slider.addEventListener('pointerup', ev => {
+    if(pointerId !== ev.pointerId) return;
+    previewAt(ev.clientX);
+    pointerId = null;
+    try { slider.releasePointerCapture(ev.pointerId); } catch(e) {}
+    ev.preventDefault();
+    selectMetaWorld(+slider.value);
+  }, {passive:false});
+  slider.addEventListener('pointercancel', ev => {
+    if(pointerId !== ev.pointerId) return;
+    pointerId = null;
+    slider.value = String(state.metaWorldIndex);
+    onPreview();
+  }, {passive:true});
+}
+
 function bindMetaWorldSwipe(panel){
   if(!panel) return;
   let drag = null;
@@ -85,7 +124,7 @@ function bindMetaWorldSwipe(panel){
   panel.addEventListener('pointerdown', ev => {
     if(ev.pointerType === 'mouse' && ev.button !== 0) return;
     if(ev.target.closest(excluded)) return;
-    drag = {id:ev.pointerId, x:ev.clientX, y:ev.clientY, lastX:ev.clientX, lastT:ev.timeStamp, axis:'pending'};
+    drag = {id:ev.pointerId, x:ev.clientX, y:ev.clientY, axis:'pending', samples:[{x:ev.clientX,t:ev.timeStamp}]};
   }, {passive:true});
   panel.addEventListener('pointermove', ev => {
     if(!drag || ev.pointerId !== drag.id) return;
@@ -101,8 +140,8 @@ function bindMetaWorldSwipe(panel){
     }
     if(drag.axis !== 'horizontal') return;
     ev.preventDefault();
-    drag.lastX = ev.clientX;
-    drag.lastT = ev.timeStamp;
+    drag.samples.push({x:ev.clientX,t:ev.timeStamp});
+    while(drag.samples.length > 2 && ev.timeStamp - drag.samples[0].t > 130) drag.samples.shift();
     const limit = panel.clientWidth * .34;
     const offset = Math.max(-limit, Math.min(limit, dx));
     panel.style.setProperty('--meta-world-drag-x', `${offset}px`);
@@ -114,9 +153,12 @@ function bindMetaWorldSwipe(panel){
     if(current.axis !== 'horizontal') return;
     ev.preventDefault();
     const dx = ev.clientX - current.x;
-    const dt = Math.max(1, ev.timeStamp - current.lastT);
-    const velocity = Math.abs(ev.clientX - current.lastX) / dt;
-    const commit = Math.abs(dx) >= Math.min(72, panel.clientWidth * .20) || (Math.abs(dx) >= 34 && velocity >= .42);
+    current.samples.push({x:ev.clientX,t:ev.timeStamp});
+    const first = current.samples[0];
+    const last = current.samples[current.samples.length - 1];
+    const velocity = (last.x - first.x) / Math.max(1, last.t - first.t);
+    const alignedVelocity = Math.sign(velocity) === Math.sign(dx) ? Math.abs(velocity) : 0;
+    const commit = Math.abs(dx) >= Math.min(72, panel.clientWidth * .20) || (Math.abs(dx) >= 34 && alignedVelocity >= .42);
     const direction = dx < 0 ? 1 : -1;
     const target = state.metaWorldIndex + direction;
     panel.classList.remove('metaWorldDragging');
@@ -213,13 +255,15 @@ function renderMetaWorlds(){
   if(next) next.onclick=()=>selectMetaWorld(state.metaWorldIndex+1);
   const slider=$('metaWorldSlider');
   if(slider){
-    slider.oninput=()=>{
+    const updateSliderPreview=()=>{
       const dot=box.querySelector('.pageTrackDot');
       if(dot) dot.style.left=`${CAMPAIGN_LEVELS.length>1 ? (+slider.value/(CAMPAIGN_LEVELS.length-1))*100 : 0}%`;
       const preview=CAMPAIGN_LEVELS[+slider.value];
       slider.setAttribute('aria-valuetext', preview ? `${preview.title}: ${preview.name}` : '');
     };
+    slider.oninput=updateSliderPreview;
     slider.onchange=()=>selectMetaWorld(+slider.value);
+    bindMetaWorldSlider(slider, updateSliderPreview);
   }
   bindMetaWorldSwipe(box.querySelector('.worldPanel'));
   document.querySelectorAll('[data-meta-level]').forEach(b=>{
