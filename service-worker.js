@@ -1,11 +1,11 @@
-const CACHE_NAME = 'trianota-pwa-v20.04.5-mobile-asset-cache-and-modal-tab-fix';
+const CACHE_NAME = 'trianota-pwa-v20.04.6-logo-transparency-and-profile-swipe';
 const LOCAL_ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './VERSION.txt',
   './css/styles.css',
-  './assets/trianota_logo.png',
+  './assets/trianota-logo-v2.png',
   './assets/icons/apple-touch-icon.png',
   './assets/icons/favicon.png',
   './assets/icons/icon-192.png',
@@ -123,4 +123,3 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(freshAsset ? networkFirst(event.request) : cacheFirst(event.request));
 });
-

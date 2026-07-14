@@ -4040,3 +4040,34 @@ body:has(#profileModal.show .profileLayerOverlay) .appTabBar{cursor:default;}
 @media (prefers-reduced-motion:reduce){
   .worldPanel{transition-duration:70ms;}
 }
+
+/* v20.04.6: logo transparente y continuidad gestual del Perfil */
+.brandLogo{
+  mix-blend-mode:normal;
+}
+#aboutModal .aboutIdentity img{
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  filter:drop-shadow(0 8px 14px rgba(0,0,0,.28));
+}
+body:not(.appNavHidden) #profileModal #profileContent,
+body:not(.appNavHidden) #profileModal .profileShowcaseView,
+body:not(.appNavHidden) #profileModal .profileShowcaseSection,
+body:not(.appNavHidden) #profileModal .profileRecordsLink{
+  touch-action:pan-y;
+}
+.profileRecordsLink{
+  min-height:58px;
+  padding-block:8px;
+}
+.profileRecordsLink::before{
+  background-position:center 54%;
+}
+@media (max-height:720px){
+  .profileRecordsLink{
+    min-height:52px;
+    margin-top:7px;
+    padding-block:6px;
+  }
+}
